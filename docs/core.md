@@ -17,13 +17,6 @@ three.renderer;   // Three renderer
 three.plugins;    // Collection of active plugins
 ````
 
-* Global Events
-
-```javascript
-// Fires once after all plugins have been installed
-three.on('ready', function (event, three) { });
-```
-
 * Event listeners
 
 ```javascript
@@ -31,12 +24,17 @@ three.on('ready', function (event, three) { });
 three.on('event', function (event, three) { });
 ```
 
+```javascript
 // Bind threestrap 'event' events to object.event(event, three)
 three.bind('event', object);
+```
 
+```javascript
 // Bind threestrap 'event' events to object.method(event, three)
 three.bind('event:method', object);
+```
 
+```javascript
 // Bind target's 'event' events to object.method(event, three)
 // where target is one of:
 // - three: threestrap context
@@ -45,13 +43,24 @@ three.bind('event:method', object);
 // - canvas: the canvas
 // - window: window object
 three.bind('target.event:method', object);
+```
 
+```javascript
 // Bind target's 'event' events to object.method(event, three)
 // where target is any object with on / off / addEventListener / removeEventListener methods.
 three.bind('target.event:method', object);
+```
 
+```javascript
 // Trigger a threestrap event.
 three.trigger({ type: 'event', /* ... */ });
+```
+
+* Global Events
+
+```javascript
+// Fires once after all plugins have been installed
+three.on('ready', function (event, three) { });
 ```
 
 size
