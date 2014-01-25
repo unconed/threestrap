@@ -249,7 +249,7 @@ describe("three", function () {
       plugins: ['foo', 'bar'],
       plugindb: { mock1: mock1, mock2: mock2, mock3: mock3, mock4: mock4 },
       aliasdb: {
-        foo: ['mock1'],
+        foo: 'mock1',
         bar: ['mock2', 'baz'],
         baz: ['mock3', 'mock4'],
       },
@@ -282,4 +282,47 @@ describe("three", function () {
     expect(caught).toBe(true);
   });
 
+  it("expands custom aliases", function () {
+
+    var installed = [0, 0, 0, 0];
+    var spec = function (key) {
+      return {
+        install: function () { installed[key]++; },
+        uninstall: function () {},
+        bind: function () {},
+        unbind: function () {},
+      };
+    }
+
+    var mock1 = function () {};
+    var mock2 = function () {};
+    var mock3 = function () {};
+    var mock4 = function () {};
+
+    mock1.prototype = spec(0);
+    mock2.prototype = spec(1);
+    mock3.prototype = spec(2);
+    mock4.prototype = spec(3);
+
+    var options = {
+      plugins: ['foo', 'bar'],
+      plugindb: { mock1: mock1, mock2: mock2, mock3: mock3, mock4: mock4 },
+      aliases: {
+        foo: 'mock1',
+        baz: ['mock3', 'mock4'],
+      },
+      aliasdb: {
+        bar: ['mock2', 'baz'],
+      },
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(installed[0]).toEqual(1);
+    expect(installed[1]).toEqual(1);
+    expect(installed[2]).toEqual(1);
+    expect(installed[3]).toEqual(1);
+
+    three.destroy();
+  });
 });

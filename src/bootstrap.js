@@ -5,6 +5,7 @@ THREE.Bootstrap = function (options) {
     init: true,
     element: document.body,
     plugins: ['core'],
+    aliases: {},
     klass: THREE.WebGLRenderer,
     parameters: {
       depth: true,
@@ -39,17 +40,24 @@ THREE.Bootstrap.prototype = {
         plugindb = options.plugindb,
         aliasdb = options.aliasdb,
         element = options.element,
-        renderer, plugins;
+        renderer, plugins, aliases;
 
     // Resolve plugins
+    aliases = _.extend({}, options.aliasdb, options.aliases);
+    _.each(aliases, function (alias, key) {
+      if (!_.isArray(alias)) aliases[key] = [alias];
+    });
+    plugins = resolve(options.plugins);
+
     function resolve(list) {
       var limit = 1024;
       while (limit-- > 0) {
         var replaced = false;
         var out = [];
         _.each(list, function (item) {
-          if (aliasdb[item]) {
-            out = out.concat(aliasdb[item]);
+          var alias;
+          if (alias = aliases[item]) {
+            out = out.concat(alias);
             replaced = true;
           }
           else out.push(item);
@@ -59,7 +67,6 @@ THREE.Bootstrap.prototype = {
       }
       throw 'Plug-in alias recursion detected';
     }
-    plugins = resolve(options.plugins);
 
     // Instantiate Three renderer
     renderer = this.renderer = new options.klass(options.parameters);

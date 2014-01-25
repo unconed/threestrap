@@ -61,6 +61,9 @@ var three = THREE.Bootstrap({
   plugins: [                     // Active plugins
     'core',                      // Use all core plugins
   ],                             
+  aliases: {
+    // 'render': 'myRender',     // Ad-hoc overrides
+  },
 
   klass: THREE.WebGLRenderer,    // Renderer class
   parameters: {                  // Parameters passed to Three.js renderer
