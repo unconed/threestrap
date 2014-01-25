@@ -7,7 +7,7 @@ describe("plugin", function () {
       uninstall: function () {},
     };
 
-    expect(THREE.Bootstrap.Plugins.mock).toBeFalsy();
+    expect(THREE.Bootstrap.Plugins.mockp1).toBeFalsy();
 
     THREE.Bootstrap.registerPlugin('mockp1', spec);
 
@@ -15,7 +15,7 @@ describe("plugin", function () {
 
     THREE.Bootstrap.unregisterPlugin('mockp1', spec);
 
-    expect(THREE.Bootstrap.Plugins.mock).toBeFalsy();
+    expect(THREE.Bootstrap.Plugins.mockp1).toBeFalsy();
   });
 
   it("sets defaults", function () {
