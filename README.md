@@ -122,8 +122,8 @@ three.addEventListener('update', function (event) {
 Docs
 ---
 
-* [Core reference](#docs/core.md)
-* [Write custom plugins](#docs/custom.md)
+* [Core reference](https://github.com/unconed/threestrap/blob/master/docs/core.md)
+* [Write custom plugins](https://github.com/unconed/threestrap/blob/master/docs/custom.md)
 
 * * *
 
