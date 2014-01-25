@@ -4,7 +4,7 @@
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unconed/threestrap.git",
+    "url": "https://github.com/unconed/threestrap.git"
   },
   "main": "build/threestrap.js",
   "dependencies": {
