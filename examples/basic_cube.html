@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Threestrap - Basic Cube</title>
+  <script type="text/javascript" src="../vendor/three.js"></script>
+  <script type="text/javascript" src="../build/threestrap.js"></script>
+</head>
+<body>
+  <script>
+
+    // Bootstrap core + stats plugin
+    var three = THREE.Bootstrap({
+      plugins: ['core', 'stats'],
+    });
+
+    // Insert a cube
+    var mesh = new THREE.Mesh(new THREE.CubeGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
+    three.scene.add(mesh);
+
+    // Orbit the camera
+    three.addEventListener('update', function () {
+      var t = three.Time.now;
+      three.camera.position.set(Math.cos(t), .5, Math.sin(t));
+      three.camera.lookAt(new THREE.Vector3());
+    });
+
+  </script>
+</body>
+</html>
