@@ -36,11 +36,11 @@ describe("time", function () {
     var fps = 60;
     var delta = 1/fps;
 
-    three.dispatchEvent({ type: 'pre' });
+    three.trigger({ type: 'pre' });
 
     for (var i = 0; i < 5; ++i) {
       stall(three.Time.now * 1000, delta * 1000);
-      three.dispatchEvent({ type: 'pre' });
+      three.trigger({ type: 'pre' });
     }
 
     expect(three.Time.now).toBeGreaterThan(0);

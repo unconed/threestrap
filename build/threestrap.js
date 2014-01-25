@@ -7304,7 +7304,7 @@ THREE.Bootstrap.registerPlugin('loop', {
 });
 THREE.Bootstrap.registerPlugin('time', {
 
-  listen: ['pre:tick', 'post:tick'],
+  listen: ['pre:tick'],
 
   install: function (three) {
 
