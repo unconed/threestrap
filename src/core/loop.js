@@ -19,8 +19,6 @@ THREE.Bootstrap.registerPlugin('loop', {
       running: false,
     });
 
-    three.start = three.Loop.start;
-    three.stop  = three.Loop.stop;
   },
 
   uninstall: function (three, renderer, element) {

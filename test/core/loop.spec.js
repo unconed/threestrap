@@ -14,9 +14,6 @@ describe("loop", function () {
     expect(three.Loop.start.call).toBeTruthy();
     expect(three.Loop.stop.call).toBeTruthy();
 
-    expect(three.start.call).toBeTruthy();
-    expect(three.stop.call).toBeTruthy();
-
     three.destroy();
 
   });
