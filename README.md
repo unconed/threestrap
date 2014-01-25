@@ -114,13 +114,13 @@ Threestrap plugins broadcast events to each other, like `resize` or `render`.
 
 You can listen for events with `.on()` and unset them with `.off()`.
 
-```
+```javascript
 three.on('event', function (event, three) {
   
 });
 ```
 
-```
+```javascript
 var handler = function () {};
 three.on('event', handler);
 three.off('event', handler);
