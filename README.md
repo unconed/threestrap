@@ -90,7 +90,7 @@ Plug-in specific options are grouped under the plug-in's name:
 
 ```javascript
 var three = THREE.Bootstrap({
-  plugins: ['size', 'loop', 'scene', 'camera', 'render'],
+  plugins: ['core', 'stats'],
   size: {
     width: 1280,
     height: 720,
