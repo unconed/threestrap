@@ -33,7 +33,7 @@ THREE.Bootstrap.registerPlugin('magic', {
 
     });
 
-    // Listen for changes from three.PluginName.set({...})
+    // Listen for changes from three.Magic.set({...})
     this.addEventListener('change', function () {
       // this.options reflects the new state, i.e.:
       // this.options.foo == 'bar'
