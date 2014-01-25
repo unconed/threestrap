@@ -46,7 +46,7 @@ three.on('update', function () {
 Configuration
 ---
 
-Threestrap is made out of plugins that each do one thing. The basic set up of `bind`, `renderer`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render` gets you a fully functional canvas in the page.
+Threestrap is made out of plugins that each do one thing. The basic set up of `renderer`, `bind`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render` gets you a fully functional canvas in the page.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
