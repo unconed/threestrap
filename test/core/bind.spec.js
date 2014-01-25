@@ -40,6 +40,9 @@ describe("bind", function () {
 
     var three = new THREE.Bootstrap(options);
 
+    expect(three.bind).toBeTruthy();
+    expect(three.unbind).toBeTruthy();
+
     three.plugins.mockb.trigger({ type: 'foo' });
     object.trigger({ type: 'wtf' });
 
@@ -48,6 +51,9 @@ describe("bind", function () {
     expect(wtf).toBe(true);
 
     three.destroy();
+
+    expect(three.bind).toBeFalsy();
+    expect(three.unbind).toBeFalsy();
 
     THREE.Bootstrap.unregisterPlugin('mockb', spec);
 

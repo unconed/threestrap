@@ -356,6 +356,9 @@ THREE.Bootstrap.registerPlugin('bind', {
 
   uninstall: function (three) {
     three.unbind(this);
+
+    delete three.bind;
+    delete three.unbind;
   },
 
   bind: function (event, three) {
