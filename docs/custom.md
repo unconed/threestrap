@@ -55,15 +55,17 @@ THREE.Bootstrap.registerPlugin('magic', {
     // three.on(...);
 
     // Make a public API (includes .set() / .get())
+    // Calling `$.api({...}, three)` will pass `three` as the final argument to all API methods.
     three.Magic = this.api({
 
-      // three.Magic.ping()
-      ping: function () {
-        // Trigger own events
-        three.trigger({ type: 'magic', ping: true });
-      }.bind(this),
+        // three.Magic.ping()
+        ping: function (three) {
+          // Trigger own events
+          three.trigger({ type: 'magic', ping: true });
+        }.bind(this),
 
-    });
+      },
+      three);
 
     // Expose values globally (discouraged)
     three.magic = 1;

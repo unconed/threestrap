@@ -97,7 +97,7 @@ THREE.Bootstrap.prototype = {
     this.trigger({ type: 'destroy' });
 
     // Uninstall plugins
-    _.each(this.__installed.reverse(), function (plugin) {
+    _.eachRight(this.__installed, function (plugin) {
       // Uninstall
       plugin.uninstall(this);
 

@@ -37,8 +37,15 @@ THREE.Bootstrap.Plugin.prototype = {
     return this.options;
   },
 
-  api: function (object) {
+  api: function (object, context) {
     object = object || {};
+
+    context && _.each(object, function (callback, key, object) {
+      if (_.isFunction(callback)) {
+        object[key] = _.partialRight(callback, context);
+      }
+    })
+
     object.set = this.set.bind(this);
     object.get = this.get.bind(this);
     return object;
