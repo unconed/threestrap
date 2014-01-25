@@ -1,3 +1,4 @@
+* $.api({...}, three) now auto-passes `three` as argument to API methods.
 * Move `bind` and `renderer` into their own plugins
 * Make bind mechanism reusable as `THREE.Binder`
 * Ad-hoc aliases to override plug-ins on init
