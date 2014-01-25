@@ -1,3 +1,4 @@
+* Ad-hoc aliases to override plug-ins on init
 * Diff changes made with api.set(), fire 'change' only on change.
 
 0.0.2
