@@ -36,7 +36,7 @@ var mesh = new THREE.Mesh(new THREE.CubeGeometry(.5, .5, .5), new THREE.MeshNorm
 three.scene.add(mesh);
 
 // Orbit the camera
-three.addEventListener('update', function () {
+three.on('update', function () {
   var t = three.Time.now;
   three.camera.position.set(Math.cos(t), .5, Math.sin(t));
   three.camera.lookAt(new THREE.Vector3());
