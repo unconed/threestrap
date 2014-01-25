@@ -330,7 +330,6 @@ THREE.Bootstrap.registerPlugin('renderer', {
   uninstall: function (three) {
     // Remove from DOM
     three.element.removeChild(three.renderer.domElement);
-    three.renderer = null;
 
     delete three.renderer;
     delete three.canvas;
