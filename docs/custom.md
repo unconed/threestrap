@@ -22,7 +22,12 @@ Events
 * use `three.on()/.off()/.bind()` for manual binding
 * method bindings are automatically unset when the context is destroyed
 
-Example
+Examples
+---
+
+See `src/extra/` for example plug-ins.
+
+Scaffold
 ---
 
 ```javascript
