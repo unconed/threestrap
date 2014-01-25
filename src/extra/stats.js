@@ -1,6 +1,8 @@
 THREE.Bootstrap.registerPlugin('stats', {
 
-  install: function (three, renderer, element) {
+  listen: ['pre', 'post'],
+
+  install: function (three) {
 
     var stats = this.stats = new THREE.Stats();
     var style = stats.domElement.style;
@@ -8,20 +10,22 @@ THREE.Bootstrap.registerPlugin('stats', {
     this.begin = stats.begin.bind(stats);
     this.end = stats.end.bind(stats);
 
-    three.addEventListener('pre', this.begin);
-    three.addEventListener('post', this.end);
-
     style.position = 'absolute';
     style.top = style.left = 0;
     document.body.appendChild(stats.domElement);
   },
 
-  uninstall: function (three, renderer, element) {
-
-    three.removeEventListener('pre', this.begin);
-    three.removeEventListener('post', this.end);
-
+  uninstall: function (three) {
     document.body.removeChild(this.stats.domElement);
   },
+
+  pre: function (event, three) {
+    this.stats.begin();
+  },
+
+  post: function (event, three) {
+    this.stats.end();
+  },
+
 
 });

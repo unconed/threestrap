@@ -1,6 +1,13 @@
 Threestrap - Core Reference
 ===
 
+* Initialization
+
+```javascript
+three.init()             // Initialize threestrap instance
+three.destroy()          // Destroy threestrap instance
+```
+
 * Global properties
 
 ```javascript
@@ -14,7 +21,37 @@ three.plugins;    // Collection of active plugins
 
 ```javascript
 // Fires once after all plugins have been installed
-three.addEventListener('ready', function () { });
+three.on('ready', function (event, three) { });
+```
+
+* Event listeners
+
+```javascript
+// Listen for three.event events
+three.on('event', function (event, three) { });
+```
+
+// Bind threestrap 'event' events to object.event(event, three)
+three.bind('event', object);
+
+// Bind threestrap 'event' events to object.method(event, three)
+three.bind('event:method', object);
+
+// Bind target's 'event' events to object.method(event, three)
+// where target is one of:
+// - three: threestrap context
+// - this: the object itself
+// - element: the containing element
+// - canvas: the canvas
+// - window: window object
+three.bind('target.event:method', object);
+
+// Bind target's 'event' events to object.method(event, three)
+// where target is any object with on / off / addEventListener / removeEventListener methods.
+three.bind('target.event:method', object);
+
+// Trigger a threestrap event.
+three.trigger({ type: 'event', /* ... */ });
 ```
 
 size
@@ -52,7 +89,7 @@ three.Size.viewHeight;    // Height of canvas on page
 
 ```javascript
 // Canvas was resized to new dimensions.
-three.addEventListener('resize', function (event) {
+three.on('resize', function (event) {
   // event ==
   {
     renderWidth: 100,
@@ -96,22 +133,22 @@ three.Loop.running;   // Is loop running?
 
 ```javascript
 // Loop has been started
-three.addEventListener('start', function () { });
+three.on('start', function () { });
 
 // Loop has been stopped
-three.addEventListener('stop', function () { });
+three.on('stop', function () { });
 
 // Prepare for rendering
-three.addEventListener('pre', function () { });
+three.on('pre', function () { });
 
 // Update state of objects
-three.addEventListener('update', function () { });
+three.on('update', function () { });
 
 // Render objects
-three.addEventListener('render', function () { });
+three.on('render', function () { });
 
 // Finish up after rendering
-three.addEventListener('post', function () { });
+three.on('post', function () { });
 ```
 
 time
@@ -177,7 +214,7 @@ three.camera;          // Global camera
 
 ```javascript
 // Camera was recreated / changed
-three.addEventListener('camera', function (event) {
+three.on('camera', function (event) {
   // event.camera
 }
 ```

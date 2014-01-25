@@ -1,6 +1,6 @@
 {
   "name": "threestrap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
@@ -8,7 +8,7 @@
   },
   "main": "build/threestrap.js",
   "dependencies": {
-    "three": "~0.58.10"
+    "three": ">=0.58.10"
   },
   "devDependencies": {
     "gulp": "~3.4.0",

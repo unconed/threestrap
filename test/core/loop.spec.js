@@ -29,6 +29,17 @@ describe("loop", function () {
 
     var three = new THREE.Bootstrap(options);
 
+    var started = false;
+    var stopped = false;
+
+    three.on('start', function () {
+      started = true;
+    });
+
+    three.on('stop', function () {
+      stopped = true;
+    });
+
     expect(three.Loop.running).toBe(false);
 
     three.Loop.start();
@@ -46,6 +57,9 @@ describe("loop", function () {
     three.Loop.stop();
 
     expect(three.Loop.running).toBe(false);
+
+    expect(started).toBe(true);
+    expect(stopped).toBe(true);
 
     three.destroy();
 
@@ -70,19 +84,19 @@ describe("loop", function () {
 
       three = new THREE.Bootstrap(options);
 
-      three.addEventListener('pre', function () {
+      three.on('pre', function () {
         pre = +new Date();
         stall(pre);
       });
-      three.addEventListener('render', function () {
+      three.on('render', function () {
         render = +new Date();
         stall(render);
       });
-      three.addEventListener('update', function () {
+      three.on('update', function () {
         update = +new Date();
         stall(update);
       });
-      three.addEventListener('post', function () {
+      three.on('post', function () {
         post = +new Date();
       });
 

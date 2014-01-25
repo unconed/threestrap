@@ -39,7 +39,7 @@ describe("size", function () {
     var three = new THREE.Bootstrap(options);
 
     var h;
-    three.addEventListener('resize', h = function (event) {
+    three.on('resize', h = function (event) {
       expect(event.viewWidth).toBe(options.size.width);
       expect(event.viewHeight).toBe(options.size.height);
 
@@ -48,8 +48,6 @@ describe("size", function () {
     });
 
     three.init();
-
-    three.removeEventListener('resize', h);
 
     three.destroy();
   });
@@ -69,7 +67,7 @@ describe("size", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    three.addEventListener('resize', function (event) {
+    three.on('resize', function (event) {
       expect(event.renderWidth).toBe(300);
       expect(event.renderHeight).toBe(200);
     });
@@ -95,7 +93,7 @@ describe("size", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    three.addEventListener('resize', function (event) {
+    three.on('resize', function (event) {
       expect(event.renderWidth).toBe(200);
       expect(event.renderHeight).toBe(300);
     });
@@ -121,7 +119,7 @@ describe("size", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    three.addEventListener('resize', function (event) {
+    three.on('resize', function (event) {
       expect(event.viewWidth).toBe(500);
       expect(event.viewHeight).toBe(400);
 
@@ -149,7 +147,7 @@ describe("size", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    three.addEventListener('resize', function (event) {
+    three.on('resize', function (event) {
       expect(event.viewWidth).toBe(400);
       expect(event.viewHeight).toBe(500);
 
@@ -185,7 +183,7 @@ describe("size", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    three.addEventListener('resize', function (event) {
+    three.on('resize', function (event) {
       expect(event.viewWidth).toBe(500);
       expect(event.viewHeight).toBe(400);
 

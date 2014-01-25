@@ -2,10 +2,7 @@ describe("plugin", function () {
 
   it("registers a plugin", function () {
 
-    var spec = {
-      install: function () {},
-      uninstall: function () {},
-    };
+    var spec = {};
 
     expect(THREE.Bootstrap.Plugins.mockp1).toBeFalsy();
 
@@ -42,14 +39,14 @@ describe("plugin", function () {
       plugins: ['mockp2'],
     };
 
-    var bootstrap = new THREE.Bootstrap(options);
+    var three = new THREE.Bootstrap(options);
 
-    bootstrap.init();
+    three.init();
 
     expect(captured.foo).toBe('baz');
     expect(captured.foos).toBe('bars');
 
-    bootstrap.destroy();
+    three.destroy();
 
     THREE.Bootstrap.unregisterPlugin('mockp2', spec);
 
@@ -78,16 +75,69 @@ describe("plugin", function () {
       plugins: ['mockp3'],
     };
 
-    var bootstrap = new THREE.Bootstrap(options);
+    var three = new THREE.Bootstrap(options);
 
-    bootstrap.init();
+    three.init();
 
     api.set({ foo: 'wtf' });
     expect(captured.foo).toBe('wtf');
 
-    bootstrap.destroy();
+    three.destroy();
 
     THREE.Bootstrap.unregisterPlugin('mockp3', spec);
+
+  });
+
+  it("binds events", function () {
+
+    var ready = false;
+    var foo = false;
+    var wtf = false;
+    var api;
+
+    var object = {};
+    THREE.EventDispatcher.prototype.apply(object);
+
+    var spec = {
+      listen: ['ready', 'this.foo:baz', [object, 'wtf']],
+      ready: function (event, three) {
+        expect(event.type).toBe('ready');
+        expect(three instanceof THREE.Bootstrap).toBe(true);
+        expect(this instanceof THREE.Bootstrap.Plugins.mockp4).toBe(true);
+        ready = true;
+      },
+      baz: function (event, three) {
+        expect(event.type).toBe('foo');
+        expect(three instanceof THREE.Bootstrap).toBe(true);
+        expect(this instanceof THREE.Bootstrap.Plugins.mockp4).toBe(true);
+        foo = true;
+      },
+      wtf: function (event, three) {
+        expect(event.type).toBe('wtf');
+        expect(three instanceof THREE.Bootstrap).toBe(true);
+        expect(this instanceof THREE.Bootstrap.Plugins.mockp4).toBe(true);
+        wtf = true;
+      },
+    };
+
+    THREE.Bootstrap.registerPlugin('mockp4', spec);
+
+    var options = {
+      plugins: ['mockp4'],
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    three.plugins.mockp4.dispatchEvent({ type: 'foo' });
+    object.dispatchEvent({ type: 'wtf' });
+
+    expect(ready).toBe(true);
+    expect(foo).toBe(true);
+    expect(wtf).toBe(true);
+
+    three.destroy();
+
+    THREE.Bootstrap.unregisterPlugin('mockp4', spec);
 
   });
 

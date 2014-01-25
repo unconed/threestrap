@@ -112,12 +112,45 @@ Events
 
 Threestrap plugins broadcast events to each other, like `resize` or `render`.
 
-Use `.addEventListener`, `removeEventListener` to track named events on the threestrap context:
+You can listen for events with `.on()` and unset them with `.off()`.
+
+```
+three.on('event', function (event, three) {
+  
+});
+```
+
+```
+var handler = function () {};
+three.on('event', handler);
+three.off('event', handler);
+```
+
+You can also bind events directly to object methods using `.bind`:
 
 ```javascript
-three.addEventListener('update', function (event) {
-  // ...
-});
+var object = {
+  render: function (event, three) { },
+  yup:    function (event, three) { },
+  redraw: function (event, three) { },
+  resize: function (event, three) { },
+  change: function (event, three) { },
+};
+
+// Bind three.render event to object.render(event, three)
+three.bind('render', object);
+
+// Bind three.ready event to object.yup(event, three);
+three.bind('ready:yup', object);
+
+// Bind object.change event to object.redraw(event, three);
+three.bind('this.change:redraw', object);
+
+// Bind window.resize event to object.resize(event, three);
+three.bind('window.resize:redraw', object);
+
+// Bind DOM element's onchange event to object.resize(event, three);
+three.bind([element, 'change'], object);
 ```
 
 Docs

@@ -22,6 +22,7 @@ var vendor = [
 ];
 
 var core = [
+  'src/dispatch.js',
   'src/bootstrap.js',
   'src/plugin.js',
   'src/aliases.js',
@@ -36,7 +37,9 @@ var core = [
 
 var extra = [
   'vendor/stats.min.js',
+  'vendor/controls/*.js',
   'src/extra/stats.js',
+  'src/extra/controls.js',
 ];
 
 var bundle = vendor.concat(core).concat(extra);
@@ -44,7 +47,7 @@ var bundle = vendor.concat(core).concat(extra);
 var test = [
   'vendor/three.js',
 ].concat(bundle).concat([
-  'test/**/*.spec.js'
+  'test/**/*.spec.js',
 ]);
 
 gulp.task('core', function () {

@@ -1,6 +1,6 @@
 THREE.Bootstrap.registerPlugin('fill', {
 
-  install: function (three, renderer, element) {
+  install: function (three) {
 
     function is(element) {
       var h = element.style.height;
@@ -14,15 +14,15 @@ THREE.Bootstrap.registerPlugin('fill', {
       return element;
     }
 
-    if (element == document.body) {
+    if (three.element == document.body) {
       // Fix body height if we're naked
       this.applied =
-        [ element, document.documentElement ].filter(is).map(set);
+        [ three.element, document.documentElement ].filter(is).map(set);
     }
 
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     if (this.applied) {
       function set(element) {
         element.style.height = '';

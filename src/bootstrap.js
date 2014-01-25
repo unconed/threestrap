@@ -21,6 +21,7 @@ THREE.Bootstrap = function (options) {
 
   this.__inited = false;
   this.__destroyed = false;
+  this.__binds = [];
   this.plugins = {};
 
   if (this.__options.init) {
@@ -37,7 +38,8 @@ THREE.Bootstrap.prototype = {
     var options = this.__options,
         plugindb = options.plugindb,
         aliasdb = options.aliasdb,
-        element = options.element;
+        element = options.element,
+        renderer, plugins;
 
     // Resolve plugins
     function resolve(list) {
@@ -57,10 +59,10 @@ THREE.Bootstrap.prototype = {
       }
       throw 'Plug-in alias recursion detected';
     }
-    var plugins = resolve(options.plugins);
+    plugins = resolve(options.plugins);
 
     // Instantiate Three renderer
-    var renderer = this.renderer = new options.klass(options.parameters);
+    renderer = this.renderer = new options.klass(options.parameters);
     this.canvas = renderer.domElement;
     this.element = element;
 
@@ -71,16 +73,20 @@ THREE.Bootstrap.prototype = {
     _.each(plugins, function (name) {
       var ctor = plugindb[name];
       if (ctor) {
-        if (this.plugins[name]) throw "Duplicate plugin '" + name + "'";
+        if (this.plugins[name]) return;
 
-        var plugin = new ctor(options[name] || {});
+        var plugin = new ctor(options[name] || {}, name);
         this.plugins[name] = plugin;
 
-        _.extend(this, plugin.install(this, renderer, element) || {});
+        // Install
+        _.extend(this, plugin.install(this) || {});
+
+        // Bind events
+        plugin.bind(this);
       }
     }.bind(this));
 
-    this.dispatchEvent({ type: 'ready'});
+    this.trigger({ type: 'ready' });
 
     return this;
   },
@@ -90,32 +96,92 @@ THREE.Bootstrap.prototype = {
     if (this.__destroyed) return;
     this.__destroyed = true;
 
-    var options = this.__options,
-        renderer = this.renderer,
-        element = options.element;
+    var options = this.__options;
 
     // Uninstall plugins
     _.each(this.plugins, function (plugin, i) {
-      plugin.uninstall(this, renderer, element);
+      plugin.uninstall(this);
     }.bind(this));
-
     this.plugins = {};
 
+    // Unbind events
+    this.unbind();
+
     // Remove from DOM
-    element.removeChild(renderer.domElement);
+    this.element.removeChild(this.renderer.domElement);
     this.renderer = null;
+
 
     return this;
   },
 
+  bind: function (key, object) {
+    // Set base target
+    var fallback = this;
+    if (_.isArray(key)) {
+      fallback = key[0];
+      key = key[1];
+    }
+
+    // Match key
+    var match = /^([^.:]*(?:\.[^.:]+)*)?(?:\:(.*))?$/.exec(key);
+    var path = match[1].split(/\./g);
+
+    var name = path.pop();
+    var dest = match[2] || name;
+
+    // Whitelisted objects
+    var target = {
+      '': fallback,
+      'this': object,
+      'three': this,
+      'element': this.element,
+      'canvas': this.canvas,
+      'window': window,
+    }[path.shift()] || fallback;
+
+    // Look up keys
+    while (target && (key = path.shift())) { target = target[key] };
+
+    // Attach event handler at last level
+    if (target && (target.on || target.addEventListener)) {
+      var callback = function (event) {
+        object[dest] && object[dest](event, this);
+      }.bind(this);
+
+      // Polyfill for both styles of event listener adders
+      var added = false;
+      [ 'addEventListener', 'on' ].map(function (key) {
+        if (!added && target[key]) {
+          added = true;
+          target[key](name, callback);
+        }
+      });
+
+      // Store bind for removal later
+      var bind = { target: target, name: name, callback: callback };
+      this.__binds.push(bind);
+    }
+    else {
+      throw "Cannot bind '" + key + "' in " + this.__name;
+    }
+  },
+
+  unbind: function () {
+    this.__binds.forEach(function (bind) {
+
+      // Polyfill for both styles of event listener removers
+      var removed = false;
+      [ 'removeEventListener', 'off' ].map(function (key) {
+        if (!removed && bind.target[key]) {
+          removed = true;
+          bind.target[key](bind.name, bind.callback);
+        }
+      });
+    });
+    this.__binds = [];
+  },
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.Bootstrap.prototype);
+THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.prototype);
 
-THREE.Bootstrap.prototype.onceEventListener = function (method, callback) {
-  var once = function (e) {
-    this.removeEventListener(method, once);
-    callback(e);
-  }.bind(this);
-  this.addEventListener(method, once);
-}

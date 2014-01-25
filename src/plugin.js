@@ -3,18 +3,24 @@ THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = _.defaults(options || {}, this.defaults);
+
+  this.__binds = [];
 }
 
 THREE.Bootstrap.Plugin.prototype = {
 
-  defaults: {
+  listen: [],
+
+  defaults: {},
+
+  install: function (three) {
+
   },
 
-  install: function (three, renderer, element) {
+  uninstall: function (three) {
   },
 
-  uninstall: function (three, renderer, element) {
-  },
+  ////////
 
   set: function (options) {
     _.extend(this.options, options);
@@ -31,13 +37,25 @@ THREE.Bootstrap.Plugin.prototype = {
     object.get = this.get.bind(this);
     return object;
   },
+
+  /////
+
+  bind: function (three) {
+
+    this.listen.forEach(function (key) {
+      three.bind(key, this);
+    }.bind(this));
+
+  },
+
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {
     THREE.Bootstrap.Plugin.call(this, options);
+    this.__name = name;
   };
   ctor.prototype = _.extend(new THREE.Bootstrap.Plugin(), spec);
 

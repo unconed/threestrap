@@ -6784,6 +6784,48 @@
   }
 }.call(this));
 
+THREE.EventDispatcherBootstrap = function () {};
+
+THREE.EventDispatcherBootstrap.prototype = {
+
+  // * Fix for three.js EventDispatcher to allow nested dispatches to work
+  // * Pass this as 2nd parameter to event handler
+  // * Rename to .on/.off/.trigger
+
+	apply: function ( object ) {
+
+		THREE.EventDispatcher.prototype.apply(object);
+
+		object.dispatchEvent = THREE.EventDispatcherBootstrap.prototype.dispatchEvent;
+		object.on = THREE.EventDispatcher.prototype.addEventListener;
+		object.off = THREE.EventDispatcher.prototype.removeEventListener;
+		object.trigger = object.dispatchEvent;
+
+	},
+
+  dispatchEvent: function (event) {
+
+		if (this._listeners === undefined) return;
+
+		var listenerArray = this._listeners[event.type];
+
+		if (listenerArray !== undefined) {
+
+      listenerArray = listenerArray.slice()
+      var length = listenerArray.length;
+
+			event.target = this;
+			for (var i = 0; i < length; i++) {
+			  // add original target as parameter for convenience
+				listenerArray[i].call(this, event, this);
+			}
+
+		}
+
+  },
+
+};
+
 THREE.Bootstrap = function (options) {
   if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
 
@@ -6807,6 +6849,7 @@ THREE.Bootstrap = function (options) {
 
   this.__inited = false;
   this.__destroyed = false;
+  this.__binds = [];
   this.plugins = {};
 
   if (this.__options.init) {
@@ -6823,7 +6866,8 @@ THREE.Bootstrap.prototype = {
     var options = this.__options,
         plugindb = options.plugindb,
         aliasdb = options.aliasdb,
-        element = options.element;
+        element = options.element,
+        renderer, plugins;
 
     // Resolve plugins
     function resolve(list) {
@@ -6843,10 +6887,10 @@ THREE.Bootstrap.prototype = {
       }
       throw 'Plug-in alias recursion detected';
     }
-    var plugins = resolve(options.plugins);
+    plugins = resolve(options.plugins);
 
     // Instantiate Three renderer
-    var renderer = this.renderer = new options.klass(options.parameters);
+    renderer = this.renderer = new options.klass(options.parameters);
     this.canvas = renderer.domElement;
     this.element = element;
 
@@ -6857,16 +6901,20 @@ THREE.Bootstrap.prototype = {
     _.each(plugins, function (name) {
       var ctor = plugindb[name];
       if (ctor) {
-        if (this.plugins[name]) throw "Duplicate plugin '" + name + "'";
+        if (this.plugins[name]) return;
 
-        var plugin = new ctor(options[name] || {});
+        var plugin = new ctor(options[name] || {}, name);
         this.plugins[name] = plugin;
 
-        _.extend(this, plugin.install(this, renderer, element) || {});
+        // Install
+        _.extend(this, plugin.install(this) || {});
+
+        // Bind events
+        plugin.bind(this);
       }
     }.bind(this));
 
-    this.dispatchEvent({ type: 'ready'});
+    this.trigger({ type: 'ready' });
 
     return this;
   },
@@ -6876,53 +6924,119 @@ THREE.Bootstrap.prototype = {
     if (this.__destroyed) return;
     this.__destroyed = true;
 
-    var options = this.__options,
-        renderer = this.renderer,
-        element = options.element;
+    var options = this.__options;
 
     // Uninstall plugins
     _.each(this.plugins, function (plugin, i) {
-      plugin.uninstall(this, renderer, element);
+      plugin.uninstall(this);
     }.bind(this));
-
     this.plugins = {};
 
+    // Unbind events
+    this.unbind();
+
     // Remove from DOM
-    element.removeChild(renderer.domElement);
+    this.element.removeChild(this.renderer.domElement);
     this.renderer = null;
+
 
     return this;
   },
 
+  bind: function (key, object) {
+    // Set base target
+    var fallback = this;
+    if (_.isArray(key)) {
+      fallback = key[0];
+      key = key[1];
+    }
+
+    // Match key
+    var match = /^([^.:]*(?:\.[^.:]+)*)?(?:\:(.*))?$/.exec(key);
+    var path = match[1].split(/\./g);
+
+    var name = path.pop();
+    var dest = match[2] || name;
+
+    // Whitelisted objects
+    var target = {
+      '': fallback,
+      'this': object,
+      'three': this,
+      'element': this.element,
+      'canvas': this.canvas,
+      'window': window,
+    }[path.shift()] || fallback;
+
+    // Look up keys
+    while (target && (key = path.shift())) { target = target[key] };
+
+    // Attach event handler at last level
+    if (target && (target.on || target.addEventListener)) {
+      var callback = function (event) {
+        object[dest] && object[dest](event, this);
+      }.bind(this);
+
+      // Polyfill for both styles of event listener adders
+      var added = false;
+      [ 'addEventListener', 'on' ].map(function (key) {
+        if (!added && target[key]) {
+          added = true;
+          target[key](name, callback);
+        }
+      });
+
+      // Store bind for removal later
+      var bind = { target: target, name: name, callback: callback };
+      this.__binds.push(bind);
+    }
+    else {
+      throw "Cannot bind '" + key + "' in " + this.__name;
+    }
+  },
+
+  unbind: function () {
+    this.__binds.forEach(function (bind) {
+
+      // Polyfill for both styles of event listener removers
+      var removed = false;
+      [ 'removeEventListener', 'off' ].map(function (key) {
+        if (!removed && bind.target[key]) {
+          removed = true;
+          bind.target[key](bind.name, bind.callback);
+        }
+      });
+    });
+    this.__binds = [];
+  },
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.Bootstrap.prototype);
+THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.prototype);
 
-THREE.Bootstrap.prototype.onceEventListener = function (method, callback) {
-  var once = function (e) {
-    this.removeEventListener(method, once);
-    callback(e);
-  }.bind(this);
-  this.addEventListener(method, once);
-}
 
 THREE.Bootstrap.Plugins = {};
 THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = _.defaults(options || {}, this.defaults);
+
+  this.__binds = [];
 }
 
 THREE.Bootstrap.Plugin.prototype = {
 
-  defaults: {
+  listen: [],
+
+  defaults: {},
+
+  install: function (three) {
+
   },
 
-  install: function (three, renderer, element) {
+  uninstall: function (three) {
   },
 
-  uninstall: function (three, renderer, element) {
-  },
+  ////////
 
   set: function (options) {
     _.extend(this.options, options);
@@ -6939,13 +7053,25 @@ THREE.Bootstrap.Plugin.prototype = {
     object.get = this.get.bind(this);
     return object;
   },
+
+  /////
+
+  bind: function (three) {
+
+    this.listen.forEach(function (key) {
+      three.bind(key, this);
+    }.bind(this));
+
+  },
+
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {
     THREE.Bootstrap.Plugin.call(this, options);
+    this.__name = name;
   };
   ctor.prototype = _.extend(new THREE.Bootstrap.Plugin(), spec);
 
@@ -6979,82 +7105,14 @@ THREE.Bootstrap.registerPlugin('size', {
     capHeight: Infinity,
   },
 
-  install: function (three, renderer, element) {
+  listen: [
+    'window.resize',
+    'element.resize',
+    'this.change:resize',
+    'ready:resize',
+  ],
 
-    // On resize handler
-    this.handler = function () {
-      var options = this.options;
-
-      var w, h, ew, eh, rw, rh, aspect, cut, style,
-          ml = 0 , mt = 0;
-
-      // Measure element
-      w = ew = (options.width === undefined || options.width == null)
-        ? element.offsetWidth || element.innerWidth || 0
-        : options.width;
-
-      h = eh = (options.height === undefined || options.height == null)
-        ? element.offsetHeight || element.innerHeight || 0
-        : options.height;
-
-      // Force aspect ratio
-      aspect = w / h;
-      if (options.aspect) {
-        if (options.aspect > aspect) {
-          h = Math.round(w / options.aspect);
-          mt = Math.floor((eh - h) / 2);
-        }
-        else {
-          w = Math.round(h * options.aspect);
-          ml = Math.floor((ew - w) / 2);
-        }
-        aspect = options.aspect;
-      }
-
-      // Apply scale and resolution cap
-      rw = Math.min(w * options.scale, options.capWidth);
-      rh = Math.min(h * options.scale, options.capHeight);
-
-      // Retain aspect ratio
-      raspect = rw / rh;
-      if (raspect > aspect) {
-        rw = Math.round(rh * aspect);
-      }
-      else {
-        rh = Math.round(rw / aspect);
-      }
-
-      // Resize WebGL
-      renderer.setSize(rw, rh);
-
-      // Resize Canvas
-      style = renderer.domElement.style;
-      style.width = w + "px";
-      style.height = h + "px";
-      style.marginLeft = ml + "px";
-      style.marginTop = mt + "px";
-
-      // Notify
-      _.extend(three.Size, {
-        renderWidth: rw,
-        renderHeight: rh,
-        viewWidth: w,
-        viewHeight: h,
-      });
-
-      three.dispatchEvent({
-        type: 'resize',
-        renderWidth: rw,
-        renderHeight: rh,
-        viewWidth: w,
-        viewHeight: h,
-      });
-
-    }.bind(this);
-
-    window.addEventListener('resize', this.handler);
-    element.addEventListener('resize', this.handler);
-    three.addEventListener('ready', this.handler);
+  install: function (three) {
 
     three.Size = this.api({
       renderWidth: 0,
@@ -7063,21 +7121,87 @@ THREE.Bootstrap.registerPlugin('size', {
       viewHeight: 0,
     });
 
-    this.addEventListener('change', this.handler);
   },
 
-  uninstall: function (three, renderer, element) {
-    window.removeEventListener('resize', this.handler);
-    element.removeEventListener('resize', this.handler);
-    three.removeEventListener('ready', this.handler);
-
+  uninstall: function (three) {
     delete three.Size;
+  },
+
+  resize: function (event, three) {
+    var options = this.options;
+    var element = three.element;
+    var renderer = three.renderer;
+
+    var w, h, ew, eh, rw, rh, aspect, cut, style,
+        ml = 0 , mt = 0;
+
+    // Measure element
+    w = ew = (options.width === undefined || options.width == null)
+      ? element.offsetWidth || element.innerWidth || 0
+      : options.width;
+
+    h = eh = (options.height === undefined || options.height == null)
+      ? element.offsetHeight || element.innerHeight || 0
+      : options.height;
+
+    // Force aspect ratio
+    aspect = w / h;
+    if (options.aspect) {
+      if (options.aspect > aspect) {
+        h = Math.round(w / options.aspect);
+        mt = Math.floor((eh - h) / 2);
+      }
+      else {
+        w = Math.round(h * options.aspect);
+        ml = Math.floor((ew - w) / 2);
+      }
+      aspect = options.aspect;
+    }
+
+    // Apply scale and resolution cap
+    rw = Math.min(w * options.scale, options.capWidth);
+    rh = Math.min(h * options.scale, options.capHeight);
+
+    // Retain aspect ratio
+    raspect = rw / rh;
+    if (raspect > aspect) {
+      rw = Math.round(rh * aspect);
+    }
+    else {
+      rh = Math.round(rw / aspect);
+    }
+
+    // Resize WebGL
+    renderer.setSize(rw, rh);
+
+    // Resize Canvas
+    style = renderer.domElement.style;
+    style.width = w + "px";
+    style.height = h + "px";
+    style.marginLeft = ml + "px";
+    style.marginTop = mt + "px";
+
+    // Notify
+    _.extend(three.Size, {
+      renderWidth: rw,
+      renderHeight: rh,
+      viewWidth: w,
+      viewHeight: h,
+    });
+
+    three.dispatchEvent({
+      type: 'resize',
+      renderWidth: rw,
+      renderHeight: rh,
+      viewWidth: w,
+      viewHeight: h,
+    });
   },
 
 });
 THREE.Bootstrap.registerPlugin('fill', {
 
-  install: function (three, renderer, element) {
+  install: function (three) {
 
     function is(element) {
       var h = element.style.height;
@@ -7091,15 +7215,15 @@ THREE.Bootstrap.registerPlugin('fill', {
       return element;
     }
 
-    if (element == document.body) {
+    if (three.element == document.body) {
       // Fix body height if we're naked
       this.applied =
-        [ element, document.documentElement ].filter(is).map(set);
+        [ three.element, document.documentElement ].filter(is).map(set);
     }
 
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     if (this.applied) {
       function set(element) {
         element.style.height = '';
@@ -7120,14 +7244,12 @@ THREE.Bootstrap.registerPlugin('loop', {
     start: true,
   },
 
-  install: function (three, renderer, element) {
+  listen: ['ready'],
+
+  install: function (three) {
 
     this.three = three;
     this.running = false;
-
-    if (this.options.start) {
-      three.onceEventListener('ready', this.start.bind(this));
-    }
 
     three.Loop = this.api({
       start: this.start.bind(this),
@@ -7137,15 +7259,18 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     this.stop();
+  },
+
+  ready: function (event, three) {
+    if (this.options.start) this.start();
   },
 
   start: function () {
     if (this.running) return;
 
     this.three.Loop.running = this.running = true;
-    this.three.dispatchEvent({ type: 'start' });
 
     var loop = function () {
       this.running && requestAnimationFrame(loop);
@@ -7157,6 +7282,8 @@ THREE.Bootstrap.registerPlugin('loop', {
     }.bind(this);
 
     requestAnimationFrame(loop);
+
+    this.three.dispatchEvent({ type: 'start' });
   },
 
   stop: function () {
@@ -7169,50 +7296,48 @@ THREE.Bootstrap.registerPlugin('loop', {
 });
 THREE.Bootstrap.registerPlugin('time', {
 
-  install: function (three, renderer, element) {
+  listen: ['pre:tick', 'post:tick'],
 
-    var api = three.Time = this.api({
+  install: function (three) {
+
+     three.Time = this.api({
       now: 0,
       delta: 1/60,
       average: 0,
       fps: 0,
     });
 
-    var last = 0;
-    this.tick = function () {
-      var now = api.now = +new Date() / 1000;
+    this.last = 0;
+  },
 
-      if (last) {
-        var delta = api.delta = now - last;
-        var average = api.average || delta;
+  tick: function (event, three) {
+    var api = three.Time;
+    var now = api.now = +new Date() / 1000;
+    var last = this.last;
 
-        api.average = average + (delta - average) * .1;
-        api.fps = 1 / average;
-      }
+    if (last) {
+      var delta = api.delta = now - last;
+      var average = api.average || delta;
 
-      last = now;
-    };
-    three.addEventListener('pre', this.tick);
+      api.average = average + (delta - average) * .1;
+      api.fps = 1 / average;
+    }
+
+    this.last = now;
   },
 
   uninstall: function (three, renderer, element) {
-
-    three.removeEventListener('pre', this.tick);
-
     delete three.Time;
   },
 
 });
 THREE.Bootstrap.registerPlugin('scene', {
 
-  install: function (three, renderer, element) {
-
-    this.scene = new THREE.Scene();
-
-    three.scene = this.scene;
+  install: function (three) {
+    three.scene = new THREE.Scene();
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     delete three.scene;
   }
 
@@ -7234,91 +7359,68 @@ THREE.Bootstrap.registerPlugin('camera', {
     top: 1,
   },
 
-  install: function (three, renderer, element) {
+  listen: ['resize', 'this.change'],
 
-    this.three = three;
-
-    this.handler = this.resize.bind(this);
-    three.addEventListener('resize', this.handler);
+  install: function (three) {
 
     three.Camera = this.api();
     three.camera = null;
 
     this.aspect = 1;
-    this.change();
-
-    this.addEventListener('change', this.change.bind(this));
+    this.change({}, three);
   },
 
-  uninstall: function (three, renderer, element) {
-    three.removeEventListener('resize', this.handler);
-
+  uninstall: function (three) {
     delete three.Camera;
     delete three.camera;
   },
 
-  change: function () {
+  change: function (event, three) {
     var o = this.options;
 
-    if (this.camera && o.type == this.cameraType) {
+    if (three.camera && o.type == this.cameraType) {
       ['near', 'far', 'left', 'right', 'top', 'bottom', 'fov'].map(function (key) {
         if (o[key] !== undefined) {
-          this.camera[key] = o[key];
+          three.camera[key] = o[key];
         }
       }.bind(this));
     }
     else {
+      this.cameraType = o.type;
       switch (o.type) {
         case 'perspective':
-          this.camera = new THREE.PerspectiveCamera(o.fov, 1, o.near, o.far);
+          three.camera = new THREE.PerspectiveCamera(o.fov, this.aspect, o.near, o.far);
           break;
 
         case 'orthographic':
-          this.camera = new THREE.OrthographicCamera(o.left, o.right, o.top, o.bottom, o.near, o.far);
+          three.camera = new THREE.OrthographicCamera(o.left, o.right, o.top, o.bottom, o.near, o.far);
           break;
       }
     }
 
-    this.cameraType = o.type;
+    three.camera.updateProjectionMatrix();
 
-    this.three.camera = this.camera;
-
-    this.update();
-  },
-
-  update: function () {
-    var o = this.options;
-
-    this.camera.aspect = o.aspect || this.aspect;
-    this.camera.updateProjectionMatrix();
-
-    this.three.dispatchEvent({
+    three.trigger({
       type: 'camera',
-      camera: this.camera,
+      camera: three.camera,
     });
   },
 
-  resize: function (event) {
-    this.aspect = event.viewWidth / Math.max(1, event.viewHeight) || 1;
-    this.update();
+  resize: function (event, three) {
+    this.aspect = this.options.aspect || event.viewWidth / Math.max(1, event.viewHeight) || 1;
+    three.camera.aspect = this.aspect;
+    three.camera.updateProjectionMatrix();
   },
 
 });
 THREE.Bootstrap.registerPlugin('render', {
 
-  install: function (three, renderer, element) {
+  listen: ['render'],
 
-    this.handler = function () {
-      if (three.scene && three.camera) {
-        renderer.render(three.scene, three.camera);
-      }
-    };
-
-    three.addEventListener('render', this.handler);
-  },
-
-  uninstall: function (three, renderer, element) {
-    three.removeEventListener('render', this.handler);
+  render: function (event, three) {
+    if (three.scene && three.camera) {
+      three.renderer.render(three.scene, three.camera);
+    }
   },
 
 });
@@ -7329,9 +7431,660 @@ k.id="msText";k.style.cssText="color:#0f0;font-family:Helvetica,Arial,sans-serif
 "block";d.style.display="none";break;case 1:a.style.display="none",d.style.display="block"}};return{REVISION:11,domElement:f,setMode:t,begin:function(){l=Date.now()},end:function(){var b=Date.now();g=b-l;n=Math.min(n,g);o=Math.max(o,g);k.textContent=g+" MS ("+n+"-"+o+")";var a=Math.min(30,30-30*(g/200));e.appendChild(e.firstChild).style.height=a+"px";r++;b>m+1E3&&(h=Math.round(1E3*r/(b-m)),p=Math.min(p,h),q=Math.max(q,h),i.textContent=h+" FPS ("+p+"-"+q+")",a=Math.min(30,30-30*(h/100)),c.appendChild(c.firstChild).style.height=
 a+"px",m=b,r=0);return b},update:function(){l=this.end()}}};
 
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ * @author paulirish / http://paulirish.com/
+ */
+
+THREE.FirstPersonControls = function ( object, domElement ) {
+
+	this.object = object;
+	this.target = new THREE.Vector3( 0, 0, 0 );
+
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
+
+	this.movementSpeed = 1.0;
+	this.lookSpeed = 0.005;
+
+	this.lookVertical = true;
+	this.autoForward = false;
+	// this.invertVertical = false;
+
+	this.activeLook = true;
+
+	this.heightSpeed = false;
+	this.heightCoef = 1.0;
+	this.heightMin = 0.0;
+	this.heightMax = 1.0;
+
+	this.constrainVertical = false;
+	this.verticalMin = 0;
+	this.verticalMax = Math.PI;
+
+	this.autoSpeedFactor = 0.0;
+
+	this.mouseX = 0;
+	this.mouseY = 0;
+
+	this.lat = 0;
+	this.lon = 0;
+	this.phi = 0;
+	this.theta = 0;
+
+	this.moveForward = false;
+	this.moveBackward = false;
+	this.moveLeft = false;
+	this.moveRight = false;
+	this.freeze = false;
+
+	this.mouseDragOn = false;
+
+	this.viewHalfX = 0;
+	this.viewHalfY = 0;
+
+	if ( this.domElement !== document ) {
+
+		this.domElement.setAttribute( 'tabindex', -1 );
+
+	}
+
+	//
+
+	this.handleResize = function () {
+
+		if ( this.domElement === document ) {
+
+			this.viewHalfX = window.innerWidth / 2;
+			this.viewHalfY = window.innerHeight / 2;
+
+		} else {
+
+			this.viewHalfX = this.domElement.offsetWidth / 2;
+			this.viewHalfY = this.domElement.offsetHeight / 2;
+
+		}
+
+	};
+
+	this.onMouseDown = function ( event ) {
+
+		if ( this.domElement !== document ) {
+
+			this.domElement.focus();
+
+		}
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( this.activeLook ) {
+
+			switch ( event.button ) {
+
+				case 0: this.moveForward = true; break;
+				case 2: this.moveBackward = true; break;
+
+			}
+
+		}
+
+		this.mouseDragOn = true;
+
+	};
+
+	this.onMouseUp = function ( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( this.activeLook ) {
+
+			switch ( event.button ) {
+
+				case 0: this.moveForward = false; break;
+				case 2: this.moveBackward = false; break;
+
+			}
+
+		}
+
+		this.mouseDragOn = false;
+
+	};
+
+	this.onMouseMove = function ( event ) {
+
+		if ( this.domElement === document ) {
+
+			this.mouseX = event.pageX - this.viewHalfX;
+			this.mouseY = event.pageY - this.viewHalfY;
+
+		} else {
+
+			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
+			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+
+		}
+
+	};
+
+	this.onKeyDown = function ( event ) {
+
+		//event.preventDefault();
+
+		switch ( event.keyCode ) {
+
+			case 38: /*up*/
+			case 87: /*W*/ this.moveForward = true; break;
+
+			case 37: /*left*/
+			case 65: /*A*/ this.moveLeft = true; break;
+
+			case 40: /*down*/
+			case 83: /*S*/ this.moveBackward = true; break;
+
+			case 39: /*right*/
+			case 68: /*D*/ this.moveRight = true; break;
+
+			case 82: /*R*/ this.moveUp = true; break;
+			case 70: /*F*/ this.moveDown = true; break;
+
+			case 81: /*Q*/ this.freeze = !this.freeze; break;
+
+		}
+
+	};
+
+	this.onKeyUp = function ( event ) {
+
+		switch( event.keyCode ) {
+
+			case 38: /*up*/
+			case 87: /*W*/ this.moveForward = false; break;
+
+			case 37: /*left*/
+			case 65: /*A*/ this.moveLeft = false; break;
+
+			case 40: /*down*/
+			case 83: /*S*/ this.moveBackward = false; break;
+
+			case 39: /*right*/
+			case 68: /*D*/ this.moveRight = false; break;
+
+			case 82: /*R*/ this.moveUp = false; break;
+			case 70: /*F*/ this.moveDown = false; break;
+
+		}
+
+	};
+
+	this.update = function( delta ) {
+
+		if ( this.freeze ) {
+
+			return;
+
+		}
+
+		if ( this.heightSpeed ) {
+
+			var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+			var heightDelta = y - this.heightMin;
+
+			this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
+
+		} else {
+
+			this.autoSpeedFactor = 0.0;
+
+		}
+
+		var actualMoveSpeed = delta * this.movementSpeed;
+
+		if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+
+		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
+		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
+
+		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
+		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+
+		var actualLookSpeed = delta * this.lookSpeed;
+
+		if ( !this.activeLook ) {
+
+			actualLookSpeed = 0;
+
+		}
+
+		var verticalLookRatio = 1;
+
+		if ( this.constrainVertical ) {
+
+			verticalLookRatio = Math.PI / ( this.verticalMax - this.verticalMin );
+
+		}
+
+		this.lon += this.mouseX * actualLookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+
+		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
+		this.phi = THREE.Math.degToRad( 90 - this.lat );
+
+		this.theta = THREE.Math.degToRad( this.lon );
+
+		if ( this.constrainVertical ) {
+
+			this.phi = THREE.Math.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+
+		}
+
+		var targetPosition = this.target,
+			position = this.object.position;
+
+		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+		targetPosition.y = position.y + 100 * Math.cos( this.phi );
+		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+
+		this.object.lookAt( targetPosition );
+
+	};
+
+
+	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+
+	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
+	this.domElement.addEventListener( 'mousedown', bind( this, this.onMouseDown ), false );
+	this.domElement.addEventListener( 'mouseup', bind( this, this.onMouseUp ), false );
+	this.domElement.addEventListener( 'keydown', bind( this, this.onKeyDown ), false );
+	this.domElement.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );
+
+	function bind( scope, fn ) {
+
+		return function () {
+
+			fn.apply( scope, arguments );
+
+		};
+
+	};
+
+	this.handleResize();
+
+};
+
+/**
+ * @author qiao / https://github.com/qiao
+ * @author mrdoob / http://mrdoob.com
+ * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
+THREE.OrbitControls = function ( object, domElement ) {
+
+	this.object = object;
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
+
+	// API
+
+	this.enabled = true;
+
+	this.center = new THREE.Vector3();
+
+	this.userZoom = true;
+	this.userZoomSpeed = 1.0;
+
+	this.userRotate = true;
+	this.userRotateSpeed = 1.0;
+
+	this.userPan = true;
+	this.userPanSpeed = 2.0;
+
+	this.autoRotate = false;
+	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
+
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
+
+	this.minDistance = 0;
+	this.maxDistance = Infinity;
+
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+
+	// internals
+
+	var scope = this;
+
+	var EPS = 0.000001;
+	var PIXELS_PER_ROUND = 1800;
+
+	var rotateStart = new THREE.Vector2();
+	var rotateEnd = new THREE.Vector2();
+	var rotateDelta = new THREE.Vector2();
+
+	var zoomStart = new THREE.Vector2();
+	var zoomEnd = new THREE.Vector2();
+	var zoomDelta = new THREE.Vector2();
+
+	var phiDelta = 0;
+	var thetaDelta = 0;
+	var scale = 1;
+
+	var lastPosition = new THREE.Vector3();
+
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+	var state = STATE.NONE;
+
+	// events
+
+	var changeEvent = { type: 'change' };
+
+
+	this.rotateLeft = function ( angle ) {
+
+		if ( angle === undefined ) {
+
+			angle = getAutoRotationAngle();
+
+		}
+
+		thetaDelta -= angle;
+
+	};
+
+	this.rotateRight = function ( angle ) {
+
+		if ( angle === undefined ) {
+
+			angle = getAutoRotationAngle();
+
+		}
+
+		thetaDelta += angle;
+
+	};
+
+	this.rotateUp = function ( angle ) {
+
+		if ( angle === undefined ) {
+
+			angle = getAutoRotationAngle();
+
+		}
+
+		phiDelta -= angle;
+
+	};
+
+	this.rotateDown = function ( angle ) {
+
+		if ( angle === undefined ) {
+
+			angle = getAutoRotationAngle();
+
+		}
+
+		phiDelta += angle;
+
+	};
+
+	this.zoomIn = function ( zoomScale ) {
+
+		if ( zoomScale === undefined ) {
+
+			zoomScale = getZoomScale();
+
+		}
+
+		scale /= zoomScale;
+
+	};
+
+	this.zoomOut = function ( zoomScale ) {
+
+		if ( zoomScale === undefined ) {
+
+			zoomScale = getZoomScale();
+
+		}
+
+		scale *= zoomScale;
+
+	};
+
+	this.pan = function ( distance ) {
+
+		distance.transformDirection( this.object.matrix );
+		distance.multiplyScalar( scope.userPanSpeed );
+
+		this.object.position.add( distance );
+		this.center.add( distance );
+
+	};
+
+	this.update = function () {
+
+		var position = this.object.position;
+		var offset = position.clone().sub( this.center );
+
+		// angle from z-axis around y-axis
+
+		var theta = Math.atan2( offset.x, offset.z );
+
+		// angle from y-axis
+
+		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+
+		if ( this.autoRotate ) {
+
+			this.rotateLeft( getAutoRotationAngle() );
+
+		}
+
+		theta += thetaDelta;
+		phi += phiDelta;
+
+		// restrict phi to be between desired limits
+		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
+
+		// restrict phi to be betwee EPS and PI-EPS
+		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
+
+		var radius = offset.length() * scale;
+
+		// restrict radius to be between desired limits
+		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
+
+		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
+		offset.y = radius * Math.cos( phi );
+		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
+
+		position.copy( this.center ).add( offset );
+
+		this.object.lookAt( this.center );
+
+		thetaDelta = 0;
+		phiDelta = 0;
+		scale = 1;
+
+		if ( lastPosition.distanceTo( this.object.position ) > 0 ) {
+
+			this.dispatchEvent( changeEvent );
+
+			lastPosition.copy( this.object.position );
+
+		}
+
+	};
+
+
+	function getAutoRotationAngle() {
+
+		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+
+	}
+
+	function getZoomScale() {
+
+		return Math.pow( 0.95, scope.userZoomSpeed );
+
+	}
+
+	function onMouseDown( event ) {
+
+		if ( scope.enabled === false ) return;
+		if ( scope.userRotate === false ) return;
+
+		event.preventDefault();
+
+		if ( event.button === 0 ) {
+
+			state = STATE.ROTATE;
+
+			rotateStart.set( event.clientX, event.clientY );
+
+		} else if ( event.button === 1 ) {
+
+			state = STATE.ZOOM;
+
+			zoomStart.set( event.clientX, event.clientY );
+
+		} else if ( event.button === 2 ) {
+
+			state = STATE.PAN;
+
+		}
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	}
+
+	function onMouseMove( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		event.preventDefault();
+
+		if ( state === STATE.ROTATE ) {
+
+			rotateEnd.set( event.clientX, event.clientY );
+			rotateDelta.subVectors( rotateEnd, rotateStart );
+
+			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
+			scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
+
+			rotateStart.copy( rotateEnd );
+
+		} else if ( state === STATE.ZOOM ) {
+
+			zoomEnd.set( event.clientX, event.clientY );
+			zoomDelta.subVectors( zoomEnd, zoomStart );
+
+			if ( zoomDelta.y > 0 ) {
+
+				scope.zoomIn();
+
+			} else {
+
+				scope.zoomOut();
+
+			}
+
+			zoomStart.copy( zoomEnd );
+
+		} else if ( state === STATE.PAN ) {
+
+			var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+			var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+
+		}
+
+	}
+
+	function onMouseUp( event ) {
+
+		if ( scope.enabled === false ) return;
+		if ( scope.userRotate === false ) return;
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+		document.removeEventListener( 'mouseup', onMouseUp, false );
+
+		state = STATE.NONE;
+
+	}
+
+	function onMouseWheel( event ) {
+
+		if ( scope.enabled === false ) return;
+		if ( scope.userZoom === false ) return;
+
+		var delta = 0;
+
+		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+
+			delta = event.wheelDelta;
+
+		} else if ( event.detail ) { // Firefox
+
+			delta = - event.detail;
+
+		}
+
+		if ( delta > 0 ) {
+
+			scope.zoomOut();
+
+		} else {
+
+			scope.zoomIn();
+
+		}
+
+	}
+
+	function onKeyDown( event ) {
+
+		if ( scope.enabled === false ) return;
+		if ( scope.userPan === false ) return;
+
+		switch ( event.keyCode ) {
+
+			case scope.keys.UP:
+				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
+				break;
+			case scope.keys.BOTTOM:
+				scope.pan( new THREE.Vector3( 0, - 1, 0 ) );
+				break;
+			case scope.keys.LEFT:
+				scope.pan( new THREE.Vector3( - 1, 0, 0 ) );
+				break;
+			case scope.keys.RIGHT:
+				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
+				break;
+		}
+
+	}
+
+	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	this.domElement.addEventListener( 'keydown', onKeyDown, false );
+
+};
+
+THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+
 THREE.Bootstrap.registerPlugin('stats', {
 
-  install: function (three, renderer, element) {
+  listen: ['pre', 'post'],
+
+  install: function (three) {
 
     var stats = this.stats = new THREE.Stats();
     var style = stats.domElement.style;
@@ -7339,20 +8092,72 @@ THREE.Bootstrap.registerPlugin('stats', {
     this.begin = stats.begin.bind(stats);
     this.end = stats.end.bind(stats);
 
-    three.addEventListener('pre', this.begin);
-    three.addEventListener('post', this.end);
-
     style.position = 'absolute';
     style.top = style.left = 0;
     document.body.appendChild(stats.domElement);
   },
 
-  uninstall: function (three, renderer, element) {
-
-    three.removeEventListener('pre', this.begin);
-    three.removeEventListener('post', this.end);
-
+  uninstall: function (three) {
     document.body.removeChild(this.stats.domElement);
+  },
+
+  pre: function (event, three) {
+    this.stats.begin();
+  },
+
+  post: function (event, three) {
+    this.stats.end();
+  },
+
+
+});
+THREE.Bootstrap.registerPlugin('controls', {
+
+  listen: ['update', 'resize', 'camera', 'this.change'],
+
+  defaults: {
+    klass: null,
+    parameters: {},
+  },
+
+  install: function (three) {
+    if (!this.options.klass) throw "Must provide class for `controls.klass`";
+
+    three.controls = null;
+
+    this._camera = three.camera || new THREE.PerspectiveCamera();
+    this.change({}, three);
+  },
+
+  uninstall: function (three) {
+    delete three.controls;
+  },
+
+  change: function (event, three) {
+    if (this.options.klass) {
+      if (this.klass !== this.options.klass) {
+        three.controls = new this.options.klass(this._camera, three.renderer.domElement);
+        this.klass = this.options.klass;
+      }
+
+      _.extend(three.controls, this.options.parameters);
+    }
+    else {
+      three.controls = null;
+    }
+  },
+
+  update: function (event, three) {
+    var delta = three.Time && three.Time.delta || 1/60;
+    three.controls.update(delta);
+  },
+
+  camera: function (event, three) {
+    three.controls.object = this._camera = event.camera;
+  },
+
+  resize: function (event, three) {
+    three.controls.handleResize && three.controls.handleResize();
   },
 
 });

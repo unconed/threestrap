@@ -1,13 +1,10 @@
 THREE.Bootstrap.registerPlugin('scene', {
 
-  install: function (three, renderer, element) {
-
-    this.scene = new THREE.Scene();
-
-    three.scene = this.scene;
+  install: function (three) {
+    three.scene = new THREE.Scene();
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     delete three.scene;
   }
 

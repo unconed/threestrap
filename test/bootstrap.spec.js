@@ -21,7 +21,7 @@ describe("three", function () {
     expect(three.__destroyed).toEqual(true);
 
     var called = false;
-    three.addEventListener('ready', function () { called = true; });
+    three.on('ready', function () { called = true; });
     three.init();
     expect(called).toBe(false);
 
@@ -104,7 +104,7 @@ describe("three", function () {
     };
 
     var three = new THREE.Bootstrap(options);
-    three.addEventListener('ready', function () { ready++; });
+    three.on('ready', function () { ready++; });
 
     expect(ready).toBe(0);
 
@@ -117,6 +117,41 @@ describe("three", function () {
     expect(ready).toBe(1);
   });
 
+  it('adds/removes handlers', function () {
+
+    var update = 0;
+
+    var options = {
+      init: false,
+      plugins: [],
+    };
+
+    var three = new THREE.Bootstrap(options);
+    var cb;
+    three.on('update', cb = function () { update++; });
+
+    expect(update).toBe(0);
+
+    three.init();
+
+    expect(update).toBe(0);
+    three.trigger({ type: 'update' });
+
+    expect(update).toBe(1);
+
+    three.trigger({ type: 'update' });
+    expect(update).toBe(2);
+
+    three.off('update', cb);
+
+    three.trigger({ type: 'update' });
+    expect(update).toBe(2);
+
+    three.destroy();
+
+
+  });
+
   it("passed on plugin options", function () {
 
     var captured = false;
@@ -124,6 +159,8 @@ describe("three", function () {
     var spec = {
       install: function () {},
       uninstall: function () {},
+      bind: function () {},
+      unbind: function () {},
     };
 
     var mock = function (options) {
@@ -155,6 +192,8 @@ describe("three", function () {
     var spec = {
       install: function () {},
       uninstall: function () {},
+      bind: function () {},
+      unbind: function () {},
     };
 
     spyOn(spec, 'install');
@@ -191,6 +230,8 @@ describe("three", function () {
       return {
         install: function () { installed[key]++; },
         uninstall: function () {},
+        bind: function () {},
+        unbind: function () {},
       };
     }
 

@@ -4,14 +4,12 @@ THREE.Bootstrap.registerPlugin('loop', {
     start: true,
   },
 
-  install: function (three, renderer, element) {
+  listen: ['ready'],
+
+  install: function (three) {
 
     this.three = three;
     this.running = false;
-
-    if (this.options.start) {
-      three.onceEventListener('ready', this.start.bind(this));
-    }
 
     three.Loop = this.api({
       start: this.start.bind(this),
@@ -21,15 +19,18 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     this.stop();
+  },
+
+  ready: function (event, three) {
+    if (this.options.start) this.start();
   },
 
   start: function () {
     if (this.running) return;
 
     this.three.Loop.running = this.running = true;
-    this.three.dispatchEvent({ type: 'start' });
 
     var loop = function () {
       this.running && requestAnimationFrame(loop);
@@ -41,6 +42,8 @@ THREE.Bootstrap.registerPlugin('loop', {
     }.bind(this);
 
     requestAnimationFrame(loop);
+
+    this.three.dispatchEvent({ type: 'start' });
   },
 
   stop: function () {

@@ -15,73 +15,57 @@ THREE.Bootstrap.registerPlugin('camera', {
     top: 1,
   },
 
-  install: function (three, renderer, element) {
+  listen: ['resize', 'this.change'],
 
-    this.three = three;
-
-    this.handler = this.resize.bind(this);
-    three.addEventListener('resize', this.handler);
+  install: function (three) {
 
     three.Camera = this.api();
     three.camera = null;
 
     this.aspect = 1;
-    this.change();
-
-    this.addEventListener('change', this.change.bind(this));
+    this.change({}, three);
   },
 
-  uninstall: function (three, renderer, element) {
-    three.removeEventListener('resize', this.handler);
-
+  uninstall: function (three) {
     delete three.Camera;
     delete three.camera;
   },
 
-  change: function () {
+  change: function (event, three) {
     var o = this.options;
 
-    if (this.camera && o.type == this.cameraType) {
+    if (three.camera && o.type == this.cameraType) {
       ['near', 'far', 'left', 'right', 'top', 'bottom', 'fov'].map(function (key) {
         if (o[key] !== undefined) {
-          this.camera[key] = o[key];
+          three.camera[key] = o[key];
         }
       }.bind(this));
     }
     else {
+      this.cameraType = o.type;
       switch (o.type) {
         case 'perspective':
-          this.camera = new THREE.PerspectiveCamera(o.fov, 1, o.near, o.far);
+          three.camera = new THREE.PerspectiveCamera(o.fov, this.aspect, o.near, o.far);
           break;
 
         case 'orthographic':
-          this.camera = new THREE.OrthographicCamera(o.left, o.right, o.top, o.bottom, o.near, o.far);
+          three.camera = new THREE.OrthographicCamera(o.left, o.right, o.top, o.bottom, o.near, o.far);
           break;
       }
     }
 
-    this.cameraType = o.type;
+    three.camera.updateProjectionMatrix();
 
-    this.three.camera = this.camera;
-
-    this.update();
-  },
-
-  update: function () {
-    var o = this.options;
-
-    this.camera.aspect = o.aspect || this.aspect;
-    this.camera.updateProjectionMatrix();
-
-    this.three.dispatchEvent({
+    three.trigger({
       type: 'camera',
-      camera: this.camera,
+      camera: three.camera,
     });
   },
 
-  resize: function (event) {
-    this.aspect = event.viewWidth / Math.max(1, event.viewHeight) || 1;
-    this.update();
+  resize: function (event, three) {
+    this.aspect = this.options.aspect || event.viewWidth / Math.max(1, event.viewHeight) || 1;
+    three.camera.aspect = this.aspect;
+    three.camera.updateProjectionMatrix();
   },
 
 });

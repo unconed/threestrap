@@ -1,18 +1,11 @@
 THREE.Bootstrap.registerPlugin('render', {
 
-  install: function (three, renderer, element) {
+  listen: ['render'],
 
-    this.handler = function () {
-      if (three.scene && three.camera) {
-        renderer.render(three.scene, three.camera);
-      }
-    };
-
-    three.addEventListener('render', this.handler);
-  },
-
-  uninstall: function (three, renderer, element) {
-    three.removeEventListener('render', this.handler);
+  render: function (event, three) {
+    if (three.scene && three.camera) {
+      three.renderer.render(three.scene, three.camera);
+    }
   },
 
 });

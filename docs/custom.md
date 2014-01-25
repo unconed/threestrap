@@ -16,11 +16,20 @@ THREE.Bootstrap.registerPlugin('magic', {
     foo: bar,
   },
 
-  // Initialize resources, bind events
-  install: function (three, renderer, element) {
+  // Declare event listeners for plugin methods
+  //
+  // format: "object.event:method"
+  // allowed objects: this, three, element, canvas, window
+  // default: "three.event:event"
+  //
+  // alt format: [object, "event:method"]
+  listen: ['this.change', 'ready:yup', [ document.body, 'click' ]],
 
-    // Listen for outside events
-    // three.addEventListener(...);
+  // Initialize resources, bind events
+  install: function (three) {
+
+    // Listen manually for outside events
+    // three.on(...);
 
     // Make a public API (includes .set() / .get())
     three.Magic = this.api({
@@ -33,29 +42,40 @@ THREE.Bootstrap.registerPlugin('magic', {
 
     });
 
-    // Listen for changes from three.Magic.set({...})
-    this.addEventListener('change', function () {
-      // this.options reflects the new state, i.e.:
-      // this.options.foo == 'bar'
-    }.bind(this));
-
     // Expose values globally (discouraged)
     three.magic = 1;
     three.pingMagic = three.Magic.ping.bind(this);
   },
 
   // Destroy resources, unbind events
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
 
-    // Remove event listeners
-    // three.removeEventListener(...);
+    // Remove manual event listeners
+    // three.off(...);
     
     // Remove from context
     delete three.Magic;
     delete three.magic;
     delete three.pingMagic;
   },
+  
+  // body.click event handler
+  click: function (event, three) {
+  },
+  
+  // this.change event handler
+  change: function (event, three) {
+    // event.type == 'change'
+    // event.changes == {...}
+    // this.options reflects the new state, i.e.:
+    // this.options.foo == 'bar'
+  }
 
+  // three.ready event handler
+  yup: function (event, three) {
+    // event.type == 'ready'
+  },
+  
 });
 ```
 

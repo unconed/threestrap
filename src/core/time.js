@@ -1,35 +1,36 @@
 THREE.Bootstrap.registerPlugin('time', {
 
-  install: function (three, renderer, element) {
+  listen: ['pre:tick', 'post:tick'],
 
-    var api = three.Time = this.api({
+  install: function (three) {
+
+     three.Time = this.api({
       now: 0,
       delta: 1/60,
       average: 0,
       fps: 0,
     });
 
-    var last = 0;
-    this.tick = function () {
-      var now = api.now = +new Date() / 1000;
+    this.last = 0;
+  },
 
-      if (last) {
-        var delta = api.delta = now - last;
-        var average = api.average || delta;
+  tick: function (event, three) {
+    var api = three.Time;
+    var now = api.now = +new Date() / 1000;
+    var last = this.last;
 
-        api.average = average + (delta - average) * .1;
-        api.fps = 1 / average;
-      }
+    if (last) {
+      var delta = api.delta = now - last;
+      var average = api.average || delta;
 
-      last = now;
-    };
-    three.addEventListener('pre', this.tick);
+      api.average = average + (delta - average) * .1;
+      api.fps = 1 / average;
+    }
+
+    this.last = now;
   },
 
   uninstall: function (three, renderer, element) {
-
-    three.removeEventListener('pre', this.tick);
-
     delete three.Time;
   },
 
