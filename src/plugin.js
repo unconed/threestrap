@@ -20,40 +20,10 @@ THREE.Bootstrap.Plugin.prototype = {
 
   ////////
 
-  set: function (options) {
-    var o = this.options;
-
-    var changes = _.reduce(options, function (result, value, key) {
-      if (o[key] !== value) result[key] = value;
-      return result;
-    }, {});
-
-    _.extend(o, changes);
-
-    this.trigger({ type: 'change', options: options, changes: changes });
-  },
-
-  get: function () {
-    return this.options;
-  },
-
-  api: function (object, context) {
-    object = object || {};
-
-    context && _.each(object, function (callback, key, object) {
-      if (_.isFunction(callback)) {
-        object[key] = _.partialRight(callback, context);
-      }
-    })
-
-    object.set = this.set.bind(this);
-    object.get = this.get.bind(this);
-    return object;
-  },
-
 };
 
 THREE.Binder.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.Api   .apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {

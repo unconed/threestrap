@@ -23,6 +23,7 @@ var vendor = [
 
 var core = [
   'src/binder.js',
+  'src/api.js',
   'src/bootstrap.js',
   'src/plugin.js',
   'src/aliases.js',

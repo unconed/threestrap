@@ -1,5 +1,9 @@
+0.0.4
+* Make api mechanism reusable as `THREE.Api`
+
 0.0.3
-* $.api({...}, three) now auto-passes `three` as argument to API methods.
+
+* this.api({...}, three) now auto-passes `three` as argument to API methods.
 * Move `bind` and `renderer` into their own plugins
 * Make bind mechanism reusable as `THREE.Binder`
 * Diff changes made with `$.api().set()`, provide `.changes` as well as all passed `.options` values

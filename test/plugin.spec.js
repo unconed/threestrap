@@ -52,40 +52,4 @@ describe("plugin", function () {
 
   });
 
-  it("api sends change events", function () {
-
-    var captured;
-    var fired = true;
-    var api;
-
-    var spec = {
-      install: function () {
-        api = this.api();
-
-        this.on('change', function () {
-          captured = this.options;
-        });
-      },
-    };
-
-    THREE.Bootstrap.registerPlugin('mockp3', spec);
-
-    var options = {
-      init: false,
-      plugins: ['mockp3'],
-    };
-
-    var three = new THREE.Bootstrap(options);
-
-    three.init();
-
-    api.set({ foo: 'wtf' });
-    expect(captured.foo).toBe('wtf');
-
-    three.destroy();
-
-    THREE.Bootstrap.unregisterPlugin('mockp3', spec);
-
-  });
-
 });
