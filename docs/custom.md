@@ -36,8 +36,8 @@ THREE.Bootstrap.registerPlugin('magic', {
 
       // three.Magic.ping()
       ping: function () {
-        // Dispatch own events
-        three.dispatchEvent({ type: 'magic', ping: true });
+        // Trigger own events
+        three.trigger({ type: 'magic', ping: true });
       }.bind(this),
 
     });
