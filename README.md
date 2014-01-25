@@ -147,7 +147,7 @@ three.bind('ready:yup', object);
 three.bind('this.change:redraw', object);
 
 // Bind window.resize event to object.resize(event, three);
-three.bind('window.resize:redraw', object);
+three.bind('window.resize', object);
 
 // Bind DOM element's onchange event to object.resize(event, three);
 three.bind([element, 'change'], object);
