@@ -4,7 +4,7 @@ Threestrap - Core Reference
 * Global properties
 
 ```javascript
-three.container;  // Containing element
+three.element;    // Containing element
 three.canvas;     // Canvas element
 three.renderer;   // Three renderer
 three.plugins;    // Collection of active plugins
