@@ -4,7 +4,13 @@ Threestrap - Extra Plugins
 stats
 ---
 Shows live FPS stats in the corner (with Stats.js)
-* No options
+
+* API
+
+```javascript
+// Properties (read-only)
+three.stats;  // Stats() object
+```
 
 controls
 ---

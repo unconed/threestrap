@@ -1,12 +1,29 @@
 Threestrap - Custom Plugins
----
+===
 
 Use `registerPlugin` to make a new plug-in available, passing in a prototype for the class.
 
+Init
+---
+
 * `install:` and `uninstall:` are for initialization and cleanup respectively
 * plugins should install themselves into `three`, preferably in a namespaced object
+
+Config
+---
+
 * `this.options` contains the plugin's options, defaults are set in `.defaults()`
 * use `this.api()` to create set/get helpers for changing options
+
+Events
+---
+
+* `listen` declares event method bindings
+* use `three.on()/.off()/.bind()` for manual binding
+* method bindings are automatically unset when the context is destroyed
+
+Example
+---
 
 ```javascript
 THREE.Bootstrap.registerPlugin('magic', {
