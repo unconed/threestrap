@@ -157,6 +157,7 @@ Docs
 ---
 
 * [Core reference](https://github.com/unconed/threestrap/blob/master/docs/core.md)
+* [Extra plugins reference](https://github.com/unconed/threestrap/blob/master/docs/extra.md)
 * [Write custom plugins](https://github.com/unconed/threestrap/blob/master/docs/custom.md)
 
 * * *
