@@ -34,7 +34,7 @@ THREE.Bootstrap.registerPlugin('camera', {
   change: function (event, three) {
     var o = this.options;
 
-    if (three.camera && o.type == this.cameraType) {
+    if (three.camera && !event.changes.type) {
       ['near', 'far', 'left', 'right', 'top', 'bottom', 'fov'].map(function (key) {
         if (o[key] !== undefined) {
           three.camera[key] = o[key];
@@ -42,7 +42,6 @@ THREE.Bootstrap.registerPlugin('camera', {
       }.bind(this));
     }
     else {
-      this.cameraType = o.type;
       switch (o.type) {
         case 'perspective':
           three.camera = new THREE.PerspectiveCamera(o.fov, this.aspect, o.near, o.far);

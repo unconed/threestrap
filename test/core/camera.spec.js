@@ -72,7 +72,7 @@ describe("camera", function () {
     document.body.removeChild(element);
   });
 
-  it("can recreate the camera", function () {
+  it("recreates the camera when needed", function () {
 
     var options = {
       plugins: ['camera'],
@@ -95,6 +95,15 @@ describe("camera", function () {
     expect(three.camera.top).toEqual(2);
     expect(three.camera.bottom).toEqual(3);
     expect(three.camera.near).toEqual(4);
+    expect(three.camera.far).toEqual(5);
+
+    var old = three.camera;
+    three.Camera.set({
+      near: -5,
+      far: 5,
+    });
+    expect(three.camera).toEqual(old);
+    expect(three.camera.near).toEqual(-5);
     expect(three.camera.far).toEqual(5);
 
     three.Camera.set({

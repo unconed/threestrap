@@ -7039,8 +7039,16 @@ THREE.Bootstrap.Plugin.prototype = {
   ////////
 
   set: function (options) {
-    _.extend(this.options, options);
-    this.dispatchEvent({ type: 'change', changes: options });
+    var o = this.options;
+
+    var changes = _.reduce(options, function (result, value, key) {
+      if (o[key] !== value) result[key] = value;
+      return result;
+    }, {});
+
+    _.extend(o, changes);
+
+    this.dispatchEvent({ type: 'change', changes: changes });
   },
 
   get: function () {
@@ -7378,7 +7386,7 @@ THREE.Bootstrap.registerPlugin('camera', {
   change: function (event, three) {
     var o = this.options;
 
-    if (three.camera && o.type == this.cameraType) {
+    if (three.camera && !event.changes.type) {
       ['near', 'far', 'left', 'right', 'top', 'bottom', 'fov'].map(function (key) {
         if (o[key] !== undefined) {
           three.camera[key] = o[key];
@@ -7386,7 +7394,6 @@ THREE.Bootstrap.registerPlugin('camera', {
       }.bind(this));
     }
     else {
-      this.cameraType = o.type;
       switch (o.type) {
         case 'perspective':
           three.camera = new THREE.PerspectiveCamera(o.fov, this.aspect, o.near, o.far);

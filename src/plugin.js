@@ -23,8 +23,16 @@ THREE.Bootstrap.Plugin.prototype = {
   ////////
 
   set: function (options) {
-    _.extend(this.options, options);
-    this.dispatchEvent({ type: 'change', changes: options });
+    var o = this.options;
+
+    var changes = _.reduce(options, function (result, value, key) {
+      if (o[key] !== value) result[key] = value;
+      return result;
+    }, {});
+
+    _.extend(o, changes);
+
+    this.dispatchEvent({ type: 'change', changes: changes });
   },
 
   get: function () {

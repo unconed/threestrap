@@ -14,6 +14,7 @@ Config
 
 * `this.options` contains the plugin's options, defaults are set in `.defaults()`
 * use `this.api()` to create set/get helpers for changing options
+* when .set() is called, the `change` event fires on `this`. `event.changes` lists the values that actually changed
 
 Events
 ---

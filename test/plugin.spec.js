@@ -62,7 +62,7 @@ describe("plugin", function () {
       install: function () {
         api = this.api();
 
-        this.addEventListener('change', function () {
+        this.on('change', function () {
           captured = this.options;
         });
       },
