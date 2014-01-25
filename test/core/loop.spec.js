@@ -18,6 +18,39 @@ describe("loop", function () {
 
   });
 
+  it("starts and stops", function (cb) {
+
+    var options = {
+      plugins: ['loop'],
+      loop: {
+        start: false,
+      },
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(three.Loop.running).toBe(false);
+
+    three.Loop.start();
+
+    expect(three.Loop.running).toBe(true);
+
+    three.Loop.stop();
+
+    expect(three.Loop.running).toBe(false);
+
+    three.Loop.start();
+
+    expect(three.Loop.running).toBe(true);
+
+    three.Loop.stop();
+
+    expect(three.Loop.running).toBe(false);
+
+    three.destroy();
+
+  });
+
   it("loops correctly", function (cb) {
 
     var pre, update, render, post, three;

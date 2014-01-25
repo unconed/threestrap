@@ -375,7 +375,7 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   stop: function () {
     if (!this.running) return;
-    this.running = false;
+    this.three.Loop.running = this.running = false;
 
     this.three.dispatchEvent({ type: 'stop' });
   },
