@@ -8092,10 +8092,14 @@ THREE.Bootstrap.registerPlugin('stats', {
     style.position = 'absolute';
     style.top = style.left = 0;
     document.body.appendChild(stats.domElement);
+
+    three.stats = stats;
   },
 
   uninstall: function (three) {
     document.body.removeChild(this.stats.domElement);
+
+    delete three.stats;
   },
 
   pre: function (event, three) {
@@ -8105,7 +8109,6 @@ THREE.Bootstrap.registerPlugin('stats', {
   post: function (event, three) {
     this.stats.end();
   },
-
 
 });
 THREE.Bootstrap.registerPlugin('controls', {
