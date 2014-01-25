@@ -74,12 +74,13 @@ var three = THREE.Bootstrap({
 
 When `init` is set to false, initialization only happens when manually calling `three.init()`. To destroy the widget, call `three.destroy()`.
 
-They can also make objects and methods available on the threestrap context, like `three.Time.now` or `three.Loop.start()`.
+Plugins can make objects and methods available on the threestrap context, like `three.Time.now` or `three.Loop.start()`.
 
 Builds
 ---
  * threestrap.js: Full build (but still requires three.js)
  * threestrap-core.js: Core only, requires three.js + lodash
+ * threestrap-extra.js: Extra plugins
 
 Plugins
 ---
