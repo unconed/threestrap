@@ -6,7 +6,7 @@ THREE.Bootstrap.registerPlugin('camera', {
 
     type: 'perspective',
     fov: 60,
-    aspect: 'auto',
+    aspect: null,
 
     // type: 'orthographic',
     left: -1,
@@ -69,7 +69,6 @@ THREE.Bootstrap.registerPlugin('camera', {
 
   update: function () {
     var o = this.options;
-    if (o.aspect == 'auto') o.aspect = 0;
 
     this.camera.aspect = o.aspect || this.aspect;
     this.camera.updateProjectionMatrix();
