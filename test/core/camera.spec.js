@@ -60,7 +60,7 @@ describe("camera", function () {
 
     var options = {
       element: element,
-      plugins: ['size', 'camera'],
+      plugins: ['renderer', 'bind', 'size', 'camera'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -75,7 +75,7 @@ describe("camera", function () {
   it("recreates the camera when needed", function () {
 
     var options = {
-      plugins: ['camera'],
+      plugins: ['bind', 'camera'],
       camera: {
         type: 'orthographic',
         left: 0,

@@ -5,10 +5,9 @@ stats
 ---
 Shows live FPS stats in the corner (with Stats.js)
 
-* API
+* Properties
 
 ```javascript
-// Properties (read-only)
 three.stats;  // Stats() object
 ```
 
@@ -30,10 +29,13 @@ Binds a THREE camera controller to the global camera. Note: you must manually in
 * API
 
 ```javascript
-//
 three.Controls.set({ });      // Set options
 three.Controls.get();         // Get options
+```
 
+* Properties
+
+```javascript
 three.controls;               // Global camera controls
 ```
 

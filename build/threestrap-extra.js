@@ -700,7 +700,7 @@ THREE.Bootstrap.registerPlugin('controls', {
     three.controls = null;
 
     this._camera = three.camera || new THREE.PerspectiveCamera();
-    this.change({}, three);
+    this.change(null, three);
   },
 
   uninstall: function (three) {
@@ -709,9 +709,8 @@ THREE.Bootstrap.registerPlugin('controls', {
 
   change: function (event, three) {
     if (this.options.klass) {
-      if (this.klass !== this.options.klass) {
+      if (!event || event.changes.klass) {
         three.controls = new this.options.klass(this._camera, three.renderer.domElement);
-        this.klass = this.options.klass;
       }
 
       _.extend(three.controls, this.options.parameters);

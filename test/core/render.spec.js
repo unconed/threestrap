@@ -3,7 +3,7 @@ describe("render", function () {
   it("renders the scene on update", function () {
 
     var options = {
-      plugins: ['render'],
+      plugins: ['renderer', 'bind', 'render'],
     };
 
     var three = new THREE.Bootstrap(options);

@@ -36,21 +36,21 @@ THREE.Bootstrap.registerPlugin('loop', {
       this.running && requestAnimationFrame(loop);
 
       ['pre', 'update', 'render', 'post'].map(function (type) {
-        this.three.dispatchEvent({ type: type });
+        this.three.trigger({ type: type });
       }.bind(this));
 
     }.bind(this);
 
     requestAnimationFrame(loop);
 
-    this.three.dispatchEvent({ type: 'start' });
+    this.three.trigger({ type: 'start' });
   },
 
   stop: function () {
     if (!this.running) return;
     this.three.Loop.running = this.running = false;
 
-    this.three.dispatchEvent({ type: 'stop' });
+    this.three.trigger({ type: 'stop' });
   },
 
 });

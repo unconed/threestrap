@@ -46,7 +46,7 @@ three.on('update', function () {
 Configuration
 ---
 
-Threestrap is made out of plugins that each do one thing. The basic set up of `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render` gets you a fully functional canvas in the page.
+Threestrap is made out of plugins that each do one thing. The basic set up of `bind`, `renderer`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render` gets you a fully functional canvas in the page.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
@@ -54,23 +54,17 @@ The following global options are available with these defaults:
 
 ```javascript
 var three = THREE.Bootstrap({
-  init: true,                    // Initialize on creation
-
-  element: document.body,        // Containing element
-
-  plugins: [                     // Active plugins
-    'core',                      // Use all core plugins
+  init: true,                      // Initialize on creation
+                                   
+  element: document.body,          // Containing element
+                                   
+  plugins: [                       // Active plugins
+    'core',                        // Use all core plugins
   ],                             
-  aliases: {
-    // 'render': 'myRender',     // Ad-hoc overrides
-  },
 
-  klass: THREE.WebGLRenderer,    // Renderer class
-  parameters: {                  // Parameters passed to Three.js renderer
-    depth: true,                                          
-    stencil: true,
-    preserveDrawingBuffer: true,
-    antialias: true,
+  aliases: {                       // Extra aliases or
+    // 'render': 'myRender',       // Ad-hoc overrides
+    // 'group': ['myFoo', 'myBar']
   },
 });
 ```
@@ -107,7 +101,7 @@ var three = THREE.Bootstrap({
 
 The following aliases are available:
 
-* `empty` = `size`, `fill`, `loop`, `time`
+* `empty` = `renderer`, `bind`, `size`, `fill`, `loop`, `time`
 * `core` = `empty` + `scene`, `camera`, `render`
 
 Events

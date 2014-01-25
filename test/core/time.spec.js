@@ -3,7 +3,7 @@ describe("time", function () {
   it("installs time values", function () {
 
     var options = {
-      plugins: ['time'],
+      plugins: ['bind','time'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -29,7 +29,7 @@ describe("time", function () {
     }
 
     var options = {
-      plugins: ['time'],
+      plugins: ['bind','time'],
     };
 
     var three = new THREE.Bootstrap(options);

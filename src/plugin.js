@@ -3,8 +3,6 @@ THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = _.defaults(options || {}, this.defaults);
-
-  this.__binds = [];
 }
 
 THREE.Bootstrap.Plugin.prototype = {
@@ -32,7 +30,7 @@ THREE.Bootstrap.Plugin.prototype = {
 
     _.extend(o, changes);
 
-    this.dispatchEvent({ type: 'change', changes: changes });
+    this.trigger({ type: 'change', options: options, changes: changes });
   },
 
   get: function () {
@@ -46,19 +44,9 @@ THREE.Bootstrap.Plugin.prototype = {
     return object;
   },
 
-  /////
-
-  bind: function (three) {
-
-    this.listen.forEach(function (key) {
-      three.bind(key, this);
-    }.bind(this));
-
-  },
-
 };
 
-THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.Binder.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {

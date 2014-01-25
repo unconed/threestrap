@@ -6,13 +6,6 @@ THREE.Bootstrap = function (options) {
     element: document.body,
     plugins: ['core'],
     aliases: {},
-    klass: THREE.WebGLRenderer,
-    parameters: {
-      depth: true,
-      stencil: true,
-      preserveDrawingBuffer: true,
-      antialias: true,
-    },
     plugindb: THREE.Bootstrap.Plugins || {},
     aliasdb: THREE.Bootstrap.Aliases || {},
   };
@@ -22,8 +15,10 @@ THREE.Bootstrap = function (options) {
 
   this.__inited = false;
   this.__destroyed = false;
-  this.__binds = [];
+  this.__installed = [];
+
   this.plugins = {};
+  this.element = options.element;
 
   if (this.__options.init) {
     this.init();
@@ -40,7 +35,7 @@ THREE.Bootstrap.prototype = {
         plugindb = options.plugindb,
         aliasdb = options.aliasdb,
         element = options.element,
-        renderer, plugins, aliases;
+        plugins, aliases;
 
     // Resolve plugins
     aliases = _.extend({}, options.aliasdb, options.aliases);
@@ -68,14 +63,6 @@ THREE.Bootstrap.prototype = {
       throw 'Plug-in alias recursion detected';
     }
 
-    // Instantiate Three renderer
-    renderer = this.renderer = new options.klass(options.parameters);
-    this.canvas = renderer.domElement;
-    this.element = element;
-
-    // Add to DOM
-    element.appendChild(renderer.domElement);
-
     // Install plugins
     _.each(plugins, function (name) {
       var ctor = plugindb[name];
@@ -86,10 +73,11 @@ THREE.Bootstrap.prototype = {
         this.plugins[name] = plugin;
 
         // Install
-        _.extend(this, plugin.install(this) || {});
+        plugin.install(this);
+        this.__installed.push(plugin);
 
-        // Bind events
-        plugin.bind(this);
+        // Notify
+        this.trigger({ type: 'install', plugin: plugin });
       }
     }.bind(this));
 
@@ -105,90 +93,26 @@ THREE.Bootstrap.prototype = {
 
     var options = this.__options;
 
+    // Notify of imminent destruction
+    this.trigger({ type: 'destroy' });
+
     // Uninstall plugins
-    _.each(this.plugins, function (plugin, i) {
+    _.each(this.__installed.reverse(), function (plugin) {
+      // Uninstall
       plugin.uninstall(this);
+
+      // Then notify
+      this.trigger({ type: 'uninstall', plugin: plugin });
+
     }.bind(this));
+
+    this.__installed = [];
     this.plugins = {};
-
-    // Unbind events
-    this.unbind();
-
-    // Remove from DOM
-    this.element.removeChild(this.renderer.domElement);
-    this.renderer = null;
-
 
     return this;
   },
 
-  bind: function (key, object) {
-    // Set base target
-    var fallback = this;
-    if (_.isArray(key)) {
-      fallback = key[0];
-      key = key[1];
-    }
-
-    // Match key
-    var match = /^([^.:]*(?:\.[^.:]+)*)?(?:\:(.*))?$/.exec(key);
-    var path = match[1].split(/\./g);
-
-    var name = path.pop();
-    var dest = match[2] || name;
-
-    // Whitelisted objects
-    var target = {
-      '': fallback,
-      'this': object,
-      'three': this,
-      'element': this.element,
-      'canvas': this.canvas,
-      'window': window,
-    }[path.shift()] || fallback;
-
-    // Look up keys
-    while (target && (key = path.shift())) { target = target[key] };
-
-    // Attach event handler at last level
-    if (target && (target.on || target.addEventListener)) {
-      var callback = function (event) {
-        object[dest] && object[dest](event, this);
-      }.bind(this);
-
-      // Polyfill for both styles of event listener adders
-      var added = false;
-      [ 'addEventListener', 'on' ].map(function (key) {
-        if (!added && target[key]) {
-          added = true;
-          target[key](name, callback);
-        }
-      });
-
-      // Store bind for removal later
-      var bind = { target: target, name: name, callback: callback };
-      this.__binds.push(bind);
-    }
-    else {
-      throw "Cannot bind '" + key + "' in " + this.__name;
-    }
-  },
-
-  unbind: function () {
-    this.__binds.forEach(function (bind) {
-
-      // Polyfill for both styles of event listener removers
-      var removed = false;
-      [ 'removeEventListener', 'off' ].map(function (key) {
-        if (!removed && bind.target[key]) {
-          removed = true;
-          bind.target[key](bind.name, bind.callback);
-        }
-      });
-    });
-    this.__binds = [];
-  },
 };
 
-THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.prototype);
+THREE.Binder.apply(THREE.Bootstrap.prototype);
 

@@ -79,7 +79,7 @@ describe("loop", function () {
     runs(function () {
       var options = {
         init: false,
-        plugins: ['loop'],
+        plugins: ['bind','loop'],
       };
 
       three = new THREE.Bootstrap(options);

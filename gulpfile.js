@@ -22,10 +22,12 @@ var vendor = [
 ];
 
 var core = [
-  'src/dispatch.js',
+  'src/binder.js',
   'src/bootstrap.js',
   'src/plugin.js',
   'src/aliases.js',
+  'src/core/renderer.js',
+  'src/core/bind.js',
   'src/core/size.js',
   'src/core/fill.js',
   'src/core/loop.js',

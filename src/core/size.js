@@ -93,7 +93,7 @@ THREE.Bootstrap.registerPlugin('size', {
       viewHeight: h,
     });
 
-    three.dispatchEvent({
+    three.trigger({
       type: 'resize',
       renderWidth: rw,
       renderHeight: rh,

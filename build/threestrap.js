@@ -6784,26 +6784,92 @@
   }
 }.call(this));
 
-THREE.EventDispatcherBootstrap = function () {};
+THREE.Binder = {
+  bind: function (context, globals) {
+    return function (key, object) {
 
-THREE.EventDispatcherBootstrap.prototype = {
+      // Prepare object
+      if (!object.__binds) {
+        object.__binds = [];
+      }
 
-  // * Fix for three.js EventDispatcher to allow nested dispatches to work
-  // * Pass this as 2nd parameter to event handler
-  // * Rename to .on/.off/.trigger
+      // Set base target
+      var fallback = context;
+      if (_.isArray(key)) {
+        fallback = key[0];
+        key = key[1];
+      }
+
+      // Match key
+      var match = /^([^.:]*(?:\.[^.:]+)*)?(?:\:(.*))?$/.exec(key);
+      var path = match[1].split(/\./g);
+
+      var name = path.pop();
+      var dest = match[2] || name;
+
+      // Whitelisted objects
+      var selector = path.shift();
+      var target = {
+        'this': object,
+      }[selector] || globals[selector] || context[selector] || fallback;
+
+      // Look up keys
+      while (target && (key = path.shift())) { target = target[key] };
+
+      // Attach event handler at last level
+      if (target && (target.on || target.addEventListener)) {
+        var callback = function (event) {
+          object[dest] && object[dest](event, context);
+        };
+
+        // Polyfill for both styles of event listener adders
+        THREE.Binder._polyfill(target, [ 'addEventListener', 'on' ], function (method) {
+          target[method](name, callback);
+        });
+
+        // Store bind for removal later
+        var bind = { target: target, name: name, callback: callback };
+        object.__binds.push(bind);
+      }
+      else {
+        throw "Cannot bind '" + key + "' in " + this.__name;
+      }
+    };
+  },
+
+  unbind: function () {
+    return function (object) {
+      // Remove all binds belonging to object
+      if (object.__binds) {
+
+        object.__binds.forEach(function (bind) {
+
+          // Polyfill for both styles of event listener removers
+          THREE.Binder._polyfill(bind.target, [ 'removeEventListener', 'off' ], function (method) {
+            bind.target[method](bind.name, bind.callback);
+          });
+        }.bind(this));
+
+        object.__binds = [];
+      }
+    }
+  },
 
 	apply: function ( object ) {
 
 		THREE.EventDispatcher.prototype.apply(object);
 
-		object.dispatchEvent = THREE.EventDispatcherBootstrap.prototype.dispatchEvent;
-		object.on = THREE.EventDispatcher.prototype.addEventListener;
-		object.off = THREE.EventDispatcher.prototype.removeEventListener;
-		object.trigger = object.dispatchEvent;
+		object.trigger = THREE.Binder._trigger;
+
+		object.on = object.addEventListener;
+		object.off = object.removeEventListener;
+		object.dispatchEvent = object.trigger;
 
 	},
 
-  dispatchEvent: function (event) {
+  ////
+
+  _trigger: function (event) {
 
 		if (this._listeners === undefined) return;
 
@@ -6824,6 +6890,11 @@ THREE.EventDispatcherBootstrap.prototype = {
 
   },
 
+  _polyfill: function (object, methods, callback) {
+    methods.map(function (method) { return object.method });
+    if (methods.length) callback(methods[0]);
+  },
+
 };
 
 THREE.Bootstrap = function (options) {
@@ -6834,13 +6905,6 @@ THREE.Bootstrap = function (options) {
     element: document.body,
     plugins: ['core'],
     aliases: {},
-    klass: THREE.WebGLRenderer,
-    parameters: {
-      depth: true,
-      stencil: true,
-      preserveDrawingBuffer: true,
-      antialias: true,
-    },
     plugindb: THREE.Bootstrap.Plugins || {},
     aliasdb: THREE.Bootstrap.Aliases || {},
   };
@@ -6850,8 +6914,10 @@ THREE.Bootstrap = function (options) {
 
   this.__inited = false;
   this.__destroyed = false;
-  this.__binds = [];
+  this.__installed = [];
+
   this.plugins = {};
+  this.element = options.element;
 
   if (this.__options.init) {
     this.init();
@@ -6868,7 +6934,7 @@ THREE.Bootstrap.prototype = {
         plugindb = options.plugindb,
         aliasdb = options.aliasdb,
         element = options.element,
-        renderer, plugins, aliases;
+        plugins, aliases;
 
     // Resolve plugins
     aliases = _.extend({}, options.aliasdb, options.aliases);
@@ -6896,14 +6962,6 @@ THREE.Bootstrap.prototype = {
       throw 'Plug-in alias recursion detected';
     }
 
-    // Instantiate Three renderer
-    renderer = this.renderer = new options.klass(options.parameters);
-    this.canvas = renderer.domElement;
-    this.element = element;
-
-    // Add to DOM
-    element.appendChild(renderer.domElement);
-
     // Install plugins
     _.each(plugins, function (name) {
       var ctor = plugindb[name];
@@ -6914,10 +6972,11 @@ THREE.Bootstrap.prototype = {
         this.plugins[name] = plugin;
 
         // Install
-        _.extend(this, plugin.install(this) || {});
+        plugin.install(this);
+        this.__installed.push(plugin);
 
-        // Bind events
-        plugin.bind(this);
+        // Notify
+        this.trigger({ type: 'install', plugin: plugin });
       }
     }.bind(this));
 
@@ -6933,92 +6992,28 @@ THREE.Bootstrap.prototype = {
 
     var options = this.__options;
 
+    // Notify of imminent destruction
+    this.trigger({ type: 'destroy' });
+
     // Uninstall plugins
-    _.each(this.plugins, function (plugin, i) {
+    _.each(this.__installed.reverse(), function (plugin) {
+      // Uninstall
       plugin.uninstall(this);
+
+      // Then notify
+      this.trigger({ type: 'uninstall', plugin: plugin });
+
     }.bind(this));
+
+    this.__installed = [];
     this.plugins = {};
-
-    // Unbind events
-    this.unbind();
-
-    // Remove from DOM
-    this.element.removeChild(this.renderer.domElement);
-    this.renderer = null;
-
 
     return this;
   },
 
-  bind: function (key, object) {
-    // Set base target
-    var fallback = this;
-    if (_.isArray(key)) {
-      fallback = key[0];
-      key = key[1];
-    }
-
-    // Match key
-    var match = /^([^.:]*(?:\.[^.:]+)*)?(?:\:(.*))?$/.exec(key);
-    var path = match[1].split(/\./g);
-
-    var name = path.pop();
-    var dest = match[2] || name;
-
-    // Whitelisted objects
-    var target = {
-      '': fallback,
-      'this': object,
-      'three': this,
-      'element': this.element,
-      'canvas': this.canvas,
-      'window': window,
-    }[path.shift()] || fallback;
-
-    // Look up keys
-    while (target && (key = path.shift())) { target = target[key] };
-
-    // Attach event handler at last level
-    if (target && (target.on || target.addEventListener)) {
-      var callback = function (event) {
-        object[dest] && object[dest](event, this);
-      }.bind(this);
-
-      // Polyfill for both styles of event listener adders
-      var added = false;
-      [ 'addEventListener', 'on' ].map(function (key) {
-        if (!added && target[key]) {
-          added = true;
-          target[key](name, callback);
-        }
-      });
-
-      // Store bind for removal later
-      var bind = { target: target, name: name, callback: callback };
-      this.__binds.push(bind);
-    }
-    else {
-      throw "Cannot bind '" + key + "' in " + this.__name;
-    }
-  },
-
-  unbind: function () {
-    this.__binds.forEach(function (bind) {
-
-      // Polyfill for both styles of event listener removers
-      var removed = false;
-      [ 'removeEventListener', 'off' ].map(function (key) {
-        if (!removed && bind.target[key]) {
-          removed = true;
-          bind.target[key](bind.name, bind.callback);
-        }
-      });
-    });
-    this.__binds = [];
-  },
 };
 
-THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.prototype);
+THREE.Binder.apply(THREE.Bootstrap.prototype);
 
 
 THREE.Bootstrap.Plugins = {};
@@ -7026,8 +7021,6 @@ THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = _.defaults(options || {}, this.defaults);
-
-  this.__binds = [];
 }
 
 THREE.Bootstrap.Plugin.prototype = {
@@ -7055,7 +7048,7 @@ THREE.Bootstrap.Plugin.prototype = {
 
     _.extend(o, changes);
 
-    this.dispatchEvent({ type: 'change', changes: changes });
+    this.trigger({ type: 'change', options: options, changes: changes });
   },
 
   get: function () {
@@ -7069,19 +7062,9 @@ THREE.Bootstrap.Plugin.prototype = {
     return object;
   },
 
-  /////
-
-  bind: function (three) {
-
-    this.listen.forEach(function (key) {
-      three.bind(key, this);
-    }.bind(this));
-
-  },
-
 };
 
-THREE.EventDispatcherBootstrap.prototype.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.Binder.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {
@@ -7105,9 +7088,77 @@ THREE.Bootstrap.unregisterAlias = function (name) {
   delete THREE.Bootstrap.Aliases[name];
 }
 
-THREE.Bootstrap.registerAlias('empty', ['size', 'fill', 'loop', 'time']);
+THREE.Bootstrap.registerAlias('empty', ['renderer', 'bind', 'size', 'fill', 'loop', 'time']);
 THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render']);
 
+
+THREE.Bootstrap.registerPlugin('renderer', {
+
+  defaults: {
+    klass: THREE.WebGLRenderer,
+    parameters: {
+      depth: true,
+      stencil: true,
+      preserveDrawingBuffer: true,
+      antialias: true,
+    },
+  },
+
+  install: function (three) {
+    // Instantiate Three renderer
+    var renderer = three.renderer = new this.options.klass(this.options.parameters);
+    three.canvas = renderer.domElement;
+
+    // Add to DOM
+    three.element.appendChild(renderer.domElement);
+  },
+
+  uninstall: function (three) {
+    // Remove from DOM
+    three.element.removeChild(three.renderer.domElement);
+    three.renderer = null;
+
+    delete three.renderer;
+    delete three.canvas;
+  },
+
+});
+
+THREE.Bootstrap.registerPlugin('bind', {
+
+  install: function (three) {
+    this.three = three;
+
+    var globals = {
+      'three': three,
+      'window': window,
+    };
+
+    three.bind = THREE.Binder.bind(three, globals);
+    three.unbind = THREE.Binder.unbind(three);
+
+    three.bind('install:bind', this);
+    three.bind('uninstall:unbind', this);
+  },
+
+  uninstall: function (three) {
+    three.unbind('install:bind', this);
+    three.unbind('uninstall:unbind', this);
+  },
+
+  bind: function (event, three) {
+    var plugin = event.plugin;
+    var listen = plugin.listen;
+    listen && listen.forEach(function (key) {
+      three.bind(key, plugin);
+    });
+  },
+
+  unbind: function (event, three) {
+    three.unbind(event.plugin);
+  },
+
+});
 
 THREE.Bootstrap.registerPlugin('size', {
 
@@ -7204,7 +7255,7 @@ THREE.Bootstrap.registerPlugin('size', {
       viewHeight: h,
     });
 
-    three.dispatchEvent({
+    three.trigger({
       type: 'resize',
       renderWidth: rw,
       renderHeight: rh,
@@ -7291,21 +7342,21 @@ THREE.Bootstrap.registerPlugin('loop', {
       this.running && requestAnimationFrame(loop);
 
       ['pre', 'update', 'render', 'post'].map(function (type) {
-        this.three.dispatchEvent({ type: type });
+        this.three.trigger({ type: type });
       }.bind(this));
 
     }.bind(this);
 
     requestAnimationFrame(loop);
 
-    this.three.dispatchEvent({ type: 'start' });
+    this.three.trigger({ type: 'start' });
   },
 
   stop: function () {
     if (!this.running) return;
     this.three.Loop.running = this.running = false;
 
-    this.three.dispatchEvent({ type: 'stop' });
+    this.three.trigger({ type: 'stop' });
   },
 
 });
@@ -7315,7 +7366,7 @@ THREE.Bootstrap.registerPlugin('time', {
 
   install: function (three) {
 
-     three.Time = this.api({
+    three.Time = this.api({
       now: 0,
       delta: 1/60,
       average: 0,
@@ -7341,7 +7392,7 @@ THREE.Bootstrap.registerPlugin('time', {
     this.last = now;
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     delete three.Time;
   },
 
@@ -8140,7 +8191,7 @@ THREE.Bootstrap.registerPlugin('controls', {
     three.controls = null;
 
     this._camera = three.camera || new THREE.PerspectiveCamera();
-    this.change({}, three);
+    this.change(null, three);
   },
 
   uninstall: function (three) {
@@ -8149,9 +8200,8 @@ THREE.Bootstrap.registerPlugin('controls', {
 
   change: function (event, three) {
     if (this.options.klass) {
-      if (this.klass !== this.options.klass) {
+      if (!event || event.changes.klass) {
         three.controls = new this.options.klass(this._camera, three.renderer.domElement);
-        this.klass = this.options.klass;
       }
 
       _.extend(three.controls, this.options.parameters);

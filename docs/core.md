@@ -1,19 +1,17 @@
 Threestrap - Core Reference
 ===
 
-* Initialization
+* API
 
 ```javascript
 three.init()             // Initialize threestrap instance
 three.destroy()          // Destroy threestrap instance
 ```
 
-* Global properties
+* Properties
 
 ```javascript
 three.element;    // Containing element
-three.canvas;     // Canvas element
-three.renderer;   // Three renderer
 three.plugins;    // Collection of active plugins
 ````
 
@@ -23,6 +21,56 @@ three.plugins;    // Collection of active plugins
 // Listen for three.event events
 three.on('event', function (event, three) { });
 ```
+```javascript
+// Remove event listener
+three.off('event', handler);
+```
+
+```javascript
+// Trigger a threestrap event.
+three.trigger({
+  type: 'event',
+  // ...
+});
+```
+
+* Events
+
+```javascript
+// Fires once after all plugins have been installed
+three.on('ready', function (event, three) { });
+```
+
+renderer
+---
+Creates the renderer of the given class.
+
+* Options
+
+```javascript
+{
+  klass: THREE.WebGLRenderer,    // Renderer class
+  parameters: {                  // Parameters passed to Three.js renderer
+    depth: true,                                          
+    stencil: true,
+    preserveDrawingBuffer: true,
+    antialias: true,
+  },
+}
+```
+
+* Properties
+
+```javascript
+three.canvas;     // Canvas / DOM element
+three.renderer;   // Three renderer
+```
+
+bind
+---
+Enables event/method binding on context and installed plug-ins (nothing works without it).
+
+* API
 
 ```javascript
 // Bind threestrap 'event' events to object.event(event, three)
@@ -38,7 +86,7 @@ three.bind('event:method', object);
 // Bind target's 'event' events to object.method(event, three)
 // where target is one of:
 // - three: threestrap context
-// - this: the object itself
+// - this: the listening object itself
 // - element: the containing element
 // - canvas: the canvas
 // - window: window object
@@ -48,19 +96,12 @@ three.bind('target.event:method', object);
 ```javascript
 // Bind target's 'event' events to object.method(event, three)
 // where target is any object with on / off / addEventListener / removeEventListener methods.
-three.bind('target.event:method', object);
+three.bind([ target, 'event:method' ], object);
 ```
 
 ```javascript
-// Trigger a threestrap event.
-three.trigger({ type: 'event', /* ... */ });
-```
-
-* Global Events
-
-```javascript
-// Fires once after all plugins have been installed
-three.on('ready', function (event, three) { });
+// Unbind all bound methods
+three.unbind(object);
 ```
 
 size
@@ -86,8 +127,11 @@ Autosizes canvas to fill its container or size to given dimensions. Force aspect
 // Methods
 three.Size.set({ });      // Set options
 three.Size.get();         // Get options
+```
 
-// Properties (read-only)
+* Properties
+
+```javascript
 three.Size.renderWidth;   // Width of frame buffer
 three.Size.renderHeight;  // Height of frame buffer
 three.Size.viewWidth;     // Width of canvas on page
@@ -130,11 +174,13 @@ Runs the rendering loop and asks plugins to update or render themselves.
 * API
 
 ```javascript
-// Methods
 three.Loop.start();   // Start loop
 three.Loop.stop();    // Stop loop
+```
 
-// Properties (read-only)
+* Properties
+
+```javascript
 three.Loop.running;   // Is loop running?
 ```
 
@@ -143,19 +189,29 @@ three.Loop.running;   // Is loop running?
 ```javascript
 // Loop has been started
 three.on('start', function () { });
+```
 
+```javascript
 // Loop has been stopped
 three.on('stop', function () { });
+```
 
+```javascript
 // Prepare for rendering
 three.on('pre', function () { });
+```
 
+```javascript
 // Update state of objects
 three.on('update', function () { });
+```
 
+```javascript
 // Render objects
 three.on('render', function () { });
+```
 
+```javascript
 // Finish up after rendering
 three.on('post', function () { });
 ```
@@ -164,10 +220,9 @@ time
 ---
 Measures time and fps in seconds.
 
-* API
+* Properties
 
 ```javascript
-// Properties (read-only)
 three.Time.now     // Clock (seconds)
 three.Time.delta   // Last frame time (seconds)
 three.Time.average // Average frame time (seconds)
@@ -181,7 +236,6 @@ Makes a scene available.
 * API
 
 ```javascript
-// Properties (read-only)
 three.scene    // Global scene
 ```
 
@@ -211,11 +265,13 @@ Makes a camera available.
 * API
 
 ```javascript
-// Methods
 three.Camera.set({ }); // Set options
 three.Camera.get();    // Get options
+```
 
-// Properties (read-only)
+* Properties
+
+```javascript
 three.camera;          // Global camera
 ```
 

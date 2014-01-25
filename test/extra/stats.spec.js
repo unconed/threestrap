@@ -3,7 +3,7 @@ describe("stats", function () {
   it("adds stats to the dom", function () {
 
     var options = {
-      plugins: ['stats'],
+      plugins: ['renderer', 'bind', 'stats'],
     };
 
     expect(document.querySelector('#stats')).toBeFalsy();

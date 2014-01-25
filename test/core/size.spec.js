@@ -9,7 +9,7 @@ describe("size", function () {
 
     var options = {
       element: element,
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -33,7 +33,7 @@ describe("size", function () {
         height: 130,
         scale: 1/2,
       },
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -56,7 +56,7 @@ describe("size", function () {
 
     var options = {
       init: false,
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
       size: {
         width: 600,
         height: 400,
@@ -82,7 +82,7 @@ describe("size", function () {
 
     var options = {
       init: false,
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
       size: {
         width: 400,
         height: 600,
@@ -114,7 +114,7 @@ describe("size", function () {
         aspect: 5/4,
         scale: 1/2,
       },
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -142,7 +142,7 @@ describe("size", function () {
         aspect: 4/5,
         scale: 1/2,
       },
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -169,7 +169,7 @@ describe("size", function () {
 
     var options = {
       element: element,
-      plugins: ['size'],
+      plugins: ['renderer', 'bind', 'size'],
     };
 
     options = {

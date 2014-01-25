@@ -4,7 +4,7 @@ THREE.Bootstrap.registerPlugin('time', {
 
   install: function (three) {
 
-     three.Time = this.api({
+    three.Time = this.api({
       now: 0,
       delta: 1/60,
       average: 0,
@@ -30,7 +30,7 @@ THREE.Bootstrap.registerPlugin('time', {
     this.last = now;
   },
 
-  uninstall: function (three, renderer, element) {
+  uninstall: function (three) {
     delete three.Time;
   },
 
