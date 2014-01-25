@@ -7141,8 +7141,7 @@ THREE.Bootstrap.registerPlugin('bind', {
   },
 
   uninstall: function (three) {
-    three.unbind('install:bind', this);
-    three.unbind('uninstall:unbind', this);
+    three.unbind(this);
   },
 
   bind: function (event, three) {
