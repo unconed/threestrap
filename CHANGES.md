@@ -1,5 +1,7 @@
-0.0.4
+0.0.4-dev
+
 * Make api mechanism reusable as `THREE.Api`
+* Hot-swap plugins with `three.install/uninstall(name/plugins)`
 
 0.0.3
 

@@ -134,6 +134,44 @@ describe("three", function () {
     expect(spec.uninstall.calls.length).toEqual(1);
   });
 
+  it("hot swaps a plugin", function () {
+
+    var spec = {
+      install: function () {},
+      uninstall: function () {},
+      bind: function () {},
+      unbind: function () {},
+    };
+
+    spyOn(spec, 'install');
+    spyOn(spec, 'uninstall');
+
+    var mock = function () {};
+    mock.prototype = spec;
+
+    var options = {
+      plugins: [],
+      plugindb: { mock: mock },
+      aliasdb: {},
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(spec.install.calls.length).toEqual(0);
+
+    three.install('mock');
+
+    expect(spec.uninstall.calls.length).toEqual(0);
+    expect(spec.install.calls.length).toEqual(1);
+
+    three.uninstall('mock');
+
+    expect(spec.uninstall.calls.length).toEqual(1);
+
+    three.destroy();
+
+  });
+
   it("expands aliases recursively", function () {
 
     var installed = [0, 0, 0, 0];

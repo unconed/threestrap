@@ -23,6 +23,7 @@ THREE.Bootstrap = function (options) {
   if (this.__options.init) {
     this.init();
   }
+
 };
 
 THREE.Bootstrap.prototype = {
@@ -31,57 +32,10 @@ THREE.Bootstrap.prototype = {
     if (this.__inited) return;
     this.__inited = true;
 
-    var options = this.__options,
-        plugindb = options.plugindb,
-        aliasdb = options.aliasdb,
-        element = options.element,
-        plugins, aliases;
-
-    // Resolve plugins
-    aliases = _.extend({}, options.aliasdb, options.aliases);
-    _.each(aliases, function (alias, key) {
-      if (!_.isArray(alias)) aliases[key] = [alias];
-    });
-    plugins = resolve(options.plugins);
-
-    function resolve(list) {
-      var limit = 256, length = 1024, i = 0;
-      while (list.length < length && i++ < limit) {
-        var replaced = false;
-        list = _.reduce(list, function (list, item) {
-          var alias;
-          if (alias = aliases[item]) {
-            list = list.concat(alias);
-            replaced = true;
-          }
-          else {
-            list.push(item);
-          }
-          return list;
-        }, []);
-        if (!replaced) return list;
-      }
-      throw 'Plug-in alias recursion detected';
-    }
-
     // Install plugins
-    _.each(plugins, function (name) {
-      var ctor = plugindb[name];
-      if (ctor) {
-        if (this.plugins[name]) return;
+    this.install(this.__options.plugins);
 
-        var plugin = new ctor(options[name] || {}, name);
-        this.plugins[name] = plugin;
-
-        // Install
-        plugin.install(this);
-        this.__installed.push(plugin);
-
-        // Notify
-        this.trigger({ type: 'install', plugin: plugin });
-      }
-    }.bind(this));
-
+    // Notify
     this.trigger({ type: 'ready' });
 
     return this;
@@ -92,26 +46,98 @@ THREE.Bootstrap.prototype = {
     if (this.__destroyed) return;
     this.__destroyed = true;
 
-    var options = this.__options;
-
     // Notify of imminent destruction
     this.trigger({ type: 'destroy' });
 
-    // Uninstall plugins
-    _.eachRight(this.__installed, function (plugin) {
-      // Uninstall
-      plugin.uninstall(this);
-
-      // Then notify
-      this.trigger({ type: 'uninstall', plugin: plugin });
-
-    }.bind(this));
-
-    this.__installed = [];
-    this.plugins = {};
+    // Then uninstall plugins
+    this.uninstall();
 
     return this;
   },
+
+  resolve: function (plugins) {
+    plugins = _.isArray(plugins) ? plugins : [plugins];
+
+    // Resolve alias database
+    var o = this.__options;
+    var aliases = _.extend({}, o.aliasdb, o.aliases);
+    _.each(aliases, function (alias, key) {
+      aliases[key] = _.isArray(alias) ? alias : [alias];
+    });
+
+    // Look up aliases recursively
+    function recurse(list, out, level) {
+      if (level >= 256) throw "Plug-in alias recursion detected.";
+      _.each(list, function (name) {
+        var alias = aliases[name];
+        if (!alias) {
+          out.push(name);
+        }
+        else {
+          out = out.concat(recurse(alias, [], level + 1));
+        }
+      });
+      return out;
+    }
+
+    return recurse(plugins, [], 0);
+  },
+
+  install: function (plugins) {
+    plugins = _.isArray(plugins) ? plugins : [plugins];
+
+    // Resolve aliases
+    plugins = this.resolve(plugins);
+
+    // Install in order
+    _.each(plugins, this.__install, this);
+  },
+
+  uninstall: function (plugins) {
+    if (plugins) {
+      plugins = _.isArray(plugins) ? plugins : [plugins];
+
+      // Resolve aliases
+      plugins = this.resolve(plugins);
+    }
+
+    // Uninstall in reverse order
+    _.eachRight(plugins || this.__installed, this.__uninstall, this);
+  },
+
+  __install: function (name) {
+    // Sanity check
+    var ctor = this.__options.plugindb[name];
+    if (!ctor) throw "[three.install] Cannot install. '" + name + "' is not registered.";
+    if (this.plugins[name]) return console.warn("[three.install] "+ name + " is already installed.");
+
+    // Construct
+    var Plugin = ctor;
+    var plugin = new Plugin(this.__options[name] || {}, name);
+    this.plugins[name] = plugin;
+
+    // Install
+    plugin.install(this);
+    this.__installed.push(plugin);
+
+    // Then notify
+    this.trigger({ type: 'install', plugin: plugin });
+  },
+
+  __uninstall: function (name, alias) {
+    // Sanity check
+    plugin = _.isString(name) ? this.plugins[name] : name;
+    if (!plugin) return console.warn("[three.uninstall] " + name + "' is not installed.");
+    name = plugin.__name;
+
+    // Uninstall
+    plugin.uninstall(this);
+    this.__installed = _.without(this.__installed, plugin);
+    delete this.plugins[name];
+
+    // Then notify
+    this.trigger({ type: 'uninstall', plugin: plugin });
+  }
 
 };
 
