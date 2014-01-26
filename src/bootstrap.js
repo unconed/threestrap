@@ -1,5 +1,8 @@
 THREE.Bootstrap = function (options) {
   if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
+  if (options)
+    if (_.isString(options)) options = [options];
+    if (_.isArray(options)) options = { plugins: options };
 
   var defaults = {
     init: true,
@@ -11,7 +14,6 @@ THREE.Bootstrap = function (options) {
   };
 
   this.__options = _.defaults(options || {}, defaults);
-  this.__options.parameters = _.defaults(this.__options.parameters, defaults.parameters);
 
   this.__inited = false;
   this.__destroyed = false;
