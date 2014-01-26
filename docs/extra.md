@@ -21,7 +21,6 @@ Binds a THREE camera controller to the global camera. Note: you must manually in
 {
   klass: THREE.OrbitControls, // Control class
   parameters: {               // Parameters for class
-    
   },
 }
 ```

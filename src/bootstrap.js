@@ -1,9 +1,14 @@
 THREE.Bootstrap = function (options) {
-  if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
   if (options)
-    if (_.isString(options)) options = [options];
+    // (plugin, ...)
+    if (_.isString(options)) { options = [].slice.apply(arguments); }
+    // ([plugin, ...])
     if (_.isArray(options)) options = { plugins: options };
 
+  // 'new' is optional
+  if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
+
+  // Apply defaults
   var defaults = {
     init: true,
     element: document.body,
@@ -12,20 +17,21 @@ THREE.Bootstrap = function (options) {
     plugindb: THREE.Bootstrap.Plugins || {},
     aliasdb: THREE.Bootstrap.Aliases || {},
   };
-
   this.__options = _.defaults(options || {}, defaults);
 
+  // Hidden state
   this.__inited = false;
   this.__destroyed = false;
   this.__installed = [];
 
+  // Global context
   this.plugins = {};
   this.element = options.element;
 
+  // Auto-init
   if (this.__options.init) {
     this.init();
   }
-
 };
 
 THREE.Bootstrap.prototype = {
@@ -63,6 +69,16 @@ THREE.Bootstrap.prototype = {
     // Resolve alias database
     var o = this.__options;
     var aliases = _.extend({}, o.aliasdb, o.aliases);
+
+    // Remove inline alias defs from plugins
+    plugins = _.filter(plugins, function (name) {
+      var key = name.split(':');
+      if (!key[1]) return true;
+      aliases[key[0]] = key[1];
+      return false;
+    });
+
+    // Unify arrays
     _.each(aliases, function (alias, key) {
       aliases[key] = _.isArray(alias) ? alias : [alias];
     });

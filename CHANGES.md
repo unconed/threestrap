@@ -1,5 +1,6 @@
 0.0.4-dev
 
+* Shorthand syntax `foo:bar` for aliases in plugin list
 * Make api mechanism reusable as `THREE.Api`
 * Hot-swap plugins with `three.install/uninstall(name/plugins)`
 

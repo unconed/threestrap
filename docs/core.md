@@ -4,15 +4,41 @@ Threestrap - Core Reference
 * API
 
 ```javascript
-three.init()             // Initialize threestrap instance
-three.destroy()          // Destroy threestrap instance
+THREE.Bootstrap()                            // Create bootstrap context
+
+THREE.Bootstrap('plugin', ...)               // With given plugins
+THREE.Bootstrap(['plugin', ...])
+THREE.Bootstrap(['plugin', "plugin:plugin"]) // and ad-hoc overrides
+
+THREE.Bootstrap({                            // With given options
+  init: true,                                // Initialize on creation
+
+  element: document.body,                    // Containing element
+
+  plugins: [                                 // Active plugins
+    'core',                                  // Use all core plugins
+  ],
+
+  aliases: {                                 // Ad-hoc overrides
+    // 'alias': 'plugin',
+    // 'alias': ['plugin', ...],
+  }
+
+
+three.init()                                 // Initialize threestrap instance
+three.destroy()                              // Destroy threestrap instance
+
+three.install('plugin', ...)                 // Install plugin(s) on the fly
+three.install(['plugin', ...])
+three.uninstall('plugin', ...)               // Uninstall plugin(s) on the fly
+three.uninstall(['plugin', ...])
 ```
 
 * Properties
 
 ```javascript
 three.element;    // Containing element
-three.plugins;    // Collection of active plugins
+three.plugins;    // Collection of installed plugins by name
 ````
 
 * Event listeners
@@ -51,7 +77,7 @@ Creates the renderer of the given class.
 {
   klass: THREE.WebGLRenderer,    // Renderer class
   parameters: {                  // Parameters passed to Three.js renderer
-    depth: true,                                          
+    depth: true,
     stencil: true,
     preserveDrawingBuffer: true,
     antialias: true,
@@ -256,7 +282,7 @@ Makes a camera available.
 
   // type: 'orthographic',     // Orthographic camera
   left: -1,                    // Bounding box
-  right: 1,                      
+  right: 1,
   bottom: -1,
   top: 1,
 }

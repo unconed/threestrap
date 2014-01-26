@@ -50,21 +50,35 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `r
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
+Shorthands:
+````
+// Core only
+var three = THREE.Bootstrap();
+
+// Pass in list of plugins
+var three = THREE.Bootstrap('core', 'stats');
+var three = THREE.Bootstrap(['core', 'stats']);
+
+// Set ad-hoc overrides
+var three = THREE.Bootstrap(['core', 'stats', 'render:myRender']);
+```
+
 The following global options are available with these defaults:
 
 ```javascript
 var three = THREE.Bootstrap({
   init: true,                      // Initialize on creation
-                                   
+
   element: document.body,          // Containing element
-                                   
+
   plugins: [                       // Active plugins
     'core',                        // Use all core plugins
-  ],                             
+    // 'render:myRender'           // Ad-hoc overrides
+  ],
 
-  aliases: {                       // Extra aliases or
-    // 'render': 'myRender',       // Ad-hoc overrides
-    // 'group': ['myFoo', 'myBar']
+  aliases: {                       // Ad-hoc overrides
+    // 'render': 'myRender',       
+    // 'alias': ['myFoo', 'myBar']
   },
 });
 ```
@@ -113,7 +127,7 @@ You can listen for events with `.on()` and unset them with `.off()`.
 
 ```javascript
 three.on('event', function (event, three) {
-  
+
 });
 ```
 

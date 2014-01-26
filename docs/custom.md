@@ -77,17 +77,17 @@ THREE.Bootstrap.registerPlugin('magic', {
 
     // Remove manual event listeners
     // three.off(...);
-    
+
     // Remove from context
     delete three.Magic;
     delete three.magic;
     delete three.pingMagic;
   },
-  
+
   // body.click event handler
   click: function (event, three) {
   },
-  
+
   // this.change event handler
   change: function (event, three) {
     // event.type == 'change'
@@ -100,7 +100,7 @@ THREE.Bootstrap.registerPlugin('magic', {
   yup: function (event, three) {
     // event.type == 'ready'
   },
-  
+
 });
 ```
 
