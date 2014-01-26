@@ -96,42 +96,6 @@ describe("three", function () {
 
     three.destroy();
 
-
-  });
-
-  it("passed on plugin options", function () {
-
-    var captured = false;
-
-    var spec = {
-      install: function () {},
-      uninstall: function () {},
-      bind: function () {},
-      unbind: function () {},
-    };
-
-    var mock = function (options) {
-      captured = options;
-    };
-    mock.prototype = spec;
-
-    var options = {
-      init: false,
-      mock: {
-        foo: 'bar',
-      },
-      plugins: ['mock'],
-      plugindb: { mock: mock },
-      aliasdb: {},
-    };
-
-    var three = new THREE.Bootstrap(options);
-
-    three.init();
-
-    expect(captured.foo).toBe('bar');
-
-    three.destroy();
   });
 
   it("installs/uninstall a plugin", function () {
@@ -272,4 +236,40 @@ describe("three", function () {
 
     three.destroy();
   });
+
+  it("passed on plugin options", function () {
+
+    var captured = false;
+
+    var spec = {
+      install: function () {},
+      uninstall: function () {},
+      bind: function () {},
+      unbind: function () {},
+    };
+
+    var mock = function (options) {
+      captured = options;
+    };
+    mock.prototype = spec;
+
+    var options = {
+      init: false,
+      mock: {
+        foo: 'bar',
+      },
+      plugins: ['mock'],
+      plugindb: { mock: mock },
+      aliasdb: {},
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    three.init();
+
+    expect(captured.foo).toBe('bar');
+
+    three.destroy();
+  });
+
 });

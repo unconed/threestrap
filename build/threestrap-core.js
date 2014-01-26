@@ -194,20 +194,21 @@ THREE.Bootstrap.prototype = {
     plugins = resolve(options.plugins);
 
     function resolve(list) {
-      var limit = 1024;
-      while (limit-- > 0) {
+      var limit = 256, length = 1024, i = 0;
+      while (list.length < length && i++ < limit) {
         var replaced = false;
-        var out = [];
-        _.each(list, function (item) {
+        list = _.reduce(list, function (list, item) {
           var alias;
           if (alias = aliases[item]) {
-            out = out.concat(alias);
+            list = list.concat(alias);
             replaced = true;
           }
-          else out.push(item);
-        });
-        if (!replaced) return out;
-        list = out;
+          else {
+            list.push(item);
+          }
+          return list;
+        }, []);
+        if (!replaced) return list;
       }
       throw 'Plug-in alias recursion detected';
     }

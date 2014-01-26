@@ -6,22 +6,22 @@ Use `registerPlugin` to make a new plug-in available, passing in a prototype for
 Init
 ---
 
-* `install:` and `uninstall:` are for initialization and cleanup respectively
+* `.install(three)` and `.uninstall(three)` are for initialization and cleanup respectively
 * plugins should install themselves into `three`, preferably in a namespaced object
 
 Config
 ---
 
-* `this.options` contains the plugin's options, defaults are set in `.defaults()`
+* `this.options` contains the plugin's options, defaults are set in `.defaults`
 * use `this.api()` to create set/get helpers for changing options
-* when .set() is called, the `change` event fires on `this`. `event.changes` lists the values that actually changed
+* when `api.set({...})` is called, the `change` event fires on `this`. `event.changes` lists the values that actually changed
 
 Events
 ---
 
-* `listen` declares event method bindings
+* `.listen` declares a list of event/method bindings
 * use `three.on()/.off()/.bind()` for manual binding
-* method bindings are automatically unset when the context is destroyed
+* method bindings are automatically unbound when the plugin is uninstalled
 
 Examples
 ---
