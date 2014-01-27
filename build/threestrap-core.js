@@ -179,7 +179,7 @@ THREE.Bootstrap = function (options) {
 
   // Global context
   this.plugins = {};
-  this.element = options.element;
+  this.element = this.__options.element;
 
   // Auto-init
   if (this.__options.init) {
@@ -498,7 +498,7 @@ THREE.Bootstrap.registerPlugin('size', {
         w = Math.round(h * options.aspect);
         ml = Math.floor((ew - w) / 2);
       }
-      aspect = options.aspect;
+      aspect = w / h;
     }
 
     // Apply scale and resolution cap
@@ -530,6 +530,7 @@ THREE.Bootstrap.registerPlugin('size', {
       renderHeight: rh,
       viewWidth: w,
       viewHeight: h,
+      aspect: aspect,
     });
 
     three.trigger({
@@ -538,6 +539,7 @@ THREE.Bootstrap.registerPlugin('size', {
       renderHeight: rh,
       viewWidth: w,
       viewHeight: h,
+      aspect: aspect,
     });
   },
 
