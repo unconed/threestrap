@@ -140,8 +140,8 @@ Autosizes canvas to fill its container or size to given dimensions. Force aspect
 {
   width: null,           // Fixed width in pixels
   height: null,          // Fixed height in pixels
-  aspect: null,          // Fixed aspect ratio
-  scale: 1,              // Scale factor. e.g. scale `1/2` renders at half resolution.
+  aspect: null,          // Fixed aspect ratio, e.g. 16/9
+  scale: 1,              // Scale factor. e.g. scale 1/2 renders at half resolution.
   capWidth:  Infinity,   // Maximum width in pixels of framebuffer
   capHeight: Infinity,   // Maximum height in pixels of framebuffer
 }
@@ -162,19 +162,21 @@ three.Size.renderWidth;   // Width of frame buffer
 three.Size.renderHeight;  // Height of frame buffer
 three.Size.viewWidth;     // Width of canvas on page
 three.Size.viewHeight;    // Height of canvas on page
+three.Size.aspect;        // Aspect ratio of view
 ```
 
 * Events
 
 ```javascript
 // Canvas was resized to new dimensions.
-three.on('resize', function (event) {
+three.on('resize', function (event, three) {
   // event ==
   {
     renderWidth: 100,
     renderHeight: 100,
     viewWidth: 100,
     viewHeight: 100,
+    aspect: 1,
   }
 }
 ```
@@ -259,7 +261,7 @@ scene
 ---
 Makes a scene available.
 
-* API
+* Properties
 
 ```javascript
 three.scene    // Global scene
@@ -305,7 +307,7 @@ three.camera;          // Global camera
 
 ```javascript
 // Camera was recreated / changed
-three.on('camera', function (event) {
+three.on('camera', function (event, three) {
   // event.camera
 }
 ```

@@ -26,7 +26,7 @@ Get a threestrap context:
 var three = THREE.Bootstrap();
 ```
 
-This will create a fullscreen Three.js WebGL canvas, initialize the scene and camera, and set up a rendering loop.
+This will create a full-page Three.js WebGL canvas, initialize the scene and camera, and set up a rendering loop.
 
 You can access the globals `three.scene` and `three.camera`, and bind events on the `three` context:
 
@@ -46,7 +46,9 @@ three.on('update', function () {
 Configuration
 ---
 
-Threestrap is made out of plugins that each do one thing. The basic set up of `renderer`, `bind`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render` gets you a fully functional canvas in the page.
+Threestrap is made out of plugins that each do one thing. The basic set up of `core` gets you a fully-functional canvas in the body or a specific DOM element, using:
+
+`renderer`, `bind`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render`
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
@@ -59,7 +61,7 @@ var three = THREE.Bootstrap();
 var three = THREE.Bootstrap('core', 'stats');
 var three = THREE.Bootstrap(['core', 'stats']);
 
-// Set ad-hoc overrides
+// Replace plugins ad-hoc
 var three = THREE.Bootstrap(['core', 'stats', 'render:myRender']);
 ```
 

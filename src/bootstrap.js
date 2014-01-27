@@ -26,7 +26,7 @@ THREE.Bootstrap = function (options) {
 
   // Global context
   this.plugins = {};
-  this.element = options.element;
+  this.element = this.__options.element;
 
   // Auto-init
   if (this.__options.init) {
