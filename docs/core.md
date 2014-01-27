@@ -287,6 +287,9 @@ Makes a camera available.
   right: 1,
   bottom: -1,
   top: 1,
+  
+  klass: null,                 // Custom class/parameters
+  parameters: null,            // if you really want to
 }
 ```
 
