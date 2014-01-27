@@ -53,7 +53,7 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `c
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
 Shorthands:
-````
+```javascript
 // Core only
 var three = THREE.Bootstrap();
 
