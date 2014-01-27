@@ -347,4 +347,15 @@ describe("three", function () {
     three.destroy();
   });
 
+  it("autoinits core", function () {
+
+    var three = new THREE.Bootstrap();
+
+    expect(three.__inited).toEqual(true);
+
+    three.destroy();
+
+  });
+
+
 });
