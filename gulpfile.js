@@ -4,6 +4,7 @@ var concat = require('gulp-concat');
 var rename = require("gulp-rename");
 var karma = require('gulp-karma');
 var runSequence = require('run-sequence');
+var watch = require('gulp-watch');
 
 var builds = {
   core: 'build/threestrap-core.js',
@@ -84,14 +85,41 @@ gulp.task('karma', function() {
   return gulp.src(test)
     .pipe(karma({
       configFile: 'karma.conf.js',
-      action: 'run',
+      action: 'single',
     }));
 });
 
+gulp.task('watch-karma', function() {
+  return gulp.src(test)
+    .pipe(karma({
+      configFile: 'karma.conf.js',
+      action: 'watch',
+    }));
+});
+
+gulp.task('watch-build', function () {
+  gulp.src(core)
+    .pipe(
+      watch(function(files) {
+        return gulp.start('build');
+      })
+    );
+});
+
+// Main tasks
+
+gulp.task('build', function (callback) {
+  runSequence(['core', 'extra', 'bundle'], callback);
+})
+
 gulp.task('default', function (callback) {
-  runSequence(['core', 'extra', 'bundle'], 'uglify', callback);
+  runSequence('build', 'uglify', callback);
 });
 
 gulp.task('test', function (callback) {
-  runSequence(['core', 'extra', 'bundle'], 'karma', callback);
+  runSequence('build', 'karma', callback);
+});
+
+gulp.task('watch', function (callback) {
+  runSequence('watch-build', 'watch-karma', callback);
 });

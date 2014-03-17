@@ -8,7 +8,17 @@
   },
   "main": "build/threestrap.js",
   "dependencies": {
-    "three": ">=0.58.10"
+    "three": ">=0.58.10",
+    "gulp-rename": "^0.2.2",
+    "run-sequence": "^0.3.6",
+    "gulp-karma": "0.0.2",
+    "gulp": "^3.4.0",
+    "gulp-uglify": "^0.1.0",
+    "karma": "^0.10.10"
+  },
+  "scripts": {
+    "build": "gulp",
+    "test": "gulp test"
   },
   "devDependencies": {
     "gulp": "~3.4.0",
@@ -18,7 +28,8 @@
     "gulp-karma": "0.0.2",
     "karma": "~0.10.9",
     "lodash": "~2.4.1",
-    "run-sequence": "~0.3.1"
+    "run-sequence": "~0.3.1",
+    "gulp-watch": "^0.5.2"
   },
   "author": "Steven Wittens",
   "license": "MIT"
