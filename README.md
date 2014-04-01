@@ -13,6 +13,11 @@ Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of yo
 Usage
 ===
 
+Install via bower:
+```
+bower install threestrap
+```
+
 Add `build/threestrap.js` to your Three.js:
 
 ```html
