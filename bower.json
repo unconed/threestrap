@@ -6,7 +6,7 @@
   "main": "build/threestrap.js",
   "keywords": ["three", "threejs", "three.js", "3d", "webgl"],
   "author": "Steven Wittens",
-  "license": "MIT"
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "*.md",
