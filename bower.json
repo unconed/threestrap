@@ -7,17 +7,17 @@
   "keywords": ["three", "threejs", "three.js", "3d", "webgl"],
   "author": "Steven Wittens",
   "license": "MIT"
-	"ignore": [
-		"**/.*",
-		"*.md",
-		"gulpfile.js",
-		"*.conf.js",
-		"bower.json",
-		"package.json",
-		"docs",
-		"examples",
-		"src",
-		"test",
-		"vendor",
-	]
+  "ignore": [
+    "**/.*",
+    "*.md",
+    "gulpfile.js",
+    "*.conf.js",
+    "bower.json",
+    "package.json",
+    "docs",
+    "examples",
+    "src",
+    "test",
+    "vendor",
+  ]
 }
