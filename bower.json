@@ -18,6 +18,6 @@
     "examples",
     "src",
     "test",
-    "vendor",
+    "vendor"
   ]
 }
