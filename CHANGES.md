@@ -1,4 +1,7 @@
-0.0.4-dev
+0.0.5
+* Make canvas display as block in 'fill'
+
+0.0.4
 
 * Shorthand syntax `foo:bar` for aliases in plugin list
 * Make api mechanism reusable as `THREE.Api`
