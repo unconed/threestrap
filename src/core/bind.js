@@ -2,7 +2,7 @@ THREE.Bootstrap.registerPlugin('bind', {
 
   install: function (three) {
     this.three = three;
-    this.ready = false;
+    this.hot   = false;
 
     var globals = {
       'three': three,
@@ -25,20 +25,21 @@ THREE.Bootstrap.registerPlugin('bind', {
   },
 
   ready: function (event, three) {
-    this.ready = true;
+    this.hot = true;
   },
 
   bind: function (event, three) {
     var plugin = event.plugin;
     var listen = plugin.listen;
 
-    var ready = { type: ready };
+    event = { type: 'ready' };
+    var hot = this.hot;
 
     listen && listen.forEach(function (key) {
       var handler = three.bind(key, plugin);
 
-      if (this.ready && key.match(/^ready(:|$)/)) {
-        handler(ready, three);
+      if (hot && key.match(/^ready(:|$)/)) {
+        handler(event, three);
       }
     });
 

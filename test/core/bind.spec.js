@@ -59,4 +59,44 @@ describe("bind", function () {
 
   });
 
+  it("fires ready events for hot install", function () {
+
+    var ready = false;
+    var api;
+
+    var object = {};
+    THREE.Binder.apply(object);
+
+    var spec = {
+      listen: ['ready'],
+      ready: function (event, three) {
+        expect(event.type).toBe('ready');
+        expect(three instanceof THREE.Bootstrap).toBe(true);
+        expect(this instanceof THREE.Bootstrap.Plugins.mockc).toBe(true);
+        ready = true;
+      },
+    };
+
+    THREE.Bootstrap.registerPlugin('mockc', spec);
+
+    var options = {
+      plugins: ['bind'],
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    console.log('inited', !!three, !!three.bind)
+
+    expect(three.plugins.mockc).toBeFalsy();
+
+    three.install('mockc');
+
+    expect(ready).toBe(true);
+
+    three.destroy();
+
+    THREE.Bootstrap.unregisterPlugin('mockc', spec);
+
+  });
+
 });
