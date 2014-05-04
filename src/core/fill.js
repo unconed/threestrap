@@ -20,7 +20,9 @@ THREE.Bootstrap.registerPlugin('fill', {
         [ three.element, document.documentElement ].filter(is).map(set);
     }
 
-    three.canvas.style.display = 'block'
+    if (three.canvas) {
+      three.canvas.style.display = 'block'
+    }
   },
 
   uninstall: function (three) {
@@ -35,7 +37,9 @@ THREE.Bootstrap.registerPlugin('fill', {
       this.applied.map(set);
     }
 
-    three.canvas.style.display = ''
+    if (three.canvas) {
+      three.canvas.style.display = ''
+    }
   }
 
 });

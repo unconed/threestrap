@@ -22,4 +22,26 @@ describe("fill", function () {
     expect(test()).toBe(false);
   });
 
+  it("makes the canvas a block element", function () {
+
+    function test() {
+      canvas = document.querySelector('canvas');
+      return canvas && canvas.style.display == 'block';
+    }
+
+    var options = {
+      plugins: ['renderer', 'fill'],
+    };
+
+    expect(test()).toBeFalsy();
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(test()).toBe(true);
+
+    three.destroy();
+
+    expect(test()).toBeFalsy();
+  });
+
 });

@@ -44,6 +44,9 @@ THREE.Binder = {
         // Store bind for removal later
         var bind = { target: target, name: name, callback: callback };
         object.__binds.push(bind);
+
+        // Return callback
+        return callback;
       }
       else {
         throw "Cannot bind '" + key + "' in " + this.__name;

@@ -6830,6 +6830,9 @@ THREE.Binder = {
         // Store bind for removal later
         var bind = { target: target, name: name, callback: callback };
         object.__binds.push(bind);
+
+        // Return callback
+        return callback;
       }
       else {
         throw "Cannot bind '" + key + "' in " + this.__name;
@@ -7189,6 +7192,7 @@ THREE.Bootstrap.registerPlugin('bind', {
 
   install: function (three) {
     this.three = three;
+    this.ready = false;
 
     var globals = {
       'three': three,
@@ -7200,6 +7204,7 @@ THREE.Bootstrap.registerPlugin('bind', {
 
     three.bind('install:bind', this);
     three.bind('uninstall:unbind', this);
+    three.bind('ready', this);
   },
 
   uninstall: function (three) {
@@ -7209,12 +7214,24 @@ THREE.Bootstrap.registerPlugin('bind', {
     delete three.unbind;
   },
 
+  ready: function (event, three) {
+    this.ready = true;
+  },
+
   bind: function (event, three) {
     var plugin = event.plugin;
     var listen = plugin.listen;
+
+    var ready = { type: ready };
+
     listen && listen.forEach(function (key) {
-      three.bind(key, plugin);
+      var handler = three.bind(key, plugin);
+
+      if (this.ready && key.match(/^ready(:|$)/)) {
+        handler(ready, three);
+      }
     });
+
   },
 
   unbind: function (event, three) {
@@ -7352,7 +7369,9 @@ THREE.Bootstrap.registerPlugin('fill', {
         [ three.element, document.documentElement ].filter(is).map(set);
     }
 
-    three.canvas.style.display = 'block'
+    if (three.canvas) {
+      three.canvas.style.display = 'block'
+    }
   },
 
   uninstall: function (three) {
@@ -7367,7 +7386,9 @@ THREE.Bootstrap.registerPlugin('fill', {
       this.applied.map(set);
     }
 
-    three.canvas.style.display = ''
+    if (three.canvas) {
+      three.canvas.style.display = ''
+    }
   }
 
 });
