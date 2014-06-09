@@ -173,14 +173,17 @@ describe("three", function () {
 
   it("hot swaps a plugin", function () {
 
+    var ready = false;
     var spec = {
-      install: function () {},
+      install: function (three) {
+        three.on('ready', function () { ready = true });
+      },
       uninstall: function () {},
       bind: function () {},
       unbind: function () {},
     };
 
-    spyOn(spec, 'install');
+    spyOn(spec, 'install').andCallThrough();
     spyOn(spec, 'uninstall');
 
     var mock = function () {};
@@ -195,11 +198,13 @@ describe("three", function () {
     var three = new THREE.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
+    expect(ready).toBe(false);
 
     three.install('mock');
 
     expect(spec.uninstall.calls.length).toEqual(0);
     expect(spec.install.calls.length).toEqual(1);
+    expect(ready).toBe(true);
 
     three.uninstall('mock');
 

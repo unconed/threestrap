@@ -43,9 +43,6 @@ THREE.Bootstrap.prototype = {
     // Install plugins
     this.install(this.__options.plugins);
 
-    // Notify
-    this.trigger({ type: 'ready' });
-
     return this;
   },
 
@@ -109,6 +106,9 @@ THREE.Bootstrap.prototype = {
 
     // Install in order
     _.each(plugins, this.__install, this);
+
+    // Fire off ready event
+    this.__ready();
   },
 
   uninstall: function (plugins) {
@@ -155,7 +155,17 @@ THREE.Bootstrap.prototype = {
 
     // Then notify
     this.trigger({ type: 'uninstall', plugin: plugin });
-  }
+  },
+
+  __ready: function () {
+    // Notify
+    this.trigger({ type: 'ready' });
+
+    // Ready should only fire once per plug-in.
+    if (this._listeners) {
+      delete this._listeners.ready;
+    }
+  },
 
 };
 

@@ -1,9 +1,6 @@
 THREE.Bootstrap.registerPlugin('bind', {
 
   install: function (three) {
-    this.three = three;
-    this.hot   = false;
-
     var globals = {
       'three': three,
       'window': window,
@@ -14,7 +11,6 @@ THREE.Bootstrap.registerPlugin('bind', {
 
     three.bind('install:bind', this);
     three.bind('uninstall:unbind', this);
-    three.bind('ready', this);
   },
 
   uninstall: function (three) {
@@ -24,25 +20,13 @@ THREE.Bootstrap.registerPlugin('bind', {
     delete three.unbind;
   },
 
-  ready: function (event, three) {
-    this.hot = true;
-  },
-
   bind: function (event, three) {
     var plugin = event.plugin;
     var listen = plugin.listen;
 
-    event = { type: 'ready' };
-    var hot = this.hot;
-
     listen && listen.forEach(function (key) {
-      var handler = three.bind(key, plugin);
-
-      if (hot && key.match(/^ready(:|$)/)) {
-        handler(event, three);
-      }
+      three.bind(key, plugin);
     });
-
   },
 
   unbind: function (event, three) {
