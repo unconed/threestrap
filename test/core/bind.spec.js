@@ -85,8 +85,6 @@ describe("bind", function () {
 
     var three = new THREE.Bootstrap(options);
 
-    console.log('inited', !!three, !!three.bind)
-
     expect(three.plugins.mockc).toBeFalsy();
 
     three.install('mockc');

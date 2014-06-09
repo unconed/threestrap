@@ -1,6 +1,6 @@
 {
   "name": "threestrap",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
@@ -8,6 +8,14 @@
   },
   "main": "build/threestrap.js",
   "dependencies": {
+    "gulp": "^3.7.0",
+    "gulp-concat": "^2.2.0",
+    "gulp-karma": "0.0.2",
+    "gulp-rename": "^0.2.2",
+    "gulp-uglify": "^0.1.0",
+    "gulp-watch": "^0.5.4",
+    "karma": "^0.10.10",
+    "optimist": "^0.6.1",
     "three": ">=0.58.10"
   },
   "scripts": {
@@ -16,13 +24,12 @@
   },
   "devDependencies": {
     "gulp": "^3.4.0",
-    "gulp-uglify": "~0.1.0",
-    "gulp-concat": "~2.1.7",
-    "gulp-rename": "^0.2.2",
-    "gulp-karma": "0.0.2",
     "gulp-uglify": "^0.1.0",
+    "gulp-concat": "^2.1.7",
+    "gulp-rename": "^0.2.2",
+    "gulp-karma": "^0.0.2",
     "karma": "^0.10.10",
-    "lodash": "~2.4.1",
+    "lodash": "^2.4.1",
     "run-sequence": "^0.3.6",
     "gulp-watch": "^0.5.2",
     "optimist": "^0.6.1"

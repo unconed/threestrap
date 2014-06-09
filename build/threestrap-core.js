@@ -72,39 +72,45 @@ THREE.Binder = {
     }
   },
 
-	apply: function ( object ) {
+  apply: function ( object ) {
 
-		THREE.EventDispatcher.prototype.apply(object);
+    THREE.EventDispatcher.prototype.apply(object);
 
-		object.trigger = THREE.Binder._trigger;
+    object.trigger     = THREE.Binder._trigger;
+    object.triggerOnce = THREE.Binder._triggerOnce;
 
-		object.on = object.addEventListener;
-		object.off = object.removeEventListener;
-		object.dispatchEvent = object.trigger;
+    object.on = object.addEventListener;
+    object.off = object.removeEventListener;
+    object.dispatchEvent = object.trigger;
 
-	},
+  },
 
   ////
 
+  _triggerOnce: function (event) {
+    this.trigger(event);
+    if (this._listeners) {
+      delete this._listeners[event.type]
+    }
+  },
+
   _trigger: function (event) {
 
-		if (this._listeners === undefined) return;
+    if (this._listeners === undefined) return;
 
-		var listenerArray = this._listeners[event.type];
+    var type = event.type;
+    var listeners = this._listeners[type];
+    if (listeners !== undefined) {
 
-		if (listenerArray !== undefined) {
+      listeners = listeners.slice()
+      var length = listeners.length;
 
-      listenerArray = listenerArray.slice()
-      var length = listenerArray.length;
-
-			event.target = this;
-			for (var i = 0; i < length; i++) {
-			  // add original target as parameter for convenience
-				listenerArray[i].call(this, event, this);
-			}
-
-		}
-
+      event.target = this;
+      for (var i = 0; i < length; i++) {
+        // add original target as parameter for convenience
+        listeners[i].call(this, event, this);
+      }
+    }
   },
 
   _polyfill: function (object, methods, callback) {
@@ -199,9 +205,6 @@ THREE.Bootstrap.prototype = {
     // Install plugins
     this.install(this.__options.plugins);
 
-    // Notify
-    this.trigger({ type: 'ready' });
-
     return this;
   },
 
@@ -265,6 +268,9 @@ THREE.Bootstrap.prototype = {
 
     // Install in order
     _.each(plugins, this.__install, this);
+
+    // Fire off ready event
+    this.__ready();
   },
 
   uninstall: function (plugins) {
@@ -311,7 +317,12 @@ THREE.Bootstrap.prototype = {
 
     // Then notify
     this.trigger({ type: 'uninstall', plugin: plugin });
-  }
+  },
+
+  __ready: function () {
+    // Notify and remove event handlers
+    this.triggerOnce({ type: 'ready' });
+  },
 
 };
 
@@ -405,9 +416,6 @@ THREE.Bootstrap.registerPlugin('renderer', {
 THREE.Bootstrap.registerPlugin('bind', {
 
   install: function (three) {
-    this.three = three;
-    this.hot   = false;
-
     var globals = {
       'three': three,
       'window': window,
@@ -418,7 +426,6 @@ THREE.Bootstrap.registerPlugin('bind', {
 
     three.bind('install:bind', this);
     three.bind('uninstall:unbind', this);
-    three.bind('ready', this);
   },
 
   uninstall: function (three) {
@@ -428,25 +435,13 @@ THREE.Bootstrap.registerPlugin('bind', {
     delete three.unbind;
   },
 
-  ready: function (event, three) {
-    this.hot = true;
-  },
-
   bind: function (event, three) {
     var plugin = event.plugin;
     var listen = plugin.listen;
 
-    event = { type: 'ready' };
-    var hot = this.hot;
-
     listen && listen.forEach(function (key) {
-      var handler = three.bind(key, plugin);
-
-      if (hot && key.match(/^ready(:|$)/)) {
-        handler(event, three);
-      }
+      three.bind(key, plugin);
     });
-
   },
 
   unbind: function (event, three) {
@@ -564,6 +559,12 @@ THREE.Bootstrap.registerPlugin('size', {
 });
 THREE.Bootstrap.registerPlugin('fill', {
 
+  defaults: {
+    block: true,
+    body: true,
+    layout: true,
+  },
+
   install: function (three) {
 
     function is(element) {
@@ -578,15 +579,25 @@ THREE.Bootstrap.registerPlugin('fill', {
       return element;
     }
 
-    if (three.element == document.body) {
+    if (this.options.body && three.element == document.body) {
       // Fix body height if we're naked
       this.applied =
         [ three.element, document.documentElement ].filter(is).map(set);
     }
 
-    if (three.canvas) {
+    if (this.options.block && three.canvas) {
       three.canvas.style.display = 'block'
+      this.block = true;
     }
+
+    if (this.options.layout && three.element) {
+      var style = window.getComputedStyle(three.element);
+      if (style.position == 'static') {
+        three.element.style.position = 'relative';
+        this.layout = true;
+      }
+    }
+
   },
 
   uninstall: function (three) {
@@ -599,12 +610,24 @@ THREE.Bootstrap.registerPlugin('fill', {
       }
 
       this.applied.map(set);
+      delete this.applied;
     }
 
-    if (three.canvas) {
-      three.canvas.style.display = ''
+    if (this.block && three.canvas) {
+      three.canvas.style.display = '';
+      delete this.block;
     }
-  }
+
+    if (this.layout && three.element) {
+      three.element.style.position = '';
+      delete this.layout;
+    }
+  },
+
+  change: function (three) {
+    this.uninstall(three);
+    this.install(three);
+  },
 
 });
 
@@ -626,6 +649,11 @@ THREE.Bootstrap.registerPlugin('loop', {
       running: false,
     }, three);
 
+    this.events =
+      ['pre', 'update', 'render', 'post'].map(function (type) {
+        return { type: type };
+      });
+
   },
 
   uninstall: function (three) {
@@ -641,13 +669,10 @@ THREE.Bootstrap.registerPlugin('loop', {
 
     three.Loop.running = this.running = true;
 
+    var trigger = three.trigger.bind(three);
     var loop = function () {
       this.running && requestAnimationFrame(loop);
-
-      ['pre', 'update', 'render', 'post'].map(function (type) {
-        three.trigger({ type: type });
-      }.bind(this));
-
+      this.events.map(trigger);
     }.bind(this);
 
     requestAnimationFrame(loop);
@@ -665,34 +690,57 @@ THREE.Bootstrap.registerPlugin('loop', {
 });
 THREE.Bootstrap.registerPlugin('time', {
 
-  listen: ['pre:tick'],
+  defaults: {
+    speed: 1, // Clock speed
+  },
+
+  listen: ['pre:tick', 'this.change'],
 
   install: function (three) {
 
     three.Time = this.api({
-      now: 0,
-      delta: 1/60,
-      average: 0,
-      fps: 0,
+      now: 0,       // Time since 1970 in seconds
+
+      clock: 0,     // Clock that counts up from 0 seconds
+      step:  1/60,  // Clock step in seconds
+
+      frames: 0,    // Framenumber
+      delta: 1/60,  // Frame step in seconds
+
+      average: 0,   // Average frame time in seconds
+      fps: 0,       // Average frames per second
     });
 
-    this.last = 0;
+    this.last  = 0;
+    this.clock = 0;
   },
 
   tick: function (event, three) {
+    var speed = this.options.speed;
+
     var api = three.Time;
     var now = api.now = +new Date() / 1000;
     var last = this.last;
+    var clock = this.clock;
 
     if (last) {
-      var delta = api.delta = now - last;
+      var delta   = api.delta = now - last;
       var average = api.average || delta;
 
       api.average = average + (delta - average) * .1;
       api.fps = 1 / average;
+
+      var step = delta * speed;
+      clock += step;
+
+      api.step  = step;
+      api.clock = clock;
+
+      api.frames++;
     }
 
-    this.last = now;
+    this.last   = now;
+    this.clock  = clock;
   },
 
   uninstall: function (three) {

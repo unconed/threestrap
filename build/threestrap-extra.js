@@ -665,7 +665,7 @@ THREE.Bootstrap.registerPlugin('stats', {
 
     style.position = 'absolute';
     style.top = style.left = 0;
-    document.body.appendChild(stats.domElement);
+    three.element.appendChild(stats.domElement);
 
     three.stats = stats;
   },

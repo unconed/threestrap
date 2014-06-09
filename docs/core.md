@@ -183,9 +183,16 @@ three.on('resize', function (event, three) {
 
 fill
 ---
-Makes sure canvas can fill the entire window when directly inside the body.
+Makes sure canvas can fill the entire window when directly inside the body. Helps positioning when inside a DOM element.
 
-* No options or API
+* Options
+```javascript
+{
+  block: true,       // Make canvas a block element
+  body: true,        // Set auto height/margin/padding on <body>
+  layout: true,      // Set position relative on container if needed to ensure layout
+}
+```
 
 loop
 ---

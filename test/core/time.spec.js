@@ -35,10 +35,11 @@ describe("time", function () {
     var three = new THREE.Bootstrap(options);
     var fps = 60;
     var delta = 1/fps;
+    var frames = 5;
 
     three.trigger({ type: 'pre' });
 
-    for (var i = 0; i < 5; ++i) {
+    for (var i = 0; i < frames; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: 'pre' });
     }
@@ -48,7 +49,7 @@ describe("time", function () {
     expect(three.Time.clock).toBeGreaterThan(0);
     expect(three.Time.step).toBeGreaterThan(0);
 
-    expect(three.Time.frames).toBeGreaterThan(0);
+    expect(three.Time.frames).toBe(frames);
     expect(three.Time.delta).toBeGreaterThan(0);
 
     expect(three.Time.average).toBeGreaterThan(0);
@@ -74,6 +75,7 @@ describe("time", function () {
     };
 
     var three = new THREE.Bootstrap(options);
+    var frames = 5;
     var fps = 60;
     var delta = 1/fps;
 
@@ -81,7 +83,7 @@ describe("time", function () {
 
     var start = three.Time.now;
 
-    for (var i = 0; i < 5; ++i) {
+    for (var i = 0; i < frames; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: 'pre' });
     }
