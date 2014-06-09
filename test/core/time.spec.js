@@ -17,6 +17,9 @@ describe("time", function () {
     var three = new THREE.Bootstrap(options);
 
     expect(three.Time.now !== undefined).toBeTruthy();
+    expect(three.Time.clock !== undefined).toBeTruthy();
+    expect(three.Time.step !== undefined).toBeTruthy();
+    expect(three.Time.frames !== undefined).toBeTruthy();
     expect(three.Time.delta !== undefined).toBeTruthy();
     expect(three.Time.average !== undefined).toBeTruthy();
     expect(three.Time.fps !== undefined).toBeTruthy();
