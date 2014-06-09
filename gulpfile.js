@@ -44,6 +44,7 @@ var extra = [
   'vendor/controls/*.js',
   'src/extra/stats.js',
   'src/extra/controls.js',
+  'src/extra/cursor.js',
 ];
 
 var bundle = vendor.concat(core).concat(extra);

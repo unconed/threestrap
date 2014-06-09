@@ -1,11 +1,14 @@
 Changes
 ----
 
+0.0.7-dev
+* New Extra/Cursor: Set mouse cursor contextually. Can auto-hide cursor with time out.
+
 0.0.6
-* Time: Frame count/time `frames` and variable speed `clock`/`step`. Use `speed` option to control.
 * Core: 'ready' event now always fires on hot install
-* Fill: Configurable options for behavior, add `layout` option to position overlays like stats correctly.
-* Stats: Insert into containing DOM element.
+* Core/Time: Frame count/time `frames` and variable speed `clock`/`step`. Use `speed` option to control.
+* Core/Fill: Configurable options for behavior, add `layout` option to position overlays like stats correctly.
+* Extra/Stats: Insert into containing DOM element.
 
 0.0.5
 * Make canvas display as block in 'fill'

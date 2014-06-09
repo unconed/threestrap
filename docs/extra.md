@@ -38,3 +38,30 @@ three.Controls.get();         // Get options
 three.controls;               // Global camera controls
 ```
 
+cursor
+---
+Sets the mouse cursor contextually. If controls are present, `move` is used, otherwise a default.
+
+* Options:
+
+```javascript
+{
+  cursor: null,               // Force a specific CSS cursor (e.g. 'pointer')
+  hide: false,                // Auto-hide the cursor after inactivity
+  timeout: 3,                 // Time out for hiding (seconds)
+}
+```
+
+* API
+
+```javascript
+three.Controls.set({ });      // Set options
+three.Controls.get();         // Get options
+```
+
+* Properties
+
+```javascript
+three.controls;               // Global camera controls
+```
+

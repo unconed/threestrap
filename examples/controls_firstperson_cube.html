@@ -13,12 +13,13 @@
 
     // Bootstrap core + controls plugin
     var three = THREE.Bootstrap({
-      plugins: ['core', 'controls'],
+      plugins: ['core', 'controls', 'cursor'],
       controls: {
         klass: THREE.FirstPersonControls,
         parameters: {
           lookSpeed: 0.1,
         },
+        hide: true,
       },
     });
 

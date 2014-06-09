@@ -12,7 +12,6 @@
     #three {
       width: 500px;
       height: 500px;
-      cursor: move;
     }
   </style>
   <h1>Drag/Zoom Controls</h1>
@@ -22,7 +21,7 @@
     // Bootstrap core + controls plugin into element
     var three = THREE.Bootstrap({
       element: document.querySelector('#three'),
-      plugins: ['core', 'controls'],
+      plugins: ['core', 'controls', 'cursor'],
       controls: {
         klass: THREE.OrbitControls
       },
