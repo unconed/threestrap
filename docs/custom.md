@@ -9,17 +9,20 @@ Init
 * `.install(three)` and `.uninstall(three)` are for initialization and cleanup respectively
 * plugins should install themselves into `three`, preferably in a namespaced object
 
+Recommended format is `three.FooBar.…` for a *Foo Bar* plugin. Creating a `three.foobar` global is allowed, other named globals are discouraged.
+
 Config
 ---
 
 * `this.options` contains the plugin's options, defaults are set in `.defaults`
 * use `this.api()` to create set/get helpers for changing options
 * when `api.set({...})` is called, the `change` event fires on `this`. `event.changes` lists the values that actually changed
+* additional API methods can be added, which receive `three` as their final argument
 
 Events
 ---
 
-* `.listen` declares a list of event/method bindings
+* `.listen` declares a list of event/method bindings as an array
 * use `three.on()/.off()/.bind()` for manual binding
 * method bindings are automatically unbound when the plugin is uninstalled
 
@@ -36,7 +39,7 @@ THREE.Bootstrap.registerPlugin('magic', {
 
   // Configuration defaults
   defaults: {
-    foo: bar,
+    foo: 'bar',
   },
 
   // Declare event listeners for plugin methods
@@ -55,7 +58,7 @@ THREE.Bootstrap.registerPlugin('magic', {
     // three.on(...);
 
     // Make a public API (includes .set() / .get())
-    // Calling `$.api({...}, three)` will pass `three` as the final argument to all API methods.
+    // Calling `….api({...}, three)` will pass `three` as the final argument to all API methods.
     three.Magic = this.api({
 
         // three.Magic.ping()
@@ -69,7 +72,7 @@ THREE.Bootstrap.registerPlugin('magic', {
 
     // Expose values globally (discouraged)
     three.magic = 1;
-    three.pingMagic = three.Magic.ping.bind(this);
+    three.doMagic = three.Magic.ping.bind(this);
   },
 
   // Destroy resources, unbind events
@@ -81,7 +84,7 @@ THREE.Bootstrap.registerPlugin('magic', {
     // Remove from context
     delete three.Magic;
     delete three.magic;
-    delete three.pingMagic;
+    delete three.doMagic;
   },
 
   // body.click event handler
@@ -94,7 +97,7 @@ THREE.Bootstrap.registerPlugin('magic', {
     // event.changes == {...}
     // this.options reflects the new state, i.e.:
     // this.options.foo == 'bar'
-  }
+  },
 
   // three.ready event handler
   yup: function (event, three) {
