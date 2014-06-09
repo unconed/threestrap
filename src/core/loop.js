@@ -16,6 +16,11 @@ THREE.Bootstrap.registerPlugin('loop', {
       running: false,
     }, three);
 
+    this.events =
+      ['pre', 'update', 'render', 'post'].map(function (type) {
+        return { type: type };
+      });
+
   },
 
   uninstall: function (three) {
@@ -31,13 +36,10 @@ THREE.Bootstrap.registerPlugin('loop', {
 
     three.Loop.running = this.running = true;
 
+    var trigger = three.trigger.bind(three);
     var loop = function () {
       this.running && requestAnimationFrame(loop);
-
-      ['pre', 'update', 'render', 'post'].map(function (type) {
-        three.trigger({ type: type });
-      }.bind(this));
-
+      this.events.map(trigger);
     }.bind(this);
 
     requestAnimationFrame(loop);
