@@ -248,11 +248,29 @@ time
 ---
 Measures time and fps in seconds.
 
+* Options
+
+```javascript
+{
+  speed: 1,        // Clock speed (2 = fast forward, 0.5 = slow motion)
+}
+```
+
+
 * Properties
 
 ```javascript
-three.Time.now     // Clock (seconds)
-three.Time.delta   // Last frame time (seconds)
+three.Time.now     // Time since 1970 (seconds)
+
+three.Time.clock   // Clock (seconds since start)
+three.Time.delta   // Clock step (seconds)
+
+three.Time.frames  // Frame count
+three.Time.frame   // Last frame time (seconds)
+
+
+
+three.Time.frame   // Last frame time (seconds)
 three.Time.average // Average frame time (seconds)
 three.Time.fps     // Average frames per second
 ```
