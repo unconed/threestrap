@@ -1,5 +1,11 @@
 THREE.Bootstrap.registerPlugin('fill', {
 
+  defaults: {
+    block: true,
+    body: true,
+    layout: true,
+  },
+
   install: function (three) {
 
     function is(element) {
@@ -14,15 +20,25 @@ THREE.Bootstrap.registerPlugin('fill', {
       return element;
     }
 
-    if (three.element == document.body) {
+    if (this.options.body && three.element == document.body) {
       // Fix body height if we're naked
       this.applied =
         [ three.element, document.documentElement ].filter(is).map(set);
     }
 
-    if (three.canvas) {
+    if (this.options.block && three.canvas) {
       three.canvas.style.display = 'block'
+      this.block = true;
     }
+
+    if (this.options.layout && three.element) {
+      var style = window.getComputedStyle(three.element);
+      if (style.position == 'static') {
+        three.element.style.position = 'relative';
+        this.layout = true;
+      }
+    }
+
   },
 
   uninstall: function (three) {
@@ -35,11 +51,23 @@ THREE.Bootstrap.registerPlugin('fill', {
       }
 
       this.applied.map(set);
+      delete this.applied;
     }
 
-    if (three.canvas) {
-      three.canvas.style.display = ''
+    if (this.block && three.canvas) {
+      three.canvas.style.display = '';
+      delete this.block;
     }
-  }
+
+    if (this.layout && three.element) {
+      three.element.style.position = '';
+      delete this.layout;
+    }
+  },
+
+  change: function (three) {
+    this.uninstall(three);
+    this.install(three);
+  },
 
 });

@@ -34,27 +34,27 @@ describe("time", function () {
 
     var three = new THREE.Bootstrap(options);
     var fps = 60;
-    var frame = 1/fps;
+    var delta = 1/fps;
 
     three.trigger({ type: 'pre' });
 
     for (var i = 0; i < 5; ++i) {
-      stall(three.Time.now, frame);
+      stall(three.Time.now, delta);
       three.trigger({ type: 'pre' });
     }
 
     expect(three.Time.now).toBeGreaterThan(0);
 
     expect(three.Time.clock).toBeGreaterThan(0);
-    expect(three.Time.delta).toBeGreaterThan(0);
+    expect(three.Time.step).toBeGreaterThan(0);
 
     expect(three.Time.frames).toBeGreaterThan(0);
-    expect(three.Time.frame).toBeGreaterThan(0);
+    expect(three.Time.delta).toBeGreaterThan(0);
 
     expect(three.Time.average).toBeGreaterThan(0);
     expect(three.Time.fps).toBeGreaterThan(0);
 
-    expect(Math.abs(three.Time.frame - frame)).toBeLessThan(.005);
+    expect(Math.abs(three.Time.delta - delta)).toBeLessThan(.005);
     expect(Math.abs(three.Time.fps - fps)).toBeLessThan(5);
     expect(Math.abs(1/three.Time.average - fps)).toBeLessThan(5);
 
@@ -75,14 +75,14 @@ describe("time", function () {
 
     var three = new THREE.Bootstrap(options);
     var fps = 60;
-    var frame = 1/fps;
+    var delta = 1/fps;
 
     three.trigger({ type: 'pre' });
 
     var start = three.Time.now;
 
     for (var i = 0; i < 5; ++i) {
-      stall(three.Time.now, frame);
+      stall(three.Time.now, delta);
       three.trigger({ type: 'pre' });
     }
 
@@ -96,7 +96,7 @@ describe("time", function () {
     var diff = 1.0 - Math.min(ratio, 1/ratio);
     expect(diff).toBeLessThan(0.05);
 
-    expect(Math.abs(1.0 / three.Time.delta - fps / RATIO)).toBeLessThan(5);
+    expect(Math.abs(1.0 / three.Time.step - fps / RATIO)).toBeLessThan(5);
 
     three.destroy();
 

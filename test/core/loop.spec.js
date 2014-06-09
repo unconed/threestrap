@@ -71,7 +71,8 @@ describe("loop", function () {
 
     function stall(val) {
       var k, i = 0;
-      while (+new Date() <= val) {
+      var delay = 10;
+      while (+new Date() <= val + delay) {
         k = ++i * ++i * ++i * ++i * ++i;
       }
     }
@@ -88,13 +89,13 @@ describe("loop", function () {
         pre = +new Date();
         stall(pre);
       });
-      three.on('render', function () {
-        render = +new Date();
-        stall(render);
-      });
       three.on('update', function () {
         update = +new Date();
         stall(update);
+      });
+      three.on('render', function () {
+        render = +new Date();
+        stall(render);
       });
       three.on('post', function () {
         post = +new Date();

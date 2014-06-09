@@ -159,7 +159,7 @@ THREE.Bootstrap.prototype = {
 
   __ready: function () {
     // Notify and remove event handlers
-    this.trigger({ type: 'ready' }, true);
+    this.triggerOnce({ type: 'ready' });
   },
 
 };

@@ -12,10 +12,10 @@ THREE.Bootstrap.registerPlugin('time', {
       now: 0,       // Time since 1970 in seconds
 
       clock: 0,     // Clock that counts up from 0 seconds
-      delta: 1/60,  // Clock step in seconds
+      step:  1/60,  // Clock step in seconds
 
       frames: 0,    // Framenumber
-      frame: 1/60,  // Frame step in seconds
+      delta: 1/60,  // Frame step in seconds
 
       average: 0,   // Average frame time in seconds
       fps: 0,       // Average frames per second
@@ -34,16 +34,16 @@ THREE.Bootstrap.registerPlugin('time', {
     var clock = this.clock;
 
     if (last) {
-      var frame   = api.frame = now - last;
-      var average = api.average || frame;
+      var delta   = api.delta = now - last;
+      var average = api.average || delta;
 
-      api.average = average + (frame - average) * .1;
+      api.average = average + (delta - average) * .1;
       api.fps = 1 / average;
 
-      var delta = frame * speed;
-      clock += delta;
+      var step = delta * speed;
+      clock += step;
 
-      api.delta = delta;
+      api.step  = step;
       api.clock = clock;
 
       api.frames++;

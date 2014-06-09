@@ -76,7 +76,8 @@ THREE.Binder = {
 
     THREE.EventDispatcher.prototype.apply(object);
 
-    object.trigger = THREE.Binder._trigger;
+    object.trigger     = THREE.Binder._trigger;
+    object.triggerOnce = THREE.Binder._triggerOnce;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
@@ -86,7 +87,14 @@ THREE.Binder = {
 
   ////
 
-  _trigger: function (event, once) {
+  _triggerOnce: function (event) {
+    this.trigger(event);
+    if (this._listeners) {
+      delete this._listeners[event.type]
+    }
+  },
+
+  _trigger: function (event) {
 
     if (this._listeners === undefined) return;
 
@@ -101,10 +109,6 @@ THREE.Binder = {
       for (var i = 0; i < length; i++) {
         // add original target as parameter for convenience
         listeners[i].call(this, event, this);
-      }
-
-      if (once) {
-        delete this._listeners[type];
       }
     }
   },

@@ -44,4 +44,32 @@ describe("fill", function () {
     expect(test()).toBeFalsy();
   });
 
+  it("makes the containing element have layout", function () {
+
+    function test() {
+      canvas = document.querySelector('canvas');
+      return canvas && canvas.parentNode.style.position == 'relative';
+    }
+
+    var element = document.createElement('div');
+    document.body.appendChild(element);
+
+    var options = {
+      plugins: ['renderer', 'fill'],
+      element: element,
+    };
+
+    expect(test()).toBeFalsy();
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(test()).toBe(true);
+
+    three.destroy();
+
+    expect(test()).toBeFalsy();
+
+    document.body.removeChild(element);
+  });
+
 });
