@@ -158,13 +158,8 @@ THREE.Bootstrap.prototype = {
   },
 
   __ready: function () {
-    // Notify
-    this.trigger({ type: 'ready' });
-
-    // Ready should only fire once per plug-in.
-    if (this._listeners) {
-      delete this._listeners.ready;
-    }
+    // Notify and remove event handlers
+    this.trigger({ type: 'ready' }, true);
   },
 
 };

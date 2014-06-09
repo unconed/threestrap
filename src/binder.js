@@ -72,39 +72,41 @@ THREE.Binder = {
     }
   },
 
-	apply: function ( object ) {
+  apply: function ( object ) {
 
-		THREE.EventDispatcher.prototype.apply(object);
+    THREE.EventDispatcher.prototype.apply(object);
 
-		object.trigger = THREE.Binder._trigger;
+    object.trigger = THREE.Binder._trigger;
 
-		object.on = object.addEventListener;
-		object.off = object.removeEventListener;
-		object.dispatchEvent = object.trigger;
+    object.on = object.addEventListener;
+    object.off = object.removeEventListener;
+    object.dispatchEvent = object.trigger;
 
-	},
+  },
 
   ////
 
-  _trigger: function (event) {
+  _trigger: function (event, once) {
 
-		if (this._listeners === undefined) return;
+    if (this._listeners === undefined) return;
 
-		var listenerArray = this._listeners[event.type];
+    var type = event.type;
+    var listeners = this._listeners[type];
+    if (listeners !== undefined) {
 
-		if (listenerArray !== undefined) {
+      listeners = listeners.slice()
+      var length = listeners.length;
 
-      listenerArray = listenerArray.slice()
-      var length = listenerArray.length;
+      event.target = this;
+      for (var i = 0; i < length; i++) {
+        // add original target as parameter for convenience
+        listeners[i].call(this, event, this);
+      }
 
-			event.target = this;
-			for (var i = 0; i < length; i++) {
-			  // add original target as parameter for convenience
-				listenerArray[i].call(this, event, this);
-			}
-
-		}
-
+      if (once) {
+        delete this._listeners[type];
+      }
+    }
   },
 
   _polyfill: function (object, methods, callback) {
