@@ -63,5 +63,46 @@ describe("binder", function () {
 
   });
 
+  it("binds/unbinds once events", function () {
+
+    var ready = 0;
+
+    var context = {};
+    THREE.Binder.apply(context);
+
+    var object = {
+      listen: ['ready'],
+      ready: function (event, _context) {
+        expect(event.type).toBe('ready');
+        expect(context).toBe(_context);
+        expect(this).toBe(object);
+        ready++;
+      },
+    };
+    THREE.Binder.apply(object);
+
+    var bind = THREE.Binder.bind(context, {});
+    var unbind = THREE.Binder.unbind(context);
+
+    _.each(object.listen, function (key) {
+      bind(key, object);
+    });
+
+    expect(ready).toBe(0);
+
+    context.triggerOnce({ type: 'ready' });
+
+    expect(ready).toBe(1);
+
+    context.triggerOnce({ type: 'ready' });
+
+    expect(ready).toBe(1);
+
+    unbind(object);
+
+    expect(ready).toBe(1);
+
+  });
+
 
 });
