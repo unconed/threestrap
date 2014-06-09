@@ -1,7 +1,7 @@
 Threestrap - Custom Plugins
 ===
 
-Use `registerPlugin` to make a new plug-in available, passing in a prototype for the class.
+See below for scaffold. Use `THREE.Bootstrap.registerPlugin` to make a new plug-in available, passing in a prototype for the class.
 
 Init
 ---
@@ -9,7 +9,7 @@ Init
 * `.install(three)` and `.uninstall(three)` are for initialization and cleanup respectively
 * plugins should install themselves into `three`, preferably in a namespaced object
 
-Recommended format is `three.FooBar.…` for a *Foo Bar* plugin. Creating a `three.foobar` global is allowed, other named globals are discouraged.
+Recommended format is `three.FooBar.…` for a *Foo Bar* plugin. Creating a `three.fooBar` global is allowed, other named globals are discouraged.
 
 Config
 ---
