@@ -9,7 +9,7 @@ Init
 * `.install(three)` and `.uninstall(three)` are for initialization and cleanup respectively
 * plugins should install themselves into `three`, preferably in a namespaced object
 
-Recommended format is `three.FooBar.…` for a *Foo Bar* plugin. Creating a `three.fooBar` global is allowed, other named globals are discouraged.
+Recommended format is `three.FooBar.…` for a *Foo Bar* plugin's namespace. Creating a `three.fooBar` global is allowed for singletons or other well known objects. Other named globals are discouraged, try to keep the `three` namespace clean.
 
 Config
 ---
