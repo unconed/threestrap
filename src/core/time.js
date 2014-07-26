@@ -6,19 +6,23 @@ THREE.Bootstrap.registerPlugin('time', {
 
   listen: ['pre:tick', 'this.change'],
 
+  now: function () {
+    return +new Date() / 1000
+  },
+
   install: function (three) {
 
     three.Time = this.api({
-      now: 0,       // Time since 1970 in seconds
+      now: this.now(), // Time since 1970 in seconds
 
-      clock: 0,     // Clock that counts up from 0 seconds
-      step:  1/60,  // Clock step in seconds
+      clock: 0,        // Clock that counts up from 0 seconds
+      step:  1/60,     // Clock step in seconds
 
-      frames: 0,    // Framenumber
-      delta: 1/60,  // Frame step in seconds
+      frames: 0,       // Framenumber
+      delta: 1/60,     // Frame step in seconds
 
-      average: 0,   // Average frame time in seconds
-      fps: 0,       // Average frames per second
+      average: 0,      // Average frame time in seconds
+      fps: 0,          // Average frames per second
     });
 
     this.last  = 0;
@@ -29,7 +33,7 @@ THREE.Bootstrap.registerPlugin('time', {
     var speed = this.options.speed;
 
     var api = three.Time;
-    var now = api.now = +new Date() / 1000;
+    var now = api.now = this.now();
     var last = this.last;
     var clock = this.clock;
 
@@ -37,11 +41,13 @@ THREE.Bootstrap.registerPlugin('time', {
       var delta   = api.delta = now - last;
       var average = api.average || delta;
 
-      api.average = average + (delta - average) * .1;
-      api.fps = 1 / average;
-
       var step = delta * speed;
       clock += step;
+
+      if (api.frames > 0) {
+        api.average = average + (delta - average) * .1;
+        api.fps = 1 / average;
+      }
 
       api.step  = step;
       api.clock = clock;

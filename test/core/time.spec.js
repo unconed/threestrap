@@ -42,7 +42,11 @@ describe("time", function () {
 
     three.trigger({ type: 'pre' });
 
-    for (var i = 0; i < frames; ++i) {
+    stall(three.Time.now, delta);
+
+    three.trigger({ type: 'pre' });
+
+    for (var i = 0; i < frames - 1; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: 'pre' });
     }
