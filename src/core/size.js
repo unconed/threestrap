@@ -75,15 +75,17 @@ THREE.Bootstrap.registerPlugin('size', {
       rh = Math.round(rw / aspect);
     }
 
-    // Resize WebGL
-    renderer.setSize(rw, rh);
+    if (renderer) {
+      // Resize WebGL
+      renderer.setSize(rw, rh);
 
-    // Resize Canvas
-    style = renderer.domElement.style;
-    style.width = w + "px";
-    style.height = h + "px";
-    style.marginLeft = ml + "px";
-    style.marginTop = mt + "px";
+      // Resize Canvas
+      style = renderer.domElement.style;
+      style.width = w + "px";
+      style.height = h + "px";
+      style.marginLeft = ml + "px";
+      style.marginTop = mt + "px";
+    }
 
     // Notify
     _.extend(three.Size, {

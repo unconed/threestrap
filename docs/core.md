@@ -69,7 +69,7 @@ three.on('ready', function (event, three) { });
 
 renderer
 ---
-Creates the renderer of the given class.
+Creates the Three.js renderer of the given class.
 
 * Options
 
@@ -342,3 +342,35 @@ render
 Renders the global scene and camera directly.
 
 * No options or API
+
+
+fallback
+---
+Displays a standard message with a link if WebGL is unavailable.
+
+* Options
+
+```javascript
+{
+  force:   false,                 // Force fallback (for testing)
+  fill:    true,                  // Use 'fill' plugin for message
+  klass:   'threestrap-fallback', // Classes to set on the message
+
+  // Styles for the message container
+  style:   'display: table; width: 100%; height: 100%; box-sizing: border-box; border: 1px dashed rgba(0, 0, 0, .25)',
+
+  // Message content
+  message: '<div style="display: table-cell; padding: 10px; vertical-align: middle; text-align: center;">'+
+           '<big><strong>This example requires WebGL</strong></big><br>'+
+           'Visit <a target="_blank" href="http://get.webgl.org/">get.webgl.org</a> for more info</a>'+
+           '</div>',
+}
+```
+
+* Properties
+
+```javascript
+three.canvas;     // Canvas / DOM element
+three.renderer;   // Three renderer
+```
+

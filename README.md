@@ -53,7 +53,16 @@ Configuration
 
 Threestrap is made out of plugins that each do one thing. The basic set up of `core` gets you a fully-functional canvas in the body or a specific DOM element, using:
 
-`renderer`, `bind`, `size`, `fill`, `loop`, `time`, `scene`, `camera`, `render`
+ * `fallback` - Displays a standard message with a link if WebGL is unavailable.
+ * `renderer` - Creates the `THREE.WebGLRenderer` (or a given class).
+ * `bind`     - Enables event/method binding.
+ * `size`     - Autosizes canvas to fit or size to given dimensions.
+ * `fill`     - Removes margin/padding and sets positioning on the element.
+ * `loop`     - Runs the rendering loop.
+ * `time`     - Measures time and fps in seconds. Provides clocks.
+ * `scene`    - Creates the `THREE.Scene`
+ * `camera`   - Creates the `THREE.Camera`
+ * `render`   - Renders the global scene and camera directly.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 

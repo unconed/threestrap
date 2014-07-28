@@ -135,11 +135,14 @@ THREE.Bootstrap.prototype = {
     this.plugins[name] = plugin;
 
     // Install
-    plugin.install(this);
+    flag = plugin.install(this);
     this.__installed.push(plugin);
 
     // Then notify
     this.trigger({ type: 'install', plugin: plugin });
+
+    // Allow early abort
+    return flag;
   },
 
   __uninstall: function (name, alias) {

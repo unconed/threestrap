@@ -28,6 +28,7 @@ var core = [
   'src/bootstrap.js',
   'src/plugin.js',
   'src/aliases.js',
+  'src/core/fallback.js',
   'src/core/renderer.js',
   'src/core/bind.js',
   'src/core/size.js',

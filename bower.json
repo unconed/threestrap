@@ -1,6 +1,6 @@
 {
   "name": "threestrap",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "homepage": "https://github.com/unconed/threestrap",
   "description": "Minimal Three.js Bootstrapper",
   "main": "build/threestrap.js",

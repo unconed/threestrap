@@ -1,9 +1,10 @@
 Changes
 ----
 
-0.0.7-dev
+0.0.7
 * New Extra/Cursor: Set mouse cursor contextually. Can auto-hide cursor with time out.
-* Init `three.Time.now` on install.
+* New Core/Fallback: Abort and display standard message when WebGL is unavailable.
+* Initialize `three.Time.now` on install.
 
 0.0.6
 * Core: 'ready' event now always fires on hot install
