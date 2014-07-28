@@ -10,6 +10,8 @@ threestrap
 
 Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of your way.
 
+While this is definitely a miniature framework, it's not really meant to wrap *your* code, but rather the code you don't care about.
+
 Usage
 ===
 
@@ -47,8 +49,6 @@ three.on('update', function () {
   three.camera.lookAt(new THREE.Vector3());
 });
 ```
-
-While this is definitely a minitiature framework, it's not really meant to wrap *your* code, but rather the code you don't care about.
 
 Configuration
 ---
