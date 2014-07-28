@@ -48,6 +48,8 @@ three.on('update', function () {
 });
 ```
 
+While this is definitely a minitiature framework, it's not really meant to wrap *your* code, but rather the code you don't care about.
+
 Configuration
 ---
 
@@ -65,6 +67,7 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `c
  * `render`   - Renders the global scene and camera directly.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
+
 
 Shorthands:
 ```javascript
