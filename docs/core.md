@@ -370,7 +370,6 @@ Displays a standard message with a link if WebGL is unavailable.
 * Properties
 
 ```javascript
-three.canvas;     // Canvas / DOM element
-three.renderer;   // Three renderer
+three.fallback;   // True if fallback was triggered.
 ```
 
