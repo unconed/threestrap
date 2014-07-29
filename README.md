@@ -75,6 +75,11 @@ var three = THREE.Bootstrap();
 var three = THREE.Bootstrap('core', 'stats');
 var three = THREE.Bootstrap(['core', 'stats']);
 
+// Insert into specific element
+var three = THREE.Bootstrap(element);
+var three = THREE.Bootstrap(element, 'core', 'stats');
+var three = THREE.Bootstrap(element, ['core', 'stats']);
+
 // Replace plugins ad-hoc
 var three = THREE.Bootstrap(['core', 'stats', 'render:myRender']);
 ```

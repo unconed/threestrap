@@ -10,6 +10,9 @@ THREE.Bootstrap('plugin', ...)               // With given plugins
 THREE.Bootstrap(['plugin', ...])
 THREE.Bootstrap(['plugin', "plugin:plugin"]) // and ad-hoc overrides
 
+THREE.Bootstrap(element, "plugin", ...)      // Inside given DOM element
+THREE.Bootstrap(element, ["plugin", ...])    // 
+
 THREE.Bootstrap({                            // With given options
   init: true,                                // Initialize on creation
 
@@ -309,7 +312,7 @@ Makes a camera available.
   right: 1,
   bottom: -1,
   top: 1,
-  
+
   klass: null,                 // Custom class/parameters
   parameters: null,            // if you really want to
 }

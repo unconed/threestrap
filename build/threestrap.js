@@ -6947,11 +6947,33 @@ THREE.Api = {
   },
 };
 THREE.Bootstrap = function (options) {
-  if (options)
-    // (plugin, ...)
-    if (_.isString(options)) { options = [].slice.apply(arguments); }
-    // ([plugin, ...])
-    if (_.isArray(options)) options = { plugins: options };
+  if (options) {
+    args = [].slice.apply(arguments);
+    options = {};
+
+    // (element, ...)
+    if (args[0] instanceof Node) {
+      node = args[0];
+      args = args.slice(1);
+
+      options.element = node;
+    }
+
+    // (..., plugin, plugin, plugin)
+    if (_.isString(args[0])) {
+      options.plugins = args;
+    }
+
+    // (..., [plugin, plugin, plugin])
+    if (_.isArray(args[0])) {
+      options.plugins = args[0];
+    }
+
+    // (..., options)
+    if (args[0]) {
+      options = _.defaults(options, args[0]);
+    }
+  }
 
   // 'new' is optional
   if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);

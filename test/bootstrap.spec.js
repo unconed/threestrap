@@ -41,6 +41,47 @@ describe("three", function () {
     three.destroy();
   });
 
+  it("installs in an element", function () {
+
+    var element = document.createElement('div');
+    document.body.appendChild(element);
+
+    var options = {
+      init: true,
+      plugins: [],
+      element: element,
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(three.__inited).toEqual(true);
+    expect(three.element).toEqual(element);
+
+    three.destroy();
+
+    document.body.removeChild(element);
+  });
+
+  it("installs in an element (shorthand)", function () {
+
+    var element = document.createElement('div');
+    document.body.appendChild(element);
+
+    var options = {
+      init: true,
+      plugins: [],
+    };
+
+    var three = new THREE.Bootstrap(element, options);
+
+    expect(three.__inited).toEqual(true);
+    expect(three.element).toEqual(element);
+
+    three.destroy();
+
+    document.body.removeChild(element);
+  });
+
   it('fires a ready event', function () {
 
     var ready = 0;
