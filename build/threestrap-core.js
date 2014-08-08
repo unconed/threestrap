@@ -404,7 +404,7 @@ THREE.Bootstrap.unregisterAlias = function (name) {
 }
 
 THREE.Bootstrap.registerAlias('empty', ['fallback', 'renderer', 'bind', 'size', 'fill', 'loop', 'time']);
-THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render']);
+THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'warmup']);
 
 
 THREE.Bootstrap.registerPlugin('fallback', {
@@ -929,6 +929,29 @@ THREE.Bootstrap.registerPlugin('render', {
     if (three.scene && three.camera) {
       three.renderer.render(three.scene, three.camera);
     }
+  },
+
+});
+THREE.Bootstrap.registerPlugin('warmup', {
+
+  defaults: {
+    delay: 2,
+  },
+
+  listen: ['ready', 'post'],
+
+  ready: function (event, three) {
+    three.renderer.domElement.style.visibility = 'hidden'
+    this.frame = 0;
+    this.hidden = true;
+  },
+
+  post: function (event, three) {
+    if (this.hidden && this.frame >= this.options.delay) {
+      three.renderer.domElement.style.visibility = 'visible'
+      this.hidden = false;
+    }
+    this.frame++;
   },
 
 });

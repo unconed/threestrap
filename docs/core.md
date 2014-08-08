@@ -377,3 +377,14 @@ three.canvas;     // Canvas / DOM element
 three.renderer;   // Three renderer
 ```
 
+warmup
+---
+Hide canvas for first few frames to avoid stuttering while JS/GL warms up.
+
+* Options
+
+```javascript
+{
+  delay: 2,  // Number of frames to wait before showing canvas
+}
+

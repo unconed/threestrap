@@ -63,6 +63,7 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `c
  * `scene`    - Creates the `THREE.Scene`
  * `camera`   - Creates the `THREE.Camera`
  * `render`   - Renders the global scene and camera directly.
+ * `warmup`   - Hide canvas for first few frames to avoid stuttering.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
 
@@ -136,8 +137,8 @@ var three = THREE.Bootstrap({
 
 The following aliases are available:
 
-* `empty` = `renderer`, `bind`, `size`, `fill`, `loop`, `time`
-* `core` = `empty` + `scene`, `camera`, `render`
+* `empty` = `fallback`, `renderer`, `bind`, `size`, `fill`, `loop`, `time`
+* `core` = `empty` + `scene`, `camera`, `render`, `warmup`
 
 Events
 ---

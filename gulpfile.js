@@ -38,6 +38,7 @@ var core = [
   'src/core/scene.js',
   'src/core/camera.js',
   'src/core/render.js',
+  'src/core/warmup.js',
 ];
 
 var extra = [
