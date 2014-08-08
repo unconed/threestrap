@@ -10,6 +10,8 @@ threestrap
 
 Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of your way.
 
+While this is definitely a miniature framework, it's not really meant to wrap *your* code, but rather the code you don't care about.
+
 Usage
 ===
 
@@ -66,6 +68,7 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `c
  * `warmup`   - Hide canvas for first few frames to avoid stuttering.
 
 Additional plug-ins can be added, or the default set can be overridden on a case by case basis.
+
 
 Shorthands:
 ```javascript
