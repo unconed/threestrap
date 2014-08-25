@@ -76,8 +76,16 @@ THREE.Bootstrap.registerPlugin('size', {
     }
 
     if (renderer) {
-      // Resize WebGL
-      renderer.setSize(rw, rh);
+      var el = renderer.domElement;
+
+      // Resize renderer to render width if it's a canvas
+      if (el && el.tagName == 'CANVAS') {
+        renderer.setSize(rw, rh);
+      }
+      // Or real width if it's just a DOM element
+      else {
+        renderer.setSize(w, h);
+      }
 
       // Resize Canvas
       style = renderer.domElement.style;

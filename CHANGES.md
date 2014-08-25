@@ -2,6 +2,7 @@ Changes
 ----
 0.0.8-dev
 * New Core/Warmup: Hide canvas for first few frames to avoid stuttering while JS/GL warms up.
+* Core/Size: Only apply render width/height to canvas-based renderers
 
 0.0.7
 * New Extra/Cursor: Set mouse cursor contextually. Can auto-hide cursor with time out.
