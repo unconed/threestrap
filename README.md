@@ -62,7 +62,7 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `c
  * `fill`     - Removes margin/padding and sets positioning on the element.
  * `loop`     - Runs the rendering loop.
  * `time`     - Measures time and fps in seconds. Provides clocks.
- 
+
  * `scene`    - Creates the `THREE.Scene`
  * `camera`   - Creates the `THREE.Camera`
  * `render`   - Renders the global scene and camera directly.
