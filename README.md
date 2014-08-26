@@ -72,7 +72,7 @@ Core:
  * `render`   - Renders the global scene and camera directly.
  * `warmup`   - Hide canvas for first few frames to avoid stuttering.
 
-Additional plug-ins can be added, or the default set can be overridden on a case by case basis. You can specify `empty` instead of `core` for a do-it-yourself set up that excludes the last 4 plugins.
+Additional plug-ins can be added, or the default set can be overridden on a case by case basis. `empty` is a do-it-yourself set up.
 
 
 Shorthands:
