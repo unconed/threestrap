@@ -21,6 +21,7 @@
   <script>
 
     // Bootstrap into element
+    var element = document.querySelector('#three');
     var webgl = three = THREE.Bootstrap({
       plugins: ['core', 'stats'],
       renderer: {
@@ -32,7 +33,7 @@
           alpha: true,
         }
       },
-      element: document.querySelector('#three'),
+      element: element,
     });
 
     var canvas2d = THREE.Bootstrap({
@@ -43,7 +44,7 @@
           alpha: true,
         }
       },
-      element: document.querySelector('#three'),
+      element: element,
     });
 
     // Clear backgrounds
