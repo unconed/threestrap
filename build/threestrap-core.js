@@ -542,10 +542,11 @@ THREE.Bootstrap.registerPlugin('size', {
   },
 
   listen: [
-    'window.resize',
-    'element.resize',
-    'this.change:resize',
+    'window.resize:queue',
+    'element.resize:queue',
+    'this.change:queue',
     'ready:resize',
+    'pre:pre',
   ],
 
   install: function (three) {
@@ -557,10 +558,21 @@ THREE.Bootstrap.registerPlugin('size', {
       viewHeight: 0,
     });
 
+    this.resized = false;
   },
 
   uninstall: function (three) {
     delete three.Size;
+  },
+
+  queue: function (event, three) {
+    this.resized = true;
+  },
+
+  pre: function (event, three) {
+    if (!this.resized) return;
+    this.resized = false;
+    this.resize(event, three);
   },
 
   resize: function (event, three) {
