@@ -4,65 +4,51 @@
   <meta charset="utf-8">
   <title>Threestrap - Multiple Renderers</title>
   <script type="text/javascript" src="../vendor/three.js"></script>
+  <script type="text/javascript" src="../vendor/renderers/CSS3DRenderer.js"></script>
+  <script type="text/javascript" src="../vendor/renderers/MultiRenderer.js"></script>
   <script type="text/javascript" src="../build/threestrap.js"></script>
 </head>
 <body>
-  <style type="text/css" media="screen">
-    #three {
-      width: 500px;
-      height: 500px;
-    }
-    #three canvas {
-      position: absolute;
-    }
-  </style>
-  <h1>WebGL Renderer + Canvas Renderer</h1>
-  <div id="three"></div>
+  <div id="hello">Hello World</div>
+
   <script>
 
-    // Bootstrap into element
-    var element = document.querySelector('#three');
-    var webgl = three = THREE.Bootstrap({
-      plugins: ['core', 'stats'],
+    var three = THREE.Bootstrap({
       renderer: {
+        klass: THREE.MultiRenderer,
         parameters: {
-          depth: true,
-          stencil: true,
-          preserveDrawingBuffer: true,
-          antialias: true,
-          alpha: true,
+          renderers: [THREE.WebGLRenderer, THREE.CSS3DRenderer],
+          parameters: [
+            { // WebGLRenderer parameters
+              depth: true,
+              stencil: true,
+              preserveDrawingBuffer: true,
+              antialias: true,
+              alpha: true,
+            },
+            {} // CSS3DRenderer paramters
+          ]
         }
-      },
-      element: element,
+      }
     });
 
-    var canvas2d = THREE.Bootstrap({
-      plugins: ['empty', 'scene', 'render'],
-      renderer: {
-        klass: THREE.CanvasRenderer,
-        parameters: {
-          alpha: true,
-        }
-      },
-      element: element,
-    });
+    // Insert a cube
+    var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
+    three.scene.add(mesh)
 
-    // Clear backgrounds
-    webgl   .renderer.setClearColor(0, 0)
-    canvas2d.renderer.setClearColor(0, 0)
-
-    // Link cameras
-    canvas2d.camera = webgl.camera;
-
-    // Insert a webgl cube
-    var mesh = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
-    mesh.position.set(-.5, 0, 0);
-    webgl.scene.add(mesh);
-
-    // Insert a canvas2d cube
-    var mesh = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
-    mesh.position.set(.5, 0, 0);
-    canvas2d.scene.add(mesh);
+    // Insert some text
+    var greeting = document.createElement( 'div' )
+		greeting.textContent = 'Hello World!'
+    greeting.style.width = '100px'
+    greeting.style.height = '100px'
+    greeting.style.fontSize = '30px'
+    greeting.style.fontFamily = 'Helvetica'
+    greeting.style.textAlign = 'center'
+    greeting.style.backfaceVisibility = 'hidden'
+    var greetingObject = new THREE.CSS3DObject(greeting)
+    greetingObject.scale.set( 0.005, 0.005, 0.005 )
+    greetingObject.position.z = 0.25
+    three.scene.add(greetingObject)
 
     // Orbit the camera
     three.on('update', function () {
