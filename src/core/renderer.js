@@ -10,6 +10,8 @@ THREE.Bootstrap.registerPlugin('renderer', {
     },
   },
 
+  listen: ['resize'],
+
   install: function (three) {
     // Instantiate Three renderer
     var renderer = three.renderer = new this.options.klass(this.options.parameters);
@@ -25,6 +27,23 @@ THREE.Bootstrap.registerPlugin('renderer', {
 
     delete three.renderer;
     delete three.canvas;
+  },
+
+  resize: function (event, three) {
+    var renderer = three.renderer;
+    var el = renderer.domElement;
+
+    // Resize renderer to render size if it's a canvas
+    if (el && el.tagName == 'CANVAS') {
+      renderer.setSize(event.renderWidth, event.renderHeight, false);
+    }
+    // Or view size if it's just a DOM element or multi-renderer
+    else {
+      if (renderer.setRenderSize) {
+        renderer.setRenderSize(event.renderWidth, event.renderHeight);
+      }
+      renderer.setSize(event.viewWidth, event.viewHeight, false);
+    }
   },
 
 });

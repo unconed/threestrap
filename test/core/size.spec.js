@@ -9,7 +9,7 @@ describe("size", function () {
 
     var options = {
       element: element,
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -33,7 +33,7 @@ describe("size", function () {
         height: 130,
         scale: 1/2,
       },
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -56,12 +56,12 @@ describe("size", function () {
 
     var options = {
       init: false,
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
       size: {
         width: 600,
         height: 400,
-        capWidth: 300,
-        capHeight: 300,
+        maxRenderWidth: 300,
+        maxRenderHeight: 300,
       },
     };
 
@@ -82,12 +82,12 @@ describe("size", function () {
 
     var options = {
       init: false,
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
       size: {
         width: 400,
         height: 600,
-        capWidth: 300,
-        capHeight: 300,
+        maxRenderWidth: 300,
+        maxRenderHeight: 300,
       },
     };
 
@@ -114,7 +114,7 @@ describe("size", function () {
         aspect: 5/4,
         scale: 1/2,
       },
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -142,7 +142,7 @@ describe("size", function () {
         aspect: 4/5,
         scale: 1/2,
       },
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -169,7 +169,7 @@ describe("size", function () {
 
     var options = {
       element: element,
-      plugins: ['renderer', 'bind', 'size'],
+      plugins: ['bind', 'renderer', 'size'],
     };
 
     options = {
@@ -177,8 +177,8 @@ describe("size", function () {
       height: 500,
       aspect: 5/4,
       scale: 1/2,
-      capWidth: 150,
-      capHeight: 100,
+      maxRenderWidth: 150,
+      maxRenderHeight: 100,
     };
 
     var three = new THREE.Bootstrap(options);

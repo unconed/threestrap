@@ -5,7 +5,7 @@ describe("warmup", function () {
     var n = 3;
 
     var options = {
-      plugins: ['renderer', 'bind', 'warmup'],
+      plugins: ['bind', 'renderer', 'warmup'],
       warmup: {
         delay: n,
       }

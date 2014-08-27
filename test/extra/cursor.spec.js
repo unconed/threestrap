@@ -3,7 +3,7 @@ describe("cursor", function () {
   it("sets and autohides the cursor", function () {
 
     var options = {
-      plugins: ['renderer', 'bind', 'camera', 'cursor'],
+      plugins: ['bind', 'renderer', 'camera', 'cursor'],
       cursor: {
         hide: true,
         timeout: 1,
@@ -41,7 +41,7 @@ describe("cursor", function () {
   it("sets the cursor contextually", function () {
 
     var options = {
-      plugins: ['renderer', 'bind', 'camera', 'controls', 'cursor'],
+      plugins: ['bind', 'renderer', 'camera', 'controls', 'cursor'],
       controls: {
         klass: THREE.OrbitControls,
       },

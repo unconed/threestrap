@@ -14,7 +14,7 @@ describe("controls", function () {
     }
 
     var options = {
-      plugins: ['renderer', 'bind', 'camera', 'controls'],
+      plugins: ['bind', 'renderer', 'camera', 'controls'],
       controls: {
         klass: klass,
         parameters: {
@@ -39,7 +39,7 @@ describe("controls", function () {
   it("responds to camera changes", function () {
 
     var options = {
-      plugins: ['renderer', 'bind', 'camera', 'controls'],
+      plugins: ['bind', 'renderer', 'camera', 'controls'],
       controls: {
         klass: THREE.OrbitControls,
       },

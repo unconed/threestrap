@@ -141,12 +141,12 @@ Autosizes canvas to fill its container or size to given dimensions. Force aspect
 
 ```javascript
 {
-  width: null,           // Fixed width in pixels
-  height: null,          // Fixed height in pixels
-  aspect: null,          // Fixed aspect ratio, e.g. 16/9
-  scale: 1,              // Scale factor. e.g. scale 1/2 renders at half resolution.
-  capWidth:  Infinity,   // Maximum width in pixels of framebuffer
-  capHeight: Infinity,   // Maximum height in pixels of framebuffer
+  width:  null,                // Fixed width in pixels
+  height: null,                // Fixed height in pixels
+  aspect: null,                // Fixed aspect ratio, e.g. 16/9
+  scale:  1,                   // Scale factor. e.g. scale 1/2 renders at half resolution.
+  maxRenderWidth:  Infinity,   // Maximum width in pixels of framebuffer
+  maxRenderHeight: Infinity,   // Maximum height in pixels of framebuffer
 }
 ```
 

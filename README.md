@@ -58,8 +58,8 @@ Threestrap is made out of plugins that each do one thing. The basic set up of `e
 Empty:
 
  * `fallback` - Displays a standard message with a link if WebGL is unavailable.
- * `renderer` - Creates the `THREE.WebGLRenderer` (or a given class).
  * `bind`     - Enables event/method binding.
+ * `renderer` - Creates the `THREE.WebGLRenderer` (or a given class).
  * `size`     - Autosizes canvas to fit or size to given dimensions.
  * `fill`     - Removes margin/padding and sets positioning on the element.
  * `loop`     - Runs the rendering loop.

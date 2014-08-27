@@ -7189,7 +7189,7 @@ THREE.Bootstrap.unregisterAlias = function (name) {
   delete THREE.Bootstrap.Aliases[name];
 }
 
-THREE.Bootstrap.registerAlias('empty', ['fallback', 'renderer', 'bind', 'size', 'fill', 'loop', 'time']);
+THREE.Bootstrap.registerAlias('empty', ['fallback', 'bind', 'renderer', 'size', 'fill', 'loop', 'time']);
 THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'warmup']);
 
 
@@ -7260,6 +7260,8 @@ THREE.Bootstrap.registerPlugin('renderer', {
     },
   },
 
+  listen: ['resize'],
+
   install: function (three) {
     // Instantiate Three renderer
     var renderer = three.renderer = new this.options.klass(this.options.parameters);
@@ -7275,6 +7277,23 @@ THREE.Bootstrap.registerPlugin('renderer', {
 
     delete three.renderer;
     delete three.canvas;
+  },
+
+  resize: function (event, three) {
+    var renderer = three.renderer;
+    var el = renderer.domElement;
+
+    // Resize renderer to render size if it's a canvas
+    if (el && el.tagName == 'CANVAS') {
+      renderer.setSize(event.renderWidth, event.renderHeight, false);
+    }
+    // Or view size if it's just a DOM element or multi-renderer
+    else {
+      if (renderer.setRenderSize) {
+        renderer.setRenderSize(event.renderWidth, event.renderHeight);
+      }
+      renderer.setSize(event.viewWidth, event.viewHeight, false);
+    }
   },
 
 });
@@ -7323,8 +7342,8 @@ THREE.Bootstrap.registerPlugin('size', {
     height: null,
     aspect: null,
     scale: 1,
-    capWidth: Infinity,
-    capHeight: Infinity,
+    maxRenderWidth: Infinity,
+    maxRenderHeight: Infinity,
   },
 
   listen: [
@@ -7392,9 +7411,9 @@ THREE.Bootstrap.registerPlugin('size', {
       aspect = w / h;
     }
 
-    // Apply scale and resolution cap
-    rw = Math.min(w * options.scale, options.capWidth);
-    rh = Math.min(h * options.scale, options.capHeight);
+    // Apply scale and resolution max
+    rw = Math.min(w * options.scale, options.maxRenderWidth);
+    rh = Math.min(h * options.scale, options.maxRenderHeight);
 
     // Retain aspect ratio
     raspect = rw / rh;
@@ -7405,25 +7424,12 @@ THREE.Bootstrap.registerPlugin('size', {
       rh = Math.round(rw / aspect);
     }
 
-    if (renderer) {
-      var el = renderer.domElement;
-
-      // Resize renderer to render width if it's a canvas
-      if (el && el.tagName == 'CANVAS') {
-        renderer.setSize(rw, rh);
-      }
-      // Or real width if it's just a DOM element
-      else {
-        renderer.setSize(w, h);
-      }
-
-      // Resize Canvas
-      style = renderer.domElement.style;
-      style.width = w + "px";
-      style.height = h + "px";
-      style.marginLeft = ml + "px";
-      style.marginTop = mt + "px";
-    }
+    // Resize and position renderer element
+    style = renderer.domElement.style;
+    style.width = w + "px";
+    style.height = h + "px";
+    style.marginLeft = ml + "px";
+    style.marginTop = mt + "px";
 
     // Notify
     _.extend(three.Size, {

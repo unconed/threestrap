@@ -105,7 +105,7 @@ describe("camera", function () {
 
     var options = {
       element: element,
-      plugins: ['renderer', 'bind', 'size', 'camera'],
+      plugins: ['bind', 'renderer', 'size', 'camera'],
     };
 
     var three = new THREE.Bootstrap(options);
