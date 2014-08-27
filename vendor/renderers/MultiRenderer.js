@@ -1,12 +1,9 @@
 /**
  * Allows a stack of renderers to be treated as a single renderer.
- *
  * @author Gheric Speiginer
  */
 
-THREE.MultiRenderer = MultiRenderer
-
-function MultiRenderer( parameters ) {
+THREE.MultiRenderer = function ( parameters ) {
 
   console.log( 'THREE.MultiRenderer', THREE.REVISION )
 
@@ -31,7 +28,7 @@ function MultiRenderer( parameters ) {
 
 }
 
-MultiRenderer.prototype.setSize = function( w, h ) {
+THREE.MultiRenderer.prototype.setSize = function( w, h ) {
 
   this.domElement.style.width = w + 'px'
   this.domElement.style.height = h + 'px'
@@ -50,7 +47,7 @@ MultiRenderer.prototype.setSize = function( w, h ) {
 
 }
 
-MultiRenderer.prototype.setRenderSize = function( rw, rh ) {
+THREE.MultiRenderer.prototype.setRenderSize = function( rw, rh ) {
 
   this._renderSizeSet = true
 
@@ -65,7 +62,7 @@ MultiRenderer.prototype.setRenderSize = function( rw, rh ) {
 
 }
 
-MultiRenderer.prototype.render = function( scene, camera ) {
+THREE.MultiRenderer.prototype.render = function( scene, camera ) {
 
   for ( var i = 0; i < this.renderers.length; i++ ) {
     this.renderers[i].render( scene, camera )
