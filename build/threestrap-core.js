@@ -410,7 +410,7 @@ THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'wa
 THREE.Bootstrap.registerPlugin('fallback', {
 
   defaults: {
-    force:   true,
+    force:   false,
     fill:    true,
     begin:   '<div class="threestrap-fallback" style="display: table; width: 100%; height: 100%;'+
              'box-sizing: border-box; border: 1px dashed rgba(0, 0, 0, .25);">'+
