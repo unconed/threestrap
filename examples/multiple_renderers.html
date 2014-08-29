@@ -37,14 +37,14 @@
     // Insert some text
     var greeting = document.createElement( 'div' )
 		greeting.textContent = 'Hello World!'
-    greeting.style.width = '100px'
-    greeting.style.height = '100px'
-    greeting.style.fontSize = '30px'
+    greeting.style.width = '400px'
+    greeting.style.height = '400px'
+    greeting.style.fontSize = '120px'
     greeting.style.fontFamily = 'Helvetica'
     greeting.style.textAlign = 'center'
     greeting.style.backfaceVisibility = 'hidden'
     var greetingObject = new THREE.CSS3DObject(greeting)
-    greetingObject.scale.set( 0.005, 0.005, 0.005 )
+    greetingObject.scale.set( 0.00125, 0.00125, 0.00125 )
     greetingObject.position.z = 0.25
     three.scene.add(greetingObject)
 
