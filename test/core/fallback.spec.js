@@ -4,11 +4,11 @@ describe("fallback", function () {
 
     var options = {
       plugins: ['fallback', 'renderer'],
-      fallback: { force: true, klass: 'fallback-test', style: 'color: red', message: '<span class="wat">wat</span>' },
+      fallback: { force: true, begin: '<div></div><div><div class="threestrap-wat">', message: '<span class="wat">wat</span>', end: '</div></div>' },
     };
 
-    var getNode = function () { return document.querySelector('.fallback-test') };
-    var getSpan = function () { return document.querySelector('.fallback-test span.wat') };
+    var getNode = function () { return document.querySelector('.threestrap-wat') };
+    var getSpan = function () { return document.querySelector('.threestrap-wat span.wat') };
 
     expect(getNode()).toBe(null);
     expect(getSpan()).toBe(null);
@@ -17,7 +17,6 @@ describe("fallback", function () {
 
     node = getNode()
     expect(node).toBeTruthy();
-    expect(node.style.color).toBe('red');
     expect(getSpan()).toBeTruthy();
 
     expect(three.renderer).toBeFalsy();

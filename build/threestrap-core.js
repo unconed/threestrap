@@ -439,7 +439,10 @@ THREE.Bootstrap.registerPlugin('fallback', {
       var div = document.createElement('div');
       div.innerHTML = begin + message + end;
 
-      while (div.childNodes.length> 0) {
+      this.children = []
+
+      while (div.childNodes.length > 0) {
+        this.children.push(div.firstChild);
         three.element.appendChild(div.firstChild);
       }
 
@@ -454,8 +457,11 @@ THREE.Bootstrap.registerPlugin('fallback', {
   },
 
   uninstall: function (three) {
-    if (this.div) {
-      this.div.parentNode.removeChild(this.div);
+    if (this.children) {
+      this.children.forEach(function (child) {
+        child.parentNode.removeChild(child);
+      });
+      this.children = null
     }
 
     delete three.fallback;
