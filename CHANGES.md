@@ -6,6 +6,7 @@ Changes
 * Core/Renderer: Only apply render width/height to canvas-based renderers
 * Core/Renderer: Call setRenderSize on renderer if present (MultiRenderer)
 * Core/Bind: Moved before renderer
+* Core/Fallback: Simply fallback message into wrapper + message
 
 0.0.7
 * New Extra/Cursor: Set mouse cursor contextually. Can auto-hide cursor with time out.

@@ -410,15 +410,14 @@ THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'wa
 THREE.Bootstrap.registerPlugin('fallback', {
 
   defaults: {
-    force:   false,
+    force:   true,
     fill:    true,
-    klass:   'threestrap-fallback',
-    style:   'display: table; width: 100%; height: 100%;'+
-             'box-sizing: border-box; border: 1px dashed rgba(0, 0, 0, .25);',
-    message: '<div style="display: table-cell; padding: 10px; vertical-align: middle; text-align: center;">'+
-             '<big><strong>This example requires WebGL</strong></big><br>'+
-             'Visit <a target="_blank" href="http://get.webgl.org/">get.webgl.org</a> for more info</a>'+
-             '</div>',
+    begin:   '<div class="threestrap-fallback" style="display: table; width: 100%; height: 100%;'+
+             'box-sizing: border-box; border: 1px dashed rgba(0, 0, 0, .25);">'+
+             '<div style="display: table-cell; padding: 10px; vertical-align: middle; text-align: center;">',
+    end:     '</div></div>',
+    message: '<big><strong>This example requires WebGL</strong></big><br>'+
+             'Visit <a target="_blank" href="http://get.webgl.org/">get.webgl.org</a> for more info</a>',
   },
 
   install: function (three) {
@@ -432,16 +431,17 @@ THREE.Bootstrap.registerPlugin('fallback', {
       three.fallback = false;
     }
     catch (e) {
-      message = this.options.message;
-      style = this.options.style;
-      klass = this.options.klass;
-      fill  = this.options.fill;
+      var message = this.options.message;
+      var begin   = this.options.begin;
+      var end     = this.options.end;
+      var fill    = this.options.fill;
 
-      div = document.createElement('div');
-      div.setAttribute('style', style);
-      div.setAttribute('class', klass);
-      div.innerHTML = message;
-      three.element.appendChild(div);
+      var div = document.createElement('div');
+      div.innerHTML = begin + message + end;
+
+      while (div.childNodes.length> 0) {
+        three.element.appendChild(div.firstChild);
+      }
 
       if (fill) {
         three.install('fill');

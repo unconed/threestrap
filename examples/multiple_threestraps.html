@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Threestrap - Multiple Threestraps</title>
+  <script type="text/javascript" src="../vendor/three.js"></script>
+  <script type="text/javascript" src="../build/threestrap.js"></script>
+</head>
+<body>
+  <style type="text/css" media="screen">
+    #three {
+      width: 500px;
+      height: 500px;
+    }
+    #three canvas {
+      position: absolute;
+    }
+  </style>
+  <h1>WebGL Renderer + Canvas Renderer</h1>
+  <div id="three"></div>
+  <script>
+
+    // Bootstrap into element
+    var element = document.querySelector('#three');
+    var webgl = three = THREE.Bootstrap({
+      plugins: ['core', 'stats'],
+      renderer: {
+        parameters: {
+          depth: true,
+          stencil: true,
+          preserveDrawingBuffer: true,
+          antialias: true,
+          alpha: true,
+        }
+      },
+      element: element,
+    });
+
+    var canvas2d = THREE.Bootstrap({
+      plugins: ['empty', 'scene', 'render', 'warmup'],
+      renderer: {
+        klass: THREE.CanvasRenderer,
+        parameters: {
+          alpha: true,
+        }
+      },
+      element: element,
+    });
+
+    // Clear backgrounds
+    webgl   .renderer.setClearColor(0, 0)
+    canvas2d.renderer.setClearColor(0, 0)
+
+    // Link cameras
+    canvas2d.camera = webgl.camera;
+
+    // Insert a webgl cube
+    var mesh = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
+    mesh.position.set(-.5, 0, 0);
+    webgl.scene.add(mesh);
+
+    // Insert a canvas2d cube
+    var mesh = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
+    mesh.position.set(.5, 0, 0);
+    canvas2d.scene.add(mesh);
+
+    // Orbit the camera
+    three.on('update', function () {
+      var t = three.Time.now;
+      three.camera.position.set(-Math.cos(t), Math.sin(t), Math.sin(t * .718));
+      three.camera.lookAt(new THREE.Vector3());
+    });
+
+  </script>
+</body>
+</html>
