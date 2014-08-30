@@ -1,6 +1,9 @@
 {
   "name": "threestrap",
   "version": "0.0.8",
+  "dependencies": {
+    "threejs": "latest"
+  },
   "homepage": "https://github.com/unconed/threestrap",
   "description": "Minimal Three.js Bootstrapper",
   "main": "build/threestrap.js",
