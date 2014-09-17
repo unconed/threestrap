@@ -162,7 +162,7 @@ THREE.Api = {
 };
 THREE.Bootstrap = function (options) {
   if (options) {
-    args = [].slice.apply(arguments);
+    var args = [].slice.apply(arguments);
     options = {};
 
     // (element, ...)
@@ -208,9 +208,15 @@ THREE.Bootstrap = function (options) {
   this.__destroyed = false;
   this.__installed = [];
 
+  // Query element
+  var element = this.__options.element;
+  if (element === '' + element) {
+    element = document.querySelector(element);
+  }
+
   // Global context
   this.plugins = {};
-  this.element = this.__options.element;
+  this.element = element;
 
   // Auto-init
   if (this.__options.init) {
