@@ -9107,6 +9107,7 @@ THREE.Bootstrap.registerPlugin('vr', {
   defaults: {
     mode:   'auto',    // 'auto', '2d'
     device:  null,
+    fov:     90,       // emulated FOV for fallback
   },
 
   listen: ['window.load', 'pre', 'render', 'resize', 'this.change'],
@@ -9126,7 +9127,7 @@ THREE.Bootstrap.registerPlugin('vr', {
     delete three.VR
   },
 
-  mocks: function (three) {
+  mocks: function (three, fov, def) {
     // Fake VR device for cardboard / desktop
 
     // Interpuppilary distance
@@ -9137,9 +9138,9 @@ THREE.Bootstrap.registerPlugin('vr', {
     var getRecommendedEyeFieldOfView = function (key) {
       var camera = three.camera;
       var aspect = camera && camera.aspect || 16/9;
-      var fov    = camera && camera.fov || 65;
-      var fovX   = Math.atan(Math.tan(fov * Math.PI / 360) * aspect / 2) * 360 / Math.PI;
-      var fovY   = fov;
+      var fov2   = (fov || (camera && camera.fov || def)) / 2;
+      var fovX   = Math.atan(Math.tan(fov2 * Math.PI / 180) * aspect / 2) * 180 / Math.PI;
+      var fovY   = fov2;
 
       return {
         left: {
@@ -9188,7 +9189,7 @@ THREE.Bootstrap.registerPlugin('vr', {
     }
     else {
       console.warn('No native VR support detected.');
-      callback(this.mocks(three), three);
+      callback(this.mocks(three, this.options.fov, this.defaults.fov), three);
     }
   },
 
