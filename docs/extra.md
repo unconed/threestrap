@@ -32,6 +32,21 @@ three.VR.renderer             // VRRenderer instance
 three.VR.state                // Last sensor state
 ```
 
+* Events
+
+```javascript
+// VR mode was activated / deactivated
+three.on('vr', function (event, three) {
+  // event ==
+  {
+    active: true,
+    //active: false,
+    hmd:    ...
+    sensor: ...
+  }
+}
+```
+
 fullscreen
 ---
 Supports going fullscreen via an API or a keypress. Integrates with `vr` if present.
