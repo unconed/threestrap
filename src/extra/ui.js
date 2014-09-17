@@ -18,6 +18,8 @@ THREE.Bootstrap.registerPlugin('ui', {
 
   markup: function (three, theme, style) {
     var url = "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css";
+    if (location.href.match(/^file:\/\//)) url = 'http://' + url;
+
     var buttons = [];
 
     if (three.Fullscreen) {

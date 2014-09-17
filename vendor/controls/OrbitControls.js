@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
+ * @author unconed / https://github.com/unconed
  */
 /*global THREE, console */
 
@@ -346,8 +347,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
     }
 
-    scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
-    scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
+    document.documentElement.addEventListener( 'mousemove', onMouseMove, false );
+    document.documentElement.addEventListener( 'mouseup', onMouseUp, false );
     scope.dispatchEvent( startEvent );
 
   }
@@ -415,8 +416,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
     if ( scope.enabled === false ) return;
 
-    scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
-    scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
+    document.documentElement.removeEventListener( 'mousemove', onMouseMove, false );
+    document.documentElement.removeEventListener( 'mouseup', onMouseUp, false );
     scope.dispatchEvent( endEvent );
     state = STATE.NONE;
 
