@@ -5,7 +5,7 @@
 
  * When real vrstate is supplied, it is used.
  * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
- * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), as we are not in VR mode.
+ * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), for regular interaction
  * 
  * @author unconed / https://github.com/unconed
  */

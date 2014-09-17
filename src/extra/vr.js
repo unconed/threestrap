@@ -80,7 +80,7 @@ THREE.Bootstrap.registerPlugin('vr', {
       navigator.mozGetVRDevices(callback);
     }
     else {
-      console.warn('No VR support detected in browser.');
+      console.warn('No native VR support detected.');
       callback(this.mocks(three.camera), three);
     }
   },
@@ -120,6 +120,7 @@ THREE.Bootstrap.registerPlugin('vr', {
   },
 
   hookup: function (hmd, sensor, three) {
+    if (!THREE.VRRenderer) console.log("THREE.VRRenderer not found");
     var klass = THREE.VRRenderer || function () {};
 
     this.renderer = new klass(three.renderer, hmd);

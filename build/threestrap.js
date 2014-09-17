@@ -8806,7 +8806,7 @@ THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype )
 
  * When real vrstate is supplied, it is used.
  * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
- * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), as we are not in VR mode.
+ * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), for regular interaction
  * 
  * @author unconed / https://github.com/unconed
  */
@@ -9180,7 +9180,7 @@ THREE.Bootstrap.registerPlugin('vr', {
       navigator.mozGetVRDevices(callback);
     }
     else {
-      console.warn('No VR support detected in browser.');
+      console.warn('No native VR support detected.');
       callback(this.mocks(three.camera), three);
     }
   },
@@ -9220,6 +9220,7 @@ THREE.Bootstrap.registerPlugin('vr', {
   },
 
   hookup: function (hmd, sensor, three) {
+    if (!THREE.VRRenderer) console.log("THREE.VRRenderer not found");
     var klass = THREE.VRRenderer || function () {};
 
     this.renderer = new klass(three.renderer, hmd);
