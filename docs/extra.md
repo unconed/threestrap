@@ -11,6 +11,7 @@ Supports rendering to HMDs like the Oculus Rift or Google Cardboard.
 {
   mode: 'auto',               // Set '2d' to force VR off
   device: null,               // Force a specific device ID
+  fov:      90,               // Set emulated FOV for fallback / cardboard use
 }
 ```
 
