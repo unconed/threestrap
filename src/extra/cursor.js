@@ -1,6 +1,6 @@
 THREE.Bootstrap.registerPlugin('cursor', {
 
-  listen: ['update', 'this.change', 'install:change', 'uninstall:change', 'element.mousemove'],
+  listen: ['update', 'this.change', 'install:change', 'uninstall:change', 'element.mousemove', 'vr'],
 
   defaults: {
     cursor: null,
@@ -40,9 +40,15 @@ THREE.Bootstrap.registerPlugin('cursor', {
     }
   },
 
+  vr: function (event, three) {
+    this.hide = event.active && !event.hmd.fake;
+    this.applyCursor(three);
+  },
+
   applyCursor: function (three, cursor) {
     var auto = three.controls ? 'move' : '';
     cursor = cursor || this.options.cursor || auto;
+    if (this.hide) cursor = 'none';
     if (this.cursor != cursor) {
       this.element.style.cursor = cursor;
     }

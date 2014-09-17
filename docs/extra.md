@@ -1,6 +1,95 @@
 Threestrap - Extra Plugins
 ===
 
+vr
+---
+Supports rendering to HMDs like the Oculus Rift or Google Cardboard.
+
+* Options:
+
+```javascript
+{
+  mode: 'auto',               // Set '2d' to force VR off
+  device: null,               // Force a specific device ID
+}
+```
+
+* API
+
+```javascript
+three.VR.set({ });            // Set options
+three.VR.get();               // Get options
+```
+
+* Properties
+
+```javascript
+three.VR.active               // Whether stereoscopic VR is currently active
+three.VR.devices              // List of available VR devices
+three.VR.hmd                  // Current head-mounted display device
+three.VR.sensor               // Current positional sensor device
+three.VR.renderer             // VRRenderer instance
+three.VR.state                // Last sensor state
+```
+
+fullscreen
+---
+Supports going fullscreen via an API or a keypress. Integrates with `vr` if present.
+
+* Options:
+
+```javascript
+{
+  key: null,                    // Keyboard letter to toggle fullscreen mode with (e.g. 'f')
+}
+```
+
+* API
+
+```javascript
+three.Fullscreen.set({ });      // Set options
+three.Fullscreen.get();         // Get options
+three.Fullscreen.toggle();      // Go fullscreen / exit fullscreen
+```
+
+* Properties
+
+```javascript
+three.Fullscreen.active       // Whether fullscreen is currently active
+```
+
+* Events
+
+```javascript
+// Fullscreen mode was activated / deactivated
+three.on('fullscreen', function (event, three) {
+  // event ==
+  {
+    active: true,
+    //active: false,
+  }
+}
+```
+
+ui
+---
+Minimal UI for fullscreen / VR mode.
+
+* Options:
+```javascript
+{
+  // Container style
+  layout: 'position: absolute; bottom: 5px; right: 5px; float: left;',
+
+  // Injected CSS
+  style:  '.threestrap-ui button { border: 0; background: none; color: #fff;'+
+          '  text-shadow: 0 1px 1px rgba(0, 0, 0, 1), 0 1px 3px rgba(0, 0, 0, 1);'+
+          '  vertical-align: middle; font-size: 85%; font-weight: bold; } '+
+          '.threestrap-ui .glyphicon { top: 2px; font-weight: bold; } '+
+          '@media (max-width: 640px) { .threestrap-ui button { font-size: 120% } }'
+},
+```
+
 stats
 ---
 Shows live FPS stats in the corner (with Stats.js)
@@ -50,18 +139,5 @@ Sets the mouse cursor contextually. If controls are present, `move` is used, oth
   hide: false,                // Auto-hide the cursor after inactivity
   timeout: 3,                 // Time out for hiding (seconds)
 }
-```
-
-* API
-
-```javascript
-three.Controls.set({ });      // Set options
-three.Controls.get();         // Get options
-```
-
-* Properties
-
-```javascript
-three.controls;               // Global camera controls
 ```
 

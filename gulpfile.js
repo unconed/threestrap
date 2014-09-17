@@ -47,6 +47,9 @@ var extra = [
   'src/extra/stats.js',
   'src/extra/controls.js',
   'src/extra/cursor.js',
+  'src/extra/fullscreen.js',
+  'src/extra/vr.js',
+  'src/extra/ui.js',
 ];
 
 var bundle = vendor.concat(core).concat(extra);
@@ -101,7 +104,7 @@ gulp.task('watch-karma', function() {
 });
 
 gulp.task('watch-build', function () {
-  gulp.src(core)
+  gulp.src(bundle)
     .pipe(
       watch(function(files) {
         return gulp.start('build');
