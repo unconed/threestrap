@@ -40,7 +40,7 @@ Supports going fullscreen via an API or a keypress. Integrates with `vr` if pres
 
 ```javascript
 {
-  key: null,                    // Keyboard letter to toggle fullscreen mode with (e.g. 'f')
+  key: 'f',                    // Keyboard letter to toggle fullscreen mode with (e.g. 'f') or 'null' to disable
 }
 ```
 
