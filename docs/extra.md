@@ -78,16 +78,20 @@ Minimal UI for fullscreen / VR mode.
 * Options:
 ```javascript
 {
-  // Container style
-  layout: 'position: absolute; bottom: 5px; right: 5px; float: left;',
-
-  // Injected CSS
-  style:  '.threestrap-ui button { border: 0; background: none; color: #fff;'+
-          '  text-shadow: 0 1px 1px rgba(0, 0, 0, 1), 0 1px 3px rgba(0, 0, 0, 1);'+
-          '  vertical-align: middle; font-size: 85%; font-weight: bold; } '+
-          '.threestrap-ui .glyphicon { top: 2px; font-weight: bold; } '+
-          '@media (max-width: 640px) { .threestrap-ui button { font-size: 120% } }'
-},
+    // Class (white / black)
+    theme: 'white',
+    // Injected CSS.
+    style: '.threestrap-ui { position: absolute; bottom: 5px; right: 5px; float: left; }'+
+           '.threestrap-ui button { border: 0; background: none;'+
+           '  vertical-align: middle; font-weight: bold; } '+
+           '.threestrap-ui .glyphicon { top: 2px; font-weight: bold; } '+
+           '@media (max-width: 640px) { .threestrap-ui button { font-size: 120% } }'+
+           '.threestrap-white button { color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 1), '+
+                                                                   '0 1px 3px rgba(0, 0, 0, 1); }'+
+           '.threestrap-black button { color: #000; text-shadow: 0 0px 1px rgba(255, 255, 255, 1), '+
+                                                                '0 0px 2px rgba(255, 255, 255, 1), '+
+                                                                '0 0px 2px rgba(255, 255, 255, 1) }'
+  }
 ```
 
 stats
