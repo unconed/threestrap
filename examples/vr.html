@@ -25,7 +25,7 @@
     });
 
     // Random generator
-    var sd = 12345;
+    var sd = 12348;
     function rnd() {
       sd = (Math.abs(Math.sin(sd * 10000) * 1000)) % 1;
       return sd * 2 - 1;
@@ -38,12 +38,19 @@
       new THREE.Color(0x60109F),
     ];
     var n = colors.length;
-    for (var i = 0; i < 500; ++i) {
+    var cubes = [];
+    var centers = [];
+    for (var i = 0; i < 300; ++i) {
       var sz = 1 + rnd() * .2;
       var mesh = new THREE.Mesh(new THREE.BoxGeometry(sz, sz, sz),
                                 new THREE.MeshPhongMaterial({ color: colors[i % n] }));
-      mesh.position.set(rnd() * 10, rnd() * 10, rnd() * 10);
+      while (mesh.position.length() < 3) {
+        mesh.position.set(rnd() * 10, rnd() * 10, rnd() * 10);
+      }
       three.scene.add(mesh);
+
+      cubes.push(mesh);
+      centers.push(mesh.position.clone());
     }
 
     // Lights
@@ -58,6 +65,20 @@
     dirLight.position.set(-1, 1.75, 1);
     dirLight.position.multiplyScalar(50);
     three.scene.add(dirLight);
+
+    // Animate
+    three.on('update', function () {
+      var time = three.Time.frames / 140;
+      var n = cubes.length;
+      for (var i = 0; i < n; ++i) {
+        var cube = cubes[i];
+        var j = i % 3;
+        cube.position.set(j == 0, j == 1, j == 2);
+        cube.position.multiplyScalar(1.8 + .8 * Math.cos(i * 11.105 + i * i * 13.5101));
+        cube.position.multiplyScalar(Math.cos(time * (1 + .8 * Math.cos(i * 11.005 + i * i * 13.5101)) + i * 1.009 + i * i * .306));
+        cube.position.add(centers[i]);
+      }
+    });
 
   </script>
 </body>

@@ -1057,9 +1057,9 @@ THREE.VRControls = function (object, domElement) {
   this.supported = false;
   var callback = function (event) {
     this.supported = event && event.alpha == +event.alpha;
-  	window.removeEventListener('deviceorientation', callback, false);
+    window.removeEventListener('deviceorientation', callback, false);
   }.bind(this);
-	window.addEventListener('deviceorientation', callback, false);
+  window.addEventListener('deviceorientation', callback, false);
 }
 
 THREE.VRControls.prototype.vr = function (vrstate) {
@@ -1331,7 +1331,7 @@ THREE.Bootstrap.registerPlugin('vr', {
   defaults: {
     mode:   'auto',    // 'auto', '2d'
     device:  null,
-    fov:     90,       // emulated FOV for fallback
+    fov:     80,       // emulated FOV for fallback
   },
 
   listen: ['window.load', 'pre', 'render', 'resize', 'this.change'],
