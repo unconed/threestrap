@@ -6,7 +6,7 @@ THREE.Bootstrap.registerPlugin('vr', {
   defaults: {
     mode:   'auto',    // 'auto', '2d'
     device:  null,
-    fov:     90,       // emulated FOV for fallback
+    fov:     80,       // emulated FOV for fallback
   },
 
   listen: ['window.load', 'pre', 'render', 'resize', 'this.change'],
