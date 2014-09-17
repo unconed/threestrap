@@ -16,8 +16,8 @@ describe("size", function () {
 
     var canvas = three.renderer.domElement;
 
-    expect(canvas.width).toBe(451);
-    expect(canvas.height).toBe(251);
+    expect(canvas.width).toBe(451 * devicePixelRatio);
+    expect(canvas.height).toBe(251 * devicePixelRatio);
 
     three.destroy();
 

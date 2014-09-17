@@ -7038,12 +7038,13 @@ THREE.Bootstrap.prototype = {
     var aliases = _.extend({}, o.aliasdb, o.aliases);
 
     // Remove inline alias defs from plugins
-    plugins = _.filter(plugins, function (name) {
+    var filter = function (name) {
       var key = name.split(':');
       if (!key[1]) return true;
-      aliases[key[0]] = key[1];
+      aliases[key[0]] = [key[1]];
       return false;
-    });
+    };
+    plugins = _.filter(plugins, filter);
 
     // Unify arrays
     _.each(aliases, function (alias, key) {
@@ -7053,6 +7054,7 @@ THREE.Bootstrap.prototype = {
     // Look up aliases recursively
     function recurse(list, out, level) {
       if (level >= 256) throw "Plug-in alias recursion detected.";
+      list = _.filter(list, filter);
       _.each(list, function (name) {
         var alias = aliases[name];
         if (!alias) {
@@ -7191,8 +7193,7 @@ THREE.Bootstrap.unregisterAlias = function (name) {
 
 THREE.Bootstrap.registerAlias('empty', ['fallback', 'bind', 'renderer', 'size', 'fill', 'loop', 'time']);
 THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'warmup']);
-
-
+THREE.Bootstrap.registerAlias('VR', ['core', 'cursor', 'fullscreen', 'render:vr']);
 THREE.Bootstrap.registerPlugin('fallback', {
 
   defaults: {
@@ -7781,6 +7782,99 @@ k.id="msText";k.style.cssText="color:#0f0;font-family:Helvetica,Arial,sans-serif
 a+"px",m=b,r=0);return b},update:function(){l=this.end()}}};
 
 /**
+ * @author richt / http://richt.me
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
+ */
+
+THREE.DeviceOrientationControls = function ( object ) {
+
+	var scope = this;
+
+	this.object = object;
+
+	this.object.rotation.reorder( "YXZ" );
+
+	this.freeze = true;
+
+	this.deviceOrientation = {};
+
+	this.screenOrientation = 0;
+
+	var onDeviceOrientationChangeEvent = function ( event ) {
+
+		scope.deviceOrientation = event;
+
+	};
+
+	var onScreenOrientationChangeEvent = function () {
+
+		scope.screenOrientation = window.orientation || 0;
+
+	};
+
+	// The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
+
+	var setObjectQuaternion = function () {
+
+		var zee = new THREE.Vector3( 0, 0, 1 );
+
+		var euler = new THREE.Euler();
+
+		var q0 = new THREE.Quaternion();
+
+		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+
+		return function ( quaternion, alpha, beta, gamma, orient ) {
+
+			euler.set( beta, alpha, - gamma, 'YXZ' );                       // 'ZXY' for the device, but 'YXZ' for us
+
+			quaternion.setFromEuler( euler );                               // orient the device
+
+			quaternion.multiply( q1 );                                      // camera looks out the back of the device, not the top
+
+			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) );    // adjust for screen orientation
+
+		}
+
+	}();
+
+	this.connect = function() {
+
+		onScreenOrientationChangeEvent(); // run once on load
+
+		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+		scope.freeze = false;
+
+	};
+
+	this.disconnect = function() {
+
+		scope.freeze = true;
+
+		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+	};
+
+	this.update = function () {
+
+		if ( scope.freeze ) return;
+
+		var alpha  = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.alpha ) : 0; // Z
+		var beta   = scope.deviceOrientation.beta  ? THREE.Math.degToRad( scope.deviceOrientation.beta  ) : 0; // X'
+		var gamma  = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.gamma ) : 0; // Y''
+		var orient = scope.screenOrientation       ? THREE.Math.degToRad( scope.screenOrientation       ) : 0; // O
+
+		setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+
+	};
+
+};
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author paulirish / http://paulirish.com/
@@ -8069,366 +8163,715 @@ THREE.FirstPersonControls = function ( object, domElement ) {
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author erich666 / http://erichaines.com
  */
+/*global THREE, console */
+
+// This set of controls performs orbiting, dollying (zooming), and panning. It maintains
+// the "up" direction as +Y, unlike the TrackballControls. Touch on tablet and phones is
+// supported.
+//
+//    Orbit - left mouse / touch: one finger move
+//    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
+//    Pan - right mouse, or arrow keys / touch: three finter swipe
+//
+// This is a drop-in replacement for (most) TrackballControls used in examples.
+// That is, include this js file and wherever you see:
+//      controls = new THREE.TrackballControls( camera );
+//      controls.target.z = 150;
+// Simple substitute "OrbitControls" and the control should work as-is.
 
 THREE.OrbitControls = function ( object, domElement ) {
 
-	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+  this.object = object;
+  this.domElement = ( domElement !== undefined ) ? domElement : document;
 
-	// API
+  // API
 
-	this.enabled = true;
+  // Set to false to disable this control
+  this.enabled = true;
 
-	this.center = new THREE.Vector3();
+  // "target" sets the location of focus, where the control orbits around
+  // and where it pans with respect to.
+  this.target = new THREE.Vector3();
 
-	this.userZoom = true;
-	this.userZoomSpeed = 1.0;
+  // center is old, deprecated; use "target" instead
+  this.center = this.target;
 
-	this.userRotate = true;
-	this.userRotateSpeed = 1.0;
+  // This option actually enables dollying in and out; left as "zoom" for
+  // backwards compatibility
+  this.noZoom = false;
+  this.zoomSpeed = 1.0;
 
-	this.userPan = true;
-	this.userPanSpeed = 2.0;
+  // Limits to how far you can dolly in and out
+  this.minDistance = 0;
+  this.maxDistance = Infinity;
 
-	this.autoRotate = false;
-	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
+  // Set to true to disable this control
+  this.noRotate = false;
+  this.rotateSpeed = 1.0;
 
-	this.minPolarAngle = 0; // radians
-	this.maxPolarAngle = Math.PI; // radians
+  // Set to true to disable this control
+  this.noPan = false;
+  this.keyPanSpeed = 7.0; // pixels moved per arrow key push
 
-	this.minDistance = 0;
-	this.maxDistance = Infinity;
+  // Set to true to automatically rotate around the target
+  this.autoRotate = false;
+  this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+  // How far you can orbit vertically, upper and lower limits.
+  // Range is 0 to Math.PI radians.
+  this.minPolarAngle = 0; // radians
+  this.maxPolarAngle = Math.PI; // radians
 
-	// internals
+  // Set to true to disable use of the keys
+  this.noKeys = false;
 
-	var scope = this;
+  // The four arrow keys
+  this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
-	var EPS = 0.000001;
-	var PIXELS_PER_ROUND = 1800;
+  ////////////
+  // internals
 
-	var rotateStart = new THREE.Vector2();
-	var rotateEnd = new THREE.Vector2();
-	var rotateDelta = new THREE.Vector2();
+  var scope = this;
 
-	var zoomStart = new THREE.Vector2();
-	var zoomEnd = new THREE.Vector2();
-	var zoomDelta = new THREE.Vector2();
+  var EPS = 0.000001;
 
-	var phiDelta = 0;
-	var thetaDelta = 0;
-	var scale = 1;
+  var rotateStart = new THREE.Vector2();
+  var rotateEnd = new THREE.Vector2();
+  var rotateDelta = new THREE.Vector2();
 
-	var lastPosition = new THREE.Vector3();
+  var panStart = new THREE.Vector2();
+  var panEnd = new THREE.Vector2();
+  var panDelta = new THREE.Vector2();
+  var panOffset = new THREE.Vector3();
 
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
-	var state = STATE.NONE;
+  var offset = new THREE.Vector3();
 
-	// events
+  var dollyStart = new THREE.Vector2();
+  var dollyEnd = new THREE.Vector2();
+  var dollyDelta = new THREE.Vector2();
 
-	var changeEvent = { type: 'change' };
+  var phiDelta = 0;
+  var thetaDelta = 0;
+  var scale = 1;
+  var pan = new THREE.Vector3();
 
+  var lastPosition = new THREE.Vector3();
 
-	this.rotateLeft = function ( angle ) {
+  var STATE = { NONE : -1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
 
-		if ( angle === undefined ) {
+  var state = STATE.NONE;
 
-			angle = getAutoRotationAngle();
+  // for reset
 
-		}
+  this.target0 = this.target.clone();
+  this.position0 = this.object.position.clone();
 
-		thetaDelta -= angle;
+  // so camera.up is the orbit axis
 
-	};
+  var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+  var quatInverse = quat.clone().inverse();
 
-	this.rotateRight = function ( angle ) {
+  // events
 
-		if ( angle === undefined ) {
+  var changeEvent = { type: 'change' };
+  var startEvent = { type: 'start'};
+  var endEvent = { type: 'end'};
 
-			angle = getAutoRotationAngle();
+  this.rotateLeft = function ( angle ) {
 
-		}
+    if ( angle === undefined ) {
 
-		thetaDelta += angle;
+      angle = getAutoRotationAngle();
 
-	};
+    }
 
-	this.rotateUp = function ( angle ) {
+    thetaDelta -= angle;
 
-		if ( angle === undefined ) {
+  };
 
-			angle = getAutoRotationAngle();
+  this.rotateUp = function ( angle ) {
 
-		}
+    if ( angle === undefined ) {
 
-		phiDelta -= angle;
+      angle = getAutoRotationAngle();
 
-	};
+    }
 
-	this.rotateDown = function ( angle ) {
+    phiDelta -= angle;
 
-		if ( angle === undefined ) {
+  };
 
-			angle = getAutoRotationAngle();
+  // pass in distance in world space to move left
+  this.panLeft = function ( distance ) {
 
-		}
+    var te = this.object.matrix.elements;
 
-		phiDelta += angle;
+    // get X column of matrix
+    panOffset.set( te[ 0 ], te[ 1 ], te[ 2 ] );
+    panOffset.multiplyScalar( - distance );
 
-	};
+    pan.add( panOffset );
 
-	this.zoomIn = function ( zoomScale ) {
+  };
 
-		if ( zoomScale === undefined ) {
+  // pass in distance in world space to move up
+  this.panUp = function ( distance ) {
 
-			zoomScale = getZoomScale();
+    var te = this.object.matrix.elements;
 
-		}
+    // get Y column of matrix
+    panOffset.set( te[ 4 ], te[ 5 ], te[ 6 ] );
+    panOffset.multiplyScalar( distance );
 
-		scale /= zoomScale;
+    pan.add( panOffset );
 
-	};
+  };
 
-	this.zoomOut = function ( zoomScale ) {
+  // pass in x,y of change desired in pixel space,
+  // right and down are positive
+  this.pan = function ( deltaX, deltaY ) {
 
-		if ( zoomScale === undefined ) {
+    var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			zoomScale = getZoomScale();
+    if ( scope.object.fov !== undefined ) {
 
-		}
+      // perspective
+      var position = scope.object.position;
+      var offset = position.clone().sub( scope.target );
+      var targetDistance = offset.length();
 
-		scale *= zoomScale;
+      // half of the fov is center to top of screen
+      targetDistance *= Math.tan( ( scope.object.fov / 2 ) * Math.PI / 180.0 );
 
-	};
+      // we actually don't use screenWidth, since perspective camera is fixed to screen height
+      scope.panLeft( 2 * deltaX * targetDistance / element.clientHeight );
+      scope.panUp( 2 * deltaY * targetDistance / element.clientHeight );
 
-	this.pan = function ( distance ) {
+    } else if ( scope.object.top !== undefined ) {
 
-		distance.transformDirection( this.object.matrix );
-		distance.multiplyScalar( scope.userPanSpeed );
+      // orthographic
+      scope.panLeft( deltaX * (scope.object.right - scope.object.left) / element.clientWidth );
+      scope.panUp( deltaY * (scope.object.top - scope.object.bottom) / element.clientHeight );
 
-		this.object.position.add( distance );
-		this.center.add( distance );
+    } else {
 
-	};
+      // camera neither orthographic or perspective
+      console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.' );
 
-	this.update = function () {
+    }
 
-		var position = this.object.position;
-		var offset = position.clone().sub( this.center );
+  };
 
-		// angle from z-axis around y-axis
+  this.dollyIn = function ( dollyScale ) {
 
-		var theta = Math.atan2( offset.x, offset.z );
+    if ( dollyScale === undefined ) {
 
-		// angle from y-axis
+      dollyScale = getZoomScale();
 
-		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+    }
 
-		if ( this.autoRotate ) {
+    scale /= dollyScale;
 
-			this.rotateLeft( getAutoRotationAngle() );
+  };
 
-		}
+  this.dollyOut = function ( dollyScale ) {
 
-		theta += thetaDelta;
-		phi += phiDelta;
+    if ( dollyScale === undefined ) {
 
-		// restrict phi to be between desired limits
-		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
+      dollyScale = getZoomScale();
 
-		// restrict phi to be betwee EPS and PI-EPS
-		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
+    }
 
-		var radius = offset.length() * scale;
+    scale *= dollyScale;
 
-		// restrict radius to be between desired limits
-		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
+  };
 
-		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
-		offset.y = radius * Math.cos( phi );
-		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
+  this.update = function () {
 
-		position.copy( this.center ).add( offset );
+    var position = this.object.position;
 
-		this.object.lookAt( this.center );
+    offset.copy( position ).sub( this.target );
 
-		thetaDelta = 0;
-		phiDelta = 0;
-		scale = 1;
+    // rotate offset to "y-axis-is-up" space
+    offset.applyQuaternion( quat );
 
-		if ( lastPosition.distanceTo( this.object.position ) > 0 ) {
+    // angle from z-axis around y-axis
 
-			this.dispatchEvent( changeEvent );
+    var theta = Math.atan2( offset.x, offset.z );
 
-			lastPosition.copy( this.object.position );
+    // angle from y-axis
 
-		}
+    var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
 
-	};
+    if ( this.autoRotate ) {
 
+      this.rotateLeft( getAutoRotationAngle() );
 
-	function getAutoRotationAngle() {
+    }
 
-		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+    theta += thetaDelta;
+    phi += phiDelta;
 
-	}
+    // restrict phi to be between desired limits
+    phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
 
-	function getZoomScale() {
+    // restrict phi to be betwee EPS and PI-EPS
+    phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
 
-		return Math.pow( 0.95, scope.userZoomSpeed );
+    var radius = offset.length() * scale;
 
-	}
+    // restrict radius to be between desired limits
+    radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
 
-	function onMouseDown( event ) {
+    // move target to panned location
+    this.target.add( pan );
 
-		if ( scope.enabled === false ) return;
-		if ( scope.userRotate === false ) return;
+    offset.x = radius * Math.sin( phi ) * Math.sin( theta );
+    offset.y = radius * Math.cos( phi );
+    offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		event.preventDefault();
+    // rotate offset back to "camera-up-vector-is-up" space
+    offset.applyQuaternion( quatInverse );
 
-		if ( event.button === 0 ) {
+    position.copy( this.target ).add( offset );
 
-			state = STATE.ROTATE;
+    this.object.lookAt( this.target );
 
-			rotateStart.set( event.clientX, event.clientY );
+    thetaDelta = 0;
+    phiDelta = 0;
+    scale = 1;
+    pan.set( 0, 0, 0 );
 
-		} else if ( event.button === 1 ) {
+    if ( lastPosition.distanceToSquared( this.object.position ) > EPS ) {
 
-			state = STATE.ZOOM;
+      this.dispatchEvent( changeEvent );
 
-			zoomStart.set( event.clientX, event.clientY );
+      lastPosition.copy( this.object.position );
 
-		} else if ( event.button === 2 ) {
+    }
 
-			state = STATE.PAN;
+  };
 
-		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+  this.reset = function () {
 
-	}
+    state = STATE.NONE;
 
-	function onMouseMove( event ) {
+    this.target.copy( this.target0 );
+    this.object.position.copy( this.position0 );
 
-		if ( scope.enabled === false ) return;
+    this.update();
 
-		event.preventDefault();
+  };
 
-		if ( state === STATE.ROTATE ) {
+  function getAutoRotationAngle() {
 
-			rotateEnd.set( event.clientX, event.clientY );
-			rotateDelta.subVectors( rotateEnd, rotateStart );
+    return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
 
-			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
-			scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
+  }
 
-			rotateStart.copy( rotateEnd );
+  function getZoomScale() {
 
-		} else if ( state === STATE.ZOOM ) {
+    return Math.pow( 0.95, scope.zoomSpeed );
 
-			zoomEnd.set( event.clientX, event.clientY );
-			zoomDelta.subVectors( zoomEnd, zoomStart );
+  }
 
-			if ( zoomDelta.y > 0 ) {
+  function onMouseDown( event ) {
 
-				scope.zoomIn();
+    if ( scope.enabled === false ) return;
+    event.preventDefault();
 
-			} else {
+    if ( event.button === 0 ) {
+      if ( scope.noRotate === true ) return;
 
-				scope.zoomOut();
+      state = STATE.ROTATE;
 
-			}
+      rotateStart.set( event.clientX, event.clientY );
 
-			zoomStart.copy( zoomEnd );
+    } else if ( event.button === 1 ) {
+      if ( scope.noZoom === true ) return;
 
-		} else if ( state === STATE.PAN ) {
+      state = STATE.DOLLY;
 
-			var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-			var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+      dollyStart.set( event.clientX, event.clientY );
 
-			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+    } else if ( event.button === 2 ) {
+      if ( scope.noPan === true ) return;
 
-		}
+      state = STATE.PAN;
 
-	}
+      panStart.set( event.clientX, event.clientY );
 
-	function onMouseUp( event ) {
+    }
 
-		if ( scope.enabled === false ) return;
-		if ( scope.userRotate === false ) return;
+    scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
+    scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
+    scope.dispatchEvent( startEvent );
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+  }
 
-		state = STATE.NONE;
+  function onMouseMove( event ) {
 
-	}
+    if ( scope.enabled === false ) return;
 
-	function onMouseWheel( event ) {
+    event.preventDefault();
 
-		if ( scope.enabled === false ) return;
-		if ( scope.userZoom === false ) return;
+    var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		var delta = 0;
+    if ( state === STATE.ROTATE ) {
 
-		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+      if ( scope.noRotate === true ) return;
 
-			delta = event.wheelDelta;
+      rotateEnd.set( event.clientX, event.clientY );
+      rotateDelta.subVectors( rotateEnd, rotateStart );
 
-		} else if ( event.detail ) { // Firefox
+      // rotating across whole screen goes 360 degrees around
+      scope.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
 
-			delta = - event.detail;
+      // rotating up and down along whole screen attempts to go 360, but limited to 180
+      scope.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
 
-		}
+      rotateStart.copy( rotateEnd );
 
-		if ( delta > 0 ) {
+    } else if ( state === STATE.DOLLY ) {
 
-			scope.zoomOut();
+      if ( scope.noZoom === true ) return;
 
-		} else {
+      dollyEnd.set( event.clientX, event.clientY );
+      dollyDelta.subVectors( dollyEnd, dollyStart );
 
-			scope.zoomIn();
+      if ( dollyDelta.y > 0 ) {
 
-		}
+        scope.dollyIn();
 
-	}
+      } else {
 
-	function onKeyDown( event ) {
+        scope.dollyOut();
 
-		if ( scope.enabled === false ) return;
-		if ( scope.userPan === false ) return;
+      }
 
-		switch ( event.keyCode ) {
+      dollyStart.copy( dollyEnd );
 
-			case scope.keys.UP:
-				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
-				break;
-			case scope.keys.BOTTOM:
-				scope.pan( new THREE.Vector3( 0, - 1, 0 ) );
-				break;
-			case scope.keys.LEFT:
-				scope.pan( new THREE.Vector3( - 1, 0, 0 ) );
-				break;
-			case scope.keys.RIGHT:
-				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
-				break;
-		}
+    } else if ( state === STATE.PAN ) {
 
-	}
+      if ( scope.noPan === true ) return;
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-	this.domElement.addEventListener( 'keydown', onKeyDown, false );
+      panEnd.set( event.clientX, event.clientY );
+      panDelta.subVectors( panEnd, panStart );
+
+      scope.pan( panDelta.x, panDelta.y );
+
+      panStart.copy( panEnd );
+
+    }
+
+    scope.update();
+
+  }
+
+  function onMouseUp( /* event */ ) {
+
+    if ( scope.enabled === false ) return;
+
+    scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+    scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
+    scope.dispatchEvent( endEvent );
+    state = STATE.NONE;
+
+  }
+
+  function onMouseWheel( event ) {
+
+    if ( scope.enabled === false || scope.noZoom === true ) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    var delta = 0;
+
+    if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
+
+      delta = event.wheelDelta;
+
+    } else if ( event.detail !== undefined ) { // Firefox
+
+      delta = - event.detail;
+
+    }
+
+    if ( delta > 0 ) {
+
+      scope.dollyOut();
+
+    } else {
+
+      scope.dollyIn();
+
+    }
+
+    scope.update();
+    scope.dispatchEvent( startEvent );
+    scope.dispatchEvent( endEvent );
+
+  }
+
+  function onKeyDown( event ) {
+
+    if ( scope.enabled === false || scope.noKeys === true || scope.noPan === true ) return;
+
+    switch ( event.keyCode ) {
+
+      case scope.keys.UP:
+        scope.pan( 0, scope.keyPanSpeed );
+        scope.update();
+        break;
+
+      case scope.keys.BOTTOM:
+        scope.pan( 0, - scope.keyPanSpeed );
+        scope.update();
+        break;
+
+      case scope.keys.LEFT:
+        scope.pan( scope.keyPanSpeed, 0 );
+        scope.update();
+        break;
+
+      case scope.keys.RIGHT:
+        scope.pan( - scope.keyPanSpeed, 0 );
+        scope.update();
+        break;
+
+    }
+
+  }
+
+  function touchstart( event ) {
+
+    if ( scope.enabled === false ) return;
+
+    switch ( event.touches.length ) {
+
+      case 1: // one-fingered touch: rotate
+
+        if ( scope.noRotate === true ) return;
+
+        state = STATE.TOUCH_ROTATE;
+
+        rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+        break;
+
+      case 2: // two-fingered touch: dolly
+
+        if ( scope.noZoom === true ) return;
+
+        state = STATE.TOUCH_DOLLY;
+
+        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+        var distance = Math.sqrt( dx * dx + dy * dy );
+        dollyStart.set( 0, distance );
+        break;
+
+      case 3: // three-fingered touch: pan
+
+        if ( scope.noPan === true ) return;
+
+        state = STATE.TOUCH_PAN;
+
+        panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+        break;
+
+      default:
+
+        state = STATE.NONE;
+
+    }
+
+    scope.dispatchEvent( startEvent );
+
+  }
+
+  function touchmove( event ) {
+
+    if ( scope.enabled === false ) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+    switch ( event.touches.length ) {
+
+      case 1: // one-fingered touch: rotate
+
+        if ( scope.noRotate === true ) return;
+        if ( state !== STATE.TOUCH_ROTATE ) return;
+
+        rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+        rotateDelta.subVectors( rotateEnd, rotateStart );
+
+        // rotating across whole screen goes 360 degrees around
+        scope.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
+        // rotating up and down along whole screen attempts to go 360, but limited to 180
+        scope.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+
+        rotateStart.copy( rotateEnd );
+
+        scope.update();
+        break;
+
+      case 2: // two-fingered touch: dolly
+
+        if ( scope.noZoom === true ) return;
+        if ( state !== STATE.TOUCH_DOLLY ) return;
+
+        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+        var distance = Math.sqrt( dx * dx + dy * dy );
+
+        dollyEnd.set( 0, distance );
+        dollyDelta.subVectors( dollyEnd, dollyStart );
+
+        if ( dollyDelta.y > 0 ) {
+
+          scope.dollyOut();
+
+        } else {
+
+          scope.dollyIn();
+
+        }
+
+        dollyStart.copy( dollyEnd );
+
+        scope.update();
+        break;
+
+      case 3: // three-fingered touch: pan
+
+        if ( scope.noPan === true ) return;
+        if ( state !== STATE.TOUCH_PAN ) return;
+
+        panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+        panDelta.subVectors( panEnd, panStart );
+
+        scope.pan( panDelta.x, panDelta.y );
+
+        panStart.copy( panEnd );
+
+        scope.update();
+        break;
+
+      default:
+
+        state = STATE.NONE;
+
+    }
+
+  }
+
+  function touchend( /* event */ ) {
+
+    if ( scope.enabled === false ) return;
+
+    scope.dispatchEvent( endEvent );
+    state = STATE.NONE;
+
+  }
+
+  this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+  this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+  this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+  this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+  this.domElement.addEventListener( 'touchstart', touchstart, false );
+  this.domElement.addEventListener( 'touchend', touchend, false );
+  this.domElement.addEventListener( 'touchmove', touchmove, false );
+
+  window.addEventListener( 'keydown', onKeyDown, false );
+
+  // force an update at start
+  this.update();
 
 };
 
 THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 
+/**
+ * VRControls
+ *
+ * Mixes vrstate with OrbitControls / DeviceOrientationControls
+
+ * When real vrstate is supplied, it is used.
+ * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
+ * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), as we are not in VR mode.
+ * 
+ * @author unconed / https://github.com/unconed
+ */
+
+
+THREE.VRControls = function (object, domElement) {
+  var EPSILON = 1e-5;
+
+  // Prepare real object and dummy object to swap out
+  var dummy   = this.dummy = new THREE.Object3D();
+  this.object = object;
+
+  // Two camera controls
+  this.device = new THREE.DeviceOrientationControls(dummy, domElement);
+  this.orbit  = new THREE.OrbitControls            (dummy, domElement);
+
+  // Ensure position/target are not identical
+  this.orbit.target.copy(object.position);
+  this.orbit.target.z += EPSILON;
+  this.orbit.rotateSpeed = -0.25;
+
+  // Check device orientation support
+  this.supported = false;
+  var callback = function (event) {
+    this.supported = event && event.alpha == +event.alpha;
+  	window.removeEventListener('deviceorientation', callback, false);
+  }.bind(this);
+	window.addEventListener('deviceorientation', callback, false);
+}
+
+THREE.VRControls.prototype.vr = function (vrstate) {
+  this.vrstate = vrstate;
+}
+
+THREE.VRControls.prototype.update = function (delta) {
+  var freeze = false;
+
+  if (this.vrstate && this.vrstate.orientation) {
+    freeze = true;
+
+    this.object.quaternion.copy(this.vrstate.orientation);
+    this.object.position  .copy(this.vrstate.position);
+
+    this.device.object = this.dummy;
+    this.orbit .object = this.dummy;
+  }
+  else if (this.vrstate && this.supported) {
+    if (this.device.freeze) this.device.connect();
+
+    this.device.object = this.object;
+    this.orbit .object = this.dummy;
+
+    this.device.update(delta);
+  }
+  else {
+    freeze = true;
+
+    this.device.object = this.dummy;
+    this.orbit .object = this.object;
+
+    this.orbit.update(delta);
+  }
+
+  if (freeze && !this.device.freeze) this.device.disconnect();
+}
 THREE.Bootstrap.registerPlugin('stats', {
 
   listen: ['pre', 'post'],
@@ -8497,6 +8940,9 @@ THREE.Bootstrap.registerPlugin('controls', {
 
   update: function (event, three) {
     var delta = three.Time && three.Time.delta || 1/60;
+    var vr = three.VR && three.VR.state;
+
+    if (three.controls.vr) three.controls.vr(vr);
     three.controls.update(delta);
   },
 
@@ -8511,7 +8957,7 @@ THREE.Bootstrap.registerPlugin('controls', {
 });
 THREE.Bootstrap.registerPlugin('cursor', {
 
-  listen: ['update', 'this.change', 'install:change', 'uninstall:change', 'element.mousemove'],
+  listen: ['update', 'this.change', 'install:change', 'uninstall:change', 'element.mousemove', 'vr'],
 
   defaults: {
     cursor: null,
@@ -8551,12 +8997,369 @@ THREE.Bootstrap.registerPlugin('cursor', {
     }
   },
 
+  vr: function (event, three) {
+    this.hide = event.active && !event.hmd.fake;
+    this.applyCursor(three);
+  },
+
   applyCursor: function (three, cursor) {
     var auto = three.controls ? 'move' : '';
     cursor = cursor || this.options.cursor || auto;
+    if (this.hide) cursor = 'none';
     if (this.cursor != cursor) {
       this.element.style.cursor = cursor;
     }
+  },
+
+});
+THREE.Bootstrap.registerPlugin('fullscreen', {
+
+  defaults: {
+    key: 'f',
+  },
+
+  listen: ['ready', 'update'],
+
+  install: function (three) {
+    three.Fullscreen = this.api({
+      active: false,
+      toggle: this.toggle.bind(this),
+    }, three);
+  },
+
+  uninstall: function (three) {
+    delete three.Fullscreen
+  },
+
+  ready: function (event, three) {
+
+    document.body.addEventListener('keypress', function (event) {
+      if (this.options.key &&
+          event.charCode == this.options.key.charCodeAt(0)) {
+        this.toggle(three);
+      }
+    }.bind(this));
+
+    var changeHandler = function () {
+      var active = !!document.fullscreenElement       ||
+                   !!document.mozFullScreenElement    ||
+                   !!document.webkitFullscreenElement ||
+                   !!document.msFullscreenElement;
+      three.Fullscreen.active = this.active = active;
+      three.trigger({
+        type: 'fullscreen',
+        active: active,
+      });
+    }.bind(this);
+    document.addEventListener("fullscreenchange", changeHandler, false);
+    document.addEventListener("webkitfullscreenchange", changeHandler, false);
+    document.addEventListener("mozfullscreenchange", changeHandler, false);
+  },
+
+  toggle: function (three) {
+    var canvas  = three.canvas;
+    var options = (three.VR && three.VR.active) ? { vrDisplay: three.VR.hmd } : {};
+
+    if (!this.active) {
+
+      if (canvas.requestFullScreen) {
+        canvas.requestFullScreen(options);
+      }
+      else if (canvas.msRequestFullScreen) {
+        canvas.msRequestFullscreen(options);
+      }
+      else if (canvas.webkitRequestFullscreen) {
+        canvas.webkitRequestFullscreen(options);
+      }
+      else if (canvas.mozRequestFullScreen) {
+        canvas.mozRequestFullScreen(options); // s vs S
+      }
+
+    }
+    else {
+
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+      else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+      else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen(); // s vs S
+      }
+
+    }
+  },
+
+});
+
+
+
+/*
+VR rendering pass + sensor / HMD hookup.
+*/
+THREE.Bootstrap.registerPlugin('vr', {
+
+  defaults: {
+    mode:   'auto',    // 'auto', '2d'
+    device:  null,
+  },
+
+  listen: ['window.load', 'pre', 'render', 'this.change'],
+
+  install: function (three) {
+    three.VR = this.api({
+      active:   false,
+      devices:  [],
+      hmd:      null,
+      sensor:   null,
+      renderer: null,
+      state:    null,
+    }, three);
+  },
+
+  uninstall: function (three) {
+    delete three.VR
+  },
+
+  mocks: function (camera) {
+    var aspect = camera.aspect;
+    var fov    = camera.fov;
+
+    var fovX = Math.atan(Math.tan(fov * Math.PI / 360) * aspect / 2) * 360 / Math.PI;
+    var fovY = fov;
+
+    // Fake VR device for cardboard / desktop
+    var getEyeTranslation = function (key) { return {left: {x: -0.03, y: 0, z: 0}, right: {x: 0.03, y: 0, z: 0}}[key]; };
+    var getRecommendedEyeFieldOfView = function (key) { return {
+        left: {
+          "rightDegrees": fovX,
+          "leftDegrees":  fovX,
+          "downDegrees":  fovY,
+          "upDegrees":    fovY,
+        },
+        right: {
+          "rightDegrees": fovX,
+          "leftDegrees":  fovX,
+          "downDegrees":  fovY,
+          "upDegrees":    fovY,
+        },
+      }[key];
+    };
+    // Will be replaced with orbit controls or device orientation controls by THREE.VRControls
+    var getState = function () { return {} };
+
+    return [
+      {
+        fake: true,
+        force: 1,
+        deviceId: 'emu',
+        deviceName: 'Emulated',
+        getEyeTranslation: getEyeTranslation,
+        getRecommendedEyeFieldOfView: getRecommendedEyeFieldOfView,
+      },
+      {
+        force: 2,
+        getState: getState,
+      },
+    ];
+  },
+
+  load: function (event, three) {
+    var callback = function (devs) {
+      this.callback(devs, three);
+    }.bind(this);
+
+    if (navigator.getVRDevices) {
+      navigator.getVRDevices().then(callback);
+    }
+    else if (navigator.mozGetVRDevices) {
+      navigator.mozGetVRDevices(callback);
+    }
+    else {
+      console.warn('No VR support detected in browser.');
+      callback(this.mocks(three.camera), three);
+    }
+  },
+
+  callback: function (vrdevs, three) {
+    var hmd, sensor;
+
+    var HMD    = window.HMDVRDevice            || function () {};
+    var SENSOR = window.PositionSensorVRDevice || function () {};
+
+    // Export list of devices
+    vrdevs = three.VR.devices = vrdevs || three.VR.devices;
+
+    // Get HMD device
+    var deviceId = this.options.device;
+    for (var i = 0; i < vrdevs.length; ++i) {
+      var dev = vrdevs[i];
+      if (dev.force == 1 || (dev instanceof HMD)) {
+        if (deviceId && deviceId != dev.deviceId) continue;
+        hmd = dev;
+        break;
+      }
+    }
+
+    if (hmd) {
+      // Get sensor device
+      for (var i = 0; i < vrdevs.length; ++i) {
+        var dev = vrdevs[i];
+        if (dev.force == 2 || (dev instanceof SENSOR && dev.hardwareUnitId == hmd.hardwareUnitId)) {
+          sensor = dev;
+          break;
+        }
+      }
+
+      this.hookup(hmd, sensor, three);
+    }
+  },
+
+  hookup: function (hmd, sensor, three) {
+    var klass = THREE.VRRenderer || function () {};
+
+    this.renderer = new klass(three.renderer, hmd);
+    this.hmd      = hmd;
+    this.sensor   = sensor;
+
+    three.VR.renderer = this.renderer;
+    three.VR.hmd      = hmd;
+    three.VR.sensor   = sensor;
+
+    console.log("THREE.VRRenderer", hmd.deviceName);
+  },
+
+  change: function (event, three) {
+    if (event.changes.device) {
+      this.callback(null, three);
+    }
+    this.pre(event, three);
+  },
+
+  pre: function (event, three) {
+    var last = this.active;
+
+    // Global active flag
+    var active = this.active = this.renderer && this.options.mode != '2d';
+    three.VR.active = active;
+
+    // Load sensor state
+    if (active && this.sensor) {
+      var state = this.sensor.getState();
+      three.VR.state = state;
+    }
+    else {
+      three.VR.state = null;
+    }
+
+    // Notify if VR state changed
+    if (last != this.active) {
+      three.trigger({ type: 'vr', active: active, hmd: this.hmd, sensor: this.sensor });
+    }
+
+  },
+
+  render: function (event, three) {
+    if (three.scene && three.camera) {
+      var renderer = this.active ? this.renderer : three.renderer;
+
+      // Cleanup leftover renderer state when swapping back to normal
+      if (this.last != renderer && renderer == three.renderer) {
+        var dpr    = renderer.devicePixelRatio;
+        var width  = renderer.domElement.width / dpr;
+        var height = renderer.domElement.height / dpr;
+        renderer.enableScissorTest(false);
+        renderer.setViewport(0, 0, width, height);
+      }
+      this.last = renderer;
+
+      renderer.render(three.scene, three.camera);
+    }
+  },
+
+});
+
+
+THREE.Bootstrap.registerPlugin('ui', {
+
+  defaults: {
+    theme: 'white',
+    style: '.threestrap-ui { position: absolute; bottom: 5px; right: 5px; float: left; }'+
+           '.threestrap-ui button { border: 0; background: none;'+
+           '  vertical-align: middle; font-weight: bold; } '+
+           '.threestrap-ui .glyphicon { top: 2px; font-weight: bold; } '+
+           '@media (max-width: 640px) { .threestrap-ui button { font-size: 120% } }'+
+           '.threestrap-white button { color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 1), '+
+                                                                   '0 1px 3px rgba(0, 0, 0, 1); }'+
+           '.threestrap-black button { color: #000; text-shadow: 0 0px 1px rgba(255, 255, 255, 1), '+
+                                                                '0 0px 2px rgba(255, 255, 255, 1), '+
+                                                                '0 0px 2px rgba(255, 255, 255, 1) }'
+  },
+
+  listen: ['fullscreen'],
+
+  markup: function (three, theme, style) {
+    var url = "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css";
+    var buttons = [];
+
+    if (three.Fullscreen) {
+      buttons.push('<button class="fullscreen" title="Full Screen">'+
+         '<span class="glyphicon glyphicon-fullscreen"></span>'+
+       '</button>');
+    }
+    if (three.VR) {
+      buttons.push('<button class="vr" title="VR Headset">VR</button>');
+    }
+
+    return '<style type="text/css">@import url("' + url + '"); '+ style + '</style>'+
+           '<div class="threestrap-ui threestrap-'+ theme + '">'+ buttons.join("\n") + '</div>';
+  },
+
+  install: function (three) {
+    var ui = this.ui = document.createElement('div');
+    ui.innerHTML = this.markup(three, this.options.theme, this.options.style);
+    document.body.appendChild(ui);
+
+    var fullscreen = this.ui.fullscreen = ui.querySelector('button.fullscreen');
+    if (fullscreen) {
+      three.bind([ fullscreen, 'click:goFullscreen' ], this);
+    }
+
+    var vr = this.ui.vr = ui.querySelector('button.vr');
+    if (vr) {
+      three.VR.set({ mode: '2d' });
+      three.bind([ vr, 'click:goVR' ], this);
+    }
+  },
+
+  uninstall: function (three) {
+    document.body.removeChild(ui);
+  },
+
+  fullscreen: function (event, three) {
+    this.ui.style.display = event.active ? 'none' : 'block';
+    if (!event.active) three.VR.set({ mode: '2d' });
+  },
+
+  goFullscreen: function (event, three) {
+    if (three.Fullscreen) {
+      three.Fullscreen.toggle();
+    }
+  },
+
+  goVR: function (event, three) {
+    if (three.VR) {
+      three.VR.set({ mode: 'auto' });
+      three.Fullscreen.toggle();
+    }
+  },
+
+  uninstall: function (three) {
+    document.body.removeChild(this.ui);
   },
 
 });

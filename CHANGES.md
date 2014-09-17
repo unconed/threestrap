@@ -1,6 +1,14 @@
 Changes
 ----
-0.0.8-dev
+0.0.9-dev
+* New Extra/VR: `render` replacement for Oculus/Cardboard VR using the `getVRDevices` API and `THREE.VRRenderer`. Specify as `render:vr` or use the `VR` alias, see `examples/vr.html`.
+* New Extra/Fullscreen: Go fullscreen / VR with keypress or API.
+* New Extra/UI: Minimal UI controls for fullscreen / VR.
+* Extra/Controls: Pass VR state to controls.
+* Extra/Cursor: Hide cursor in VR mode.
+* Vendor/controls/VRControls: Apply VR state and fallback to DeviceOrientationControls / OrbitControls
+
+0.0.8
 * New Core/Warmup: Hide canvas for first few frames to avoid stuttering while JS/GL warms up.
 * Core/Size: Rename capWidth/capHeight to maxRenderWidth/maxRenderHeight
 * Core/Renderer: Only apply render width/height to canvas-based renderers

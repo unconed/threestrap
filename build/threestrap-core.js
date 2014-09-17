@@ -252,12 +252,13 @@ THREE.Bootstrap.prototype = {
     var aliases = _.extend({}, o.aliasdb, o.aliases);
 
     // Remove inline alias defs from plugins
-    plugins = _.filter(plugins, function (name) {
+    var filter = function (name) {
       var key = name.split(':');
       if (!key[1]) return true;
-      aliases[key[0]] = key[1];
+      aliases[key[0]] = [key[1]];
       return false;
-    });
+    };
+    plugins = _.filter(plugins, filter);
 
     // Unify arrays
     _.each(aliases, function (alias, key) {
@@ -267,6 +268,7 @@ THREE.Bootstrap.prototype = {
     // Look up aliases recursively
     function recurse(list, out, level) {
       if (level >= 256) throw "Plug-in alias recursion detected.";
+      list = _.filter(list, filter);
       _.each(list, function (name) {
         var alias = aliases[name];
         if (!alias) {
@@ -405,8 +407,7 @@ THREE.Bootstrap.unregisterAlias = function (name) {
 
 THREE.Bootstrap.registerAlias('empty', ['fallback', 'bind', 'renderer', 'size', 'fill', 'loop', 'time']);
 THREE.Bootstrap.registerAlias('core', ['empty', 'scene', 'camera', 'render', 'warmup']);
-
-
+THREE.Bootstrap.registerAlias('VR', ['core', 'cursor', 'fullscreen', 'render:vr']);
 THREE.Bootstrap.registerPlugin('fallback', {
 
   defaults: {

@@ -35,6 +35,9 @@ THREE.Bootstrap.registerPlugin('controls', {
 
   update: function (event, three) {
     var delta = three.Time && three.Time.delta || 1/60;
+    var vr = three.VR && three.VR.state;
+
+    if (three.controls.vr) three.controls.vr(vr);
     three.controls.update(delta);
   },
 

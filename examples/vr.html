@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Threestrap - VR</title>
+  <script type="text/javascript" src="../vendor/three.js"></script>
+  <script type="text/javascript" src="../build/threestrap.js"></script>
+  <script type="text/javascript" src="../vendor/renderers/VRRenderer.js"></script>
+  <script type="text/javascript" src="../vendor/controls/DeviceOrientationControls.js"></script>
+  <script type="text/javascript" src="../vendor/controls/OrbitControls.js"></script>
+  <script type="text/javascript" src="../vendor/controls/VRControls.js"></script>
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+</head>
+<body>
+  <script>
+
+    // Bootstrap core + basic VR set up
+    var three = THREE.Bootstrap({
+      plugins: ['VR', 'ui', 'controls'],
+      // Equivalent to:
+      //   plugins: ['core', 'cursor', 'fullscreen', 'render:vr', 'ui']
+      controls: {
+        klass: THREE.VRControls,
+      },
+    });
+
+    var sd = 12345;
+    function rnd() {
+      sd = (Math.abs(Math.sin(sd * 10000) * 1000)) % 1;
+      return sd * 2 - 1;
+    }
+
+    // Insert cubes
+    for (var i = 0; i < 200; ++i) {
+      var mesh = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), new THREE.MeshNormalMaterial());
+      mesh.position.set(rnd() * 10, rnd() * 10, rnd() * 10);
+      three.scene.add(mesh);
+    }
+
+    // Set camera position
+//    three.camera.position.set(0, 0, 0);
+
+  </script>
+</body>
+</html>
