@@ -16,7 +16,7 @@ Examples:
 * [Basic Cubes](http://acko.net/files/threestrap/basic_cube.html)
 * [Drag/Zoom Controls](http://acko.net/files/threestrap/controls_orbit_cube.html)
 * [WebGL + CSS 3D](http://acko.net/files/threestrap/multiple_renderers.html)
-* [VR + Controls](http://acko.net/files/threestrap/vr.html)
+* [VR + Controls](http://acko.net/files/threestrap/vr2.html)
 
 Usage
 ===
