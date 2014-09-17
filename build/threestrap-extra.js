@@ -1333,7 +1333,7 @@ THREE.Bootstrap.registerPlugin('vr', {
     device:  null,
   },
 
-  listen: ['window.load', 'pre', 'render', 'this.change'],
+  listen: ['window.load', 'pre', 'render', 'resize', 'this.change'],
 
   install: function (three) {
     three.VR = this.api({
@@ -1350,16 +1350,22 @@ THREE.Bootstrap.registerPlugin('vr', {
     delete three.VR
   },
 
-  mocks: function (camera) {
-    var aspect = camera.aspect;
-    var fov    = camera.fov;
-
-    var fovX = Math.atan(Math.tan(fov * Math.PI / 360) * aspect / 2) * 360 / Math.PI;
-    var fovY = fov;
-
+  mocks: function (three) {
     // Fake VR device for cardboard / desktop
-    var getEyeTranslation = function (key) { return {left: {x: -0.03, y: 0, z: 0}, right: {x: 0.03, y: 0, z: 0}}[key]; };
-    var getRecommendedEyeFieldOfView = function (key) { return {
+
+    // Interpuppilary distance
+    var ipd = 0.03;
+
+    // Symmetric eye FOVs (Cardboard style)
+    var getEyeTranslation = function (key) { return {left: {x: -ipd, y: 0, z: 0}, right: {x: ipd, y: 0, z: 0}}[key]; };
+    var getRecommendedEyeFieldOfView = function (key) {
+      var camera = three.camera;
+      var aspect = camera && camera.aspect || 16/9;
+      var fov    = camera && camera.fov || 65;
+      var fovX   = Math.atan(Math.tan(fov * Math.PI / 360) * aspect / 2) * 360 / Math.PI;
+      var fovY   = fov;
+
+      return {
         left: {
           "rightDegrees": fovX,
           "leftDegrees":  fovX,
@@ -1406,7 +1412,7 @@ THREE.Bootstrap.registerPlugin('vr', {
     }
     else {
       console.warn('No native VR support detected.');
-      callback(this.mocks(three.camera), three);
+      callback(this.mocks(three), three);
     }
   },
 
@@ -1489,18 +1495,28 @@ THREE.Bootstrap.registerPlugin('vr', {
 
   },
 
+  resize: function (event, three) {
+    if (this.active) {
+      // Reinit HMD projection
+      this.renderer.initialize();
+    }
+  },
+
   render: function (event, three) {
     if (three.scene && three.camera) {
       var renderer = this.active ? this.renderer : three.renderer;
 
-      // Cleanup leftover renderer state when swapping back to normal
-      if (this.last != renderer && renderer == three.renderer) {
-        var dpr    = renderer.devicePixelRatio;
-        var width  = renderer.domElement.width / dpr;
-        var height = renderer.domElement.height / dpr;
-        renderer.enableScissorTest(false);
-        renderer.setViewport(0, 0, width, height);
+      if (this.last != renderer) {
+        if (renderer == three.renderer) {
+          // Cleanup leftover renderer state when swapping back to normal
+          var dpr    = renderer.devicePixelRatio;
+          var width  = renderer.domElement.width / dpr;
+          var height = renderer.domElement.height / dpr;
+          renderer.enableScissorTest(false);
+          renderer.setViewport(0, 0, width, height);
+        }
       }
+
       this.last = renderer;
 
       renderer.render(three.scene, three.camera);

@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * VRRenderer
+ *
+ * @author wwwtyro https://github.com/wwwtyro
+ * @author unconed https://github.com/unconed
+ */
 THREE.VRRenderer = function(renderer, hmd) {
 
     var self = this;
@@ -22,13 +28,12 @@ THREE.VRRenderer = function(renderer, hmd) {
         };
     }
 
-    self.FovPortToProjection = function(fov, rightHanded /* = true */ , zNear /* = 0.01 */ , zFar /* = 10000.0 */ ) {
+    self.FovPortToProjection = function(matrix, fov, rightHanded /* = true */ , zNear /* = 0.01 */ , zFar /* = 10000.0 */ ) {
         rightHanded = rightHanded === undefined ? true : rightHanded;
         zNear = zNear === undefined ? 0.01 : zNear;
         zFar = zFar === undefined ? 10000.0 : zFar;
         var handednessScale = rightHanded ? -1.0 : 1.0;
-        var mobj = new THREE.Matrix4();
-        var m = mobj.elements;
+        var m = matrix.elements;
         var scaleAndOffset = self.FovToNDCScaleOffset(fov);
         m[0 * 4 + 0] = scaleAndOffset.scale[0];
         m[0 * 4 + 1] = 0.0;
@@ -46,38 +51,49 @@ THREE.VRRenderer = function(renderer, hmd) {
         m[3 * 4 + 1] = 0.0;
         m[3 * 4 + 2] = handednessScale;
         m[3 * 4 + 3] = 0.0;
-        mobj.transpose();
-        return mobj;
+        matrix.transpose();
     }
 
-    self.FovToProjection = function(fov, rightHanded /* = true */ , zNear /* = 0.01 */ , zFar /* = 10000.0 */ ) {
+    self.FovToProjection = function(matrix, fov, rightHanded /* = true */ , zNear /* = 0.01 */ , zFar /* = 10000.0 */ ) {
         var fovPort = {
             upTan: Math.tan(fov.upDegrees * Math.PI / 180.0),
             downTan: Math.tan(fov.downDegrees * Math.PI / 180.0),
             leftTan: Math.tan(fov.leftDegrees * Math.PI / 180.0),
             rightTan: Math.tan(fov.rightDegrees * Math.PI / 180.0)
         };
-        return self.FovPortToProjection(fovPort, rightHanded, zNear, zFar);
+        return self.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
     }
 
+    var right  = new THREE.Vector3();
+
+    var cameraLeft  = new THREE.PerspectiveCamera();
+    var cameraRight = new THREE.PerspectiveCamera();
+
     self.render = function(scene, camera) {
-        var cameraLeft = camera.clone();
-        var cameraRight = camera.clone();
-        cameraLeft.projectionMatrix = self.FovToProjection(self.fovLeft, true, camera.near, camera.far);
-        cameraRight.projectionMatrix = self.FovToProjection(self.fovRight, true, camera.near, camera.far);
-        var right = new THREE.Vector3(1, 0, 0);
+        self.FovToProjection(cameraLeft .projectionMatrix, self.fovLeft , true, camera.near, camera.far);
+        self.FovToProjection(cameraRight.projectionMatrix, self.fovRight, true, camera.near, camera.far);
+
+        right.set(self.halfIPD, 0, 0);
         right.applyQuaternion(camera.quaternion);
-        cameraLeft.position.sub(right.clone().multiplyScalar(self.halfIPD));
-        cameraRight.position.add(right.clone().multiplyScalar(self.halfIPD));
-        renderer.enableScissorTest(true);
-        var dpr = renderer.devicePixelRatio;
-        var width = renderer.domElement.width / 2 / dpr;
+
+        cameraLeft .position.copy(camera.position).sub(right);
+        cameraRight.position.copy(camera.position).add(right);
+
+        cameraLeft .quaternion.copy(camera.quaternion);
+        cameraRight.quaternion.copy(camera.quaternion);
+
+        var dpr    = renderer.devicePixelRatio;
+        var width  = renderer.domElement.width  / 2 / dpr;
         var height = renderer.domElement.height / dpr;
+
+        renderer.enableScissorTest(true);
+
         renderer.setViewport(0, 0, width, height);
-        renderer.setScissor(0, 0, width, height);
+        renderer.setScissor (0, 0, width, height);
         renderer.render(scene, cameraLeft);
+
         renderer.setViewport(width, 0, width, height);
-        renderer.setScissor(width, 0, width, height);
+        renderer.setScissor (width, 0, width, height);
         renderer.render(scene, cameraRight);
     }
 
