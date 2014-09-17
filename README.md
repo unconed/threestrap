@@ -3,7 +3,7 @@ threestrap
 
 *Use Three.js with zero hassle.*
 
-![threestrap](https://raw.github.com/unconed/threestrap/master/examples/basic_cube.png)
+<a href="http://acko.net/files/threestrap/basic_cube.html"><img src="https://raw.github.com/unconed/threestrap/master/examples/basic_cube.png" alt="Example"></a>
 
 
 * * *
@@ -11,6 +11,12 @@ threestrap
 Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of your way.
 
 While this is definitely a miniature framework, it's not really meant to wrap *your* code, but rather the code you don't care about.
+
+Examples:
+* [Basic Cubes](http://acko.net/files/threestrap/basic_cube.html)
+* [Drag/Zoom Controls](http://acko.net/files/threestrap/controls_orbit_cube.html)
+* [WebGL + CSS 3D](http://acko.net/files/threestrap/multiple_renderers.html)
+* [VR + Controls](http://acko.net/files/threestrap/vr.html)
 
 Usage
 ===
