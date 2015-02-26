@@ -484,6 +484,7 @@ THREE.Bootstrap.registerPlugin('renderer', {
       stencil: true,
       preserveDrawingBuffer: true,
       antialias: true,
+      devicePixelRatio: true,
     },
   },
 
@@ -509,6 +510,12 @@ THREE.Bootstrap.registerPlugin('renderer', {
   resize: function (event, three) {
     var renderer = three.renderer;
     var el = renderer.domElement;
+
+    // Apply pixel ratio
+    if (renderer.setPixelRatio) {
+      var ratio = this.options.devicePixelRatio ? window.devicePixelRatio : 1;
+      renderer.setPixelRatio(ratio);
+    }
 
     // Resize renderer to render size if it's a canvas
     if (el && el.tagName == 'CANVAS') {

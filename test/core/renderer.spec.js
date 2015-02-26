@@ -53,6 +53,30 @@ describe('renderer', function () {
     document.body.removeChild(element);
   });
 
+  it("calls renderer setPixelRatio", function () {
+
+    var element = document.createElement('div');
+    document.body.appendChild(element);
+
+    var options = {
+      init: false,
+      element: element,
+      plugins: ['renderer'],
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    var called = 0;
+    var callback = function () { called++; };
+
+    three.init();
+    three.renderer.setPixelRatio = callback;
+    three.plugins.renderer.resize({ renderWidth: 5, renderHeight: 4, viewWidth: 3, viewHeight: 2, aspect: 3/2 }, three);
+    three.destroy();
+
+    expect(called).toBe(1);
+  });
+
   it("calls renderer setSize", function () {
 
     var element = document.createElement('div');
