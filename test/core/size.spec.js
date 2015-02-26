@@ -10,14 +10,17 @@ describe("size", function () {
     var options = {
       element: element,
       plugins: ['bind', 'renderer', 'size'],
+      size: {
+        devicePixelRatio: false,
+      },
     };
 
     var three = new THREE.Bootstrap(options);
 
     var canvas = three.renderer.domElement;
 
-    expect(canvas.width).toBe(451 * devicePixelRatio);
-    expect(canvas.height).toBe(251 * devicePixelRatio);
+    expect(canvas.width).toBe(451);
+    expect(canvas.height).toBe(251);
 
     three.destroy();
 
@@ -32,6 +35,7 @@ describe("size", function () {
         width: 230,
         height: 130,
         scale: 1/2,
+        devicePixelRatio: false,
       },
       plugins: ['bind', 'renderer', 'size'],
     };
@@ -54,29 +58,35 @@ describe("size", function () {
     three.destroy();
   });
 
-  it("caps resolution while retaining aspect wide", function () {
+  it("applies devicepixelratio", function () {
 
     var options = {
       init: false,
       plugins: ['bind', 'renderer', 'size'],
       size: {
-        width: 600,
-        height: 400,
-        maxRenderWidth: 300,
-        maxRenderHeight: 300,
+        width: 300,
+        height: 200,
+        devicePixelRatio: true,
       },
     };
+
+    dpr = window.devicePixelRatio
+    window.devicePixelRatio = 2
 
     var three = new THREE.Bootstrap(options);
 
     three.on('resize', function (event) {
-      expect(event.renderWidth).toBe(300);
-      expect(event.renderHeight).toBe(200);
+      expect(event.renderWidth).toBe(600);
+      expect(event.renderHeight).toBe(400);
+      expect(event.viewWidth).toBe(300);
+      expect(event.viewHeight).toBe(200);
     });
 
     three.init();
 
     three.destroy();
+
+    window.devicePixelRatio = dpr
 
   });
 
@@ -90,6 +100,7 @@ describe("size", function () {
         height: 600,
         maxRenderWidth: 300,
         maxRenderHeight: 300,
+        devicePixelRatio: false,
       },
     };
 
@@ -115,6 +126,7 @@ describe("size", function () {
         height: 500,
         aspect: 5/4,
         scale: 1/2,
+        devicePixelRatio: false,
       },
       plugins: ['bind', 'renderer', 'size'],
     };
@@ -143,6 +155,7 @@ describe("size", function () {
         height: 500,
         aspect: 4/5,
         scale: 1/2,
+        devicePixelRatio: false,
       },
       plugins: ['bind', 'renderer', 'size'],
     };
@@ -172,7 +185,24 @@ describe("size", function () {
     var options = {
       element: element,
       plugins: ['bind', 'renderer', 'size'],
+      size: {
+        width: 300,
+        height: 200,
+      }
     };
+
+    var three = new THREE.Bootstrap(options);
+
+    var called = false;
+    three.on('resize', function (event) {
+      expect(event.viewWidth).toBe(500);
+      expect(event.viewHeight).toBe(400);
+
+      expect(event.renderWidth).toBe(125);
+      expect(event.renderHeight).toBe(100);
+      
+      called = true;
+    });
 
     options = {
       width: 500,
@@ -181,19 +211,14 @@ describe("size", function () {
       scale: 1/2,
       maxRenderWidth: 150,
       maxRenderHeight: 100,
+      devicePixelRatio: false,
     };
 
-    var three = new THREE.Bootstrap(options);
-
-    three.on('resize', function (event) {
-      expect(event.viewWidth).toBe(500);
-      expect(event.viewHeight).toBe(400);
-
-      expect(event.renderWidth).toBe(125);
-      expect(event.renderHeight).toBe(100);
-    });
-
     three.Size.set(options);
+    
+    three.trigger({ type: 'pre' });
+
+    expect(called).toBe(true);
 
     three.destroy();
   });

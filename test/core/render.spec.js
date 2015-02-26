@@ -11,11 +11,12 @@ describe("render", function () {
     three.scene = new THREE.Scene();
     three.camera = new THREE.PerspectiveCamera();
 
-    expect(three.scene.__webglObjects).toBeFalsy();
+    called = 0;
+    three.renderer.render = function () { called++; }
 
     three.dispatchEvent({ type: 'render' });
 
-    expect(three.scene.__webglObjects).toBeTruthy();
+    expect(called).toBe(1);
 
     three.destroy();
 

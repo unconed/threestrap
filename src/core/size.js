@@ -7,7 +7,7 @@ THREE.Bootstrap.registerPlugin('size', {
     scale: 1,
     maxRenderWidth: Infinity,
     maxRenderHeight: Infinity,
-    devixePixelRatio: true,
+    devicePixelRatio: true,
   },
 
   listen: [
