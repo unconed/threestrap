@@ -48,7 +48,7 @@ THREE.Bootstrap.registerPlugin('size', {
     var element = three.element;
     var renderer = three.renderer;
 
-    var w, h, ew, eh, rw, rh, aspect, cut, style,
+    var w, h, ew, eh, rw, rh, aspect, cut, style, ratio,
         ml = 0 , mt = 0;
 
     // Measure element
@@ -94,6 +94,12 @@ THREE.Bootstrap.registerPlugin('size', {
     style.marginLeft = ml + "px";
     style.marginTop = mt + "px";
 
+    // Measure device pixel ratio
+    ratio = 1
+    if (typeof window != 'undefined') {
+      ratio = window.devicePixelRatio || 1
+    }
+
     // Notify
     _.extend(three.Size, {
       renderWidth: rw,
@@ -101,6 +107,7 @@ THREE.Bootstrap.registerPlugin('size', {
       viewWidth: w,
       viewHeight: h,
       aspect: aspect,
+      pixelRatio: ratio,
     });
 
     three.trigger({
@@ -110,6 +117,7 @@ THREE.Bootstrap.registerPlugin('size', {
       viewWidth: w,
       viewHeight: h,
       aspect: aspect,
+      pixelRatio: ratio,
     });
   },
 

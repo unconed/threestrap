@@ -7,7 +7,7 @@ THREE.Bootstrap.registerPlugin('renderer', {
       stencil: true,
       preserveDrawingBuffer: true,
       antialias: true,
-      devicePixelRatio: true,
+      pixelRatio: true,
     },
   },
 
@@ -36,7 +36,7 @@ THREE.Bootstrap.registerPlugin('renderer', {
 
     // Apply pixel ratio
     if (renderer.setPixelRatio) {
-      var ratio = this.options.devicePixelRatio ? window.devicePixelRatio : 1;
+      var ratio = this.options.pixelRatio ? event.pixelRatio : 1;
       renderer.setPixelRatio(ratio);
     }
 
