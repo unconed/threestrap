@@ -571,6 +571,7 @@ THREE.Bootstrap.registerPlugin('size', {
     scale: 1,
     maxRenderWidth: Infinity,
     maxRenderHeight: Infinity,
+    devixePixelRatio: true,
   },
 
   listen: [
@@ -640,7 +641,7 @@ THREE.Bootstrap.registerPlugin('size', {
 
     // Get device pixel ratio
     ratio = 1
-    if (typeof window != 'undefined') {
+    if (options.devicePixelRatio && typeof window != 'undefined') {
       ratio = window.devicePixelRatio || 1
     }
 
@@ -656,9 +657,9 @@ THREE.Bootstrap.registerPlugin('size', {
     else {
       rh = Math.round(rw / aspect);
     }
-    
+
     // Measure final pixel ratio
-    ratio = h / rh
+    ratio = rh / h
 
     // Resize and position renderer element
     style = renderer.domElement.style;
