@@ -40,7 +40,7 @@ describe("size", function () {
 
     var h;
     three.on('resize', h = function (event) {
-      expect(event.pixelRatio).toBeGreaterThan(0);
+      expect(event.pixelRatio).toBe(event.viewHeight / event.renderHeight);
 
       expect(event.viewWidth).toBe(options.size.width);
       expect(event.viewHeight).toBe(options.size.height);

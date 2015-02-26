@@ -74,9 +74,15 @@ THREE.Bootstrap.registerPlugin('size', {
       aspect = w / h;
     }
 
+    // Get device pixel ratio
+    ratio = 1
+    if (typeof window != 'undefined') {
+      ratio = window.devicePixelRatio || 1
+    }
+
     // Apply scale and resolution max
-    rw = Math.min(w * options.scale, options.maxRenderWidth);
-    rh = Math.min(h * options.scale, options.maxRenderHeight);
+    rw = Math.min(w * ratio * options.scale, options.maxRenderWidth);
+    rh = Math.min(h * ratio * options.scale, options.maxRenderHeight);
 
     // Retain aspect ratio
     raspect = rw / rh;
@@ -86,6 +92,9 @@ THREE.Bootstrap.registerPlugin('size', {
     else {
       rh = Math.round(rw / aspect);
     }
+    
+    // Measure final pixel ratio
+    ratio = h / rh
 
     // Resize and position renderer element
     style = renderer.domElement.style;
@@ -93,12 +102,6 @@ THREE.Bootstrap.registerPlugin('size', {
     style.height = h + "px";
     style.marginLeft = ml + "px";
     style.marginTop = mt + "px";
-
-    // Measure device pixel ratio
-    ratio = 1
-    if (typeof window != 'undefined') {
-      ratio = window.devicePixelRatio || 1
-    }
 
     // Notify
     _.extend(three.Size, {
