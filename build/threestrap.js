@@ -9118,7 +9118,7 @@ THREE.Bootstrap.registerPlugin('fullscreen', {
 
 
 /*
-VR rendering pass + sensor / HMD hookup.
+VR sensor / HMD hookup.
 */
 THREE.Bootstrap.registerPlugin('vr', {
 
