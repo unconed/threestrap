@@ -82,6 +82,28 @@ describe("three", function () {
     document.body.removeChild(element);
   });
 
+  it("installs in an element (selector)", function () {
+
+    var element = document.createElement('div');
+    element.setAttribute('id', 'watwatwatselector');
+    document.body.appendChild(element);
+
+    var options = {
+      init: true,
+      plugins: [],
+      element: '#watwatwatselector'
+    };
+
+    var three = new THREE.Bootstrap(options);
+
+    expect(three.__inited).toEqual(true);
+    expect(three.element).toEqual(element);
+
+    three.destroy();
+
+    document.body.removeChild(element);
+  });
+
   it('fires a ready event', function () {
 
     var ready = 0;

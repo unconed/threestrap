@@ -147,6 +147,7 @@ Autosizes canvas to fill its container or size to given dimensions. Force aspect
   scale:  1,                   // Scale factor. e.g. scale 1/2 renders at half resolution.
   maxRenderWidth:  Infinity,   // Maximum width in pixels of framebuffer
   maxRenderHeight: Infinity,   // Maximum height in pixels of framebuffer
+  devixePixelRatio: true,      // Whether to automatically adjust for high DPI displays
 }
 ```
 
@@ -166,6 +167,7 @@ three.Size.renderHeight;  // Height of frame buffer
 three.Size.viewWidth;     // Width of canvas on page
 three.Size.viewHeight;    // Height of canvas on page
 three.Size.aspect;        // Aspect ratio of view
+three.Size.pixelRatio;    // Pixel ratio (render height / view height)
 ```
 
 * Events

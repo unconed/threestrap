@@ -1,5 +1,8 @@
 Changes
 ----
+0.0.10
+* Bootstrap: Can pass in CSS selector for { element: ... } option.
+
 0.0.9
 * New Extra/VR: `render` replacement for Oculus/Cardboard VR using the `getVRDevices` API and `THREE.VRRenderer`. Specify as `render:vr` or use the `VR` alias, see `examples/vr.html`.
 * New Extra/Fullscreen: Go fullscreen / VR with keypress or API.
