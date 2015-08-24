@@ -111,4 +111,45 @@ describe("time", function () {
 
   });
 
+  it("clock waits N frames then starts from 0", function (cb) {
+
+    var pre, update, render, post, three;
+
+    var delay = 5;
+
+    var options = {
+      plugins: ['bind', 'time'],
+      time: { delay: delay }
+    };
+
+    var three = new THREE.Bootstrap(options);
+    var frames = delay;
+    var fps = 60;
+    var delta = 1/fps;
+
+    three.trigger({ type: 'pre' });
+
+    var start = three.Time.clock;
+
+    for (var i = 0; i < frames; ++i) {
+      stall(three.Time.now, delta);
+      three.trigger({ type: 'pre' });
+    }
+
+    var clockTime = three.Time.clock;
+
+    expect(clockTime).toBe(0);
+
+    stall(three.Time.now, delta);
+    three.trigger({ type: 'pre' });
+
+    clockTime = three.Time.clock;
+
+    expect(clockTime).toBeGreaterThan(0);
+    expect(clockTime).toBeLessThan(delta * 2);
+
+    three.destroy();
+
+  });
+
 });

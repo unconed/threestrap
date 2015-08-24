@@ -2,6 +2,7 @@ THREE.Bootstrap.registerPlugin('time', {
 
   defaults: {
     speed: 1, // Clock speed
+    delay: 0, // Wait N frames before starting clock
   },
 
   listen: ['pre:tick', 'this.change'],
@@ -27,6 +28,8 @@ THREE.Bootstrap.registerPlugin('time', {
 
     this.last  = 0;
     this.clock = 0;
+    this.wait  = this.options.delay;
+    this.start = 0;
   },
 
   tick: function (event, three) {
@@ -50,9 +53,15 @@ THREE.Bootstrap.registerPlugin('time', {
       }
 
       api.step  = step;
-      api.clock = clock;
+      api.clock = clock - this.start;
 
       api.frames++;
+
+      if (this.wait-- > 0) {
+        this.start = clock;
+        api.clock = 0;
+        api.step  = 1e-100;
+      }
     }
 
     this.last   = now;
