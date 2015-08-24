@@ -5,6 +5,7 @@ Changes
 
 0.0.10
 * Bootstrap: Can pass in CSS selector for { element: ... } option.
+* Size: handle retina/high-DPI displays to match Three.js changes. 
 
 0.0.9
 * New Extra/VR: `render` replacement for Oculus/Cardboard VR using the `getVRDevices` API and `THREE.VRRenderer`. Specify as `render:vr` or use the `VR` alias, see `examples/vr.html`.

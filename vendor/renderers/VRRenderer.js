@@ -82,7 +82,7 @@ THREE.VRRenderer = function(renderer, hmd) {
         cameraLeft .quaternion.copy(camera.quaternion);
         cameraRight.quaternion.copy(camera.quaternion);
 
-        var dpr    = renderer.devicePixelRatio;
+        var dpr    = renderer.devicePixelRatio || 1;
         var width  = renderer.domElement.width  / 2 / dpr;
         var height = renderer.domElement.height / dpr;
 

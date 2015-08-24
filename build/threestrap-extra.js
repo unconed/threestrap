@@ -1324,7 +1324,7 @@ THREE.Bootstrap.registerPlugin('fullscreen', {
 
 
 /*
-VR rendering pass + sensor / HMD hookup.
+VR sensor / HMD hookup.
 */
 THREE.Bootstrap.registerPlugin('vr', {
 
@@ -1510,7 +1510,7 @@ THREE.Bootstrap.registerPlugin('vr', {
       if (this.last != renderer) {
         if (renderer == three.renderer) {
           // Cleanup leftover renderer state when swapping back to normal
-          var dpr    = renderer.devicePixelRatio;
+          var dpr    = renderer.getPixelRatio();
           var width  = renderer.domElement.width / dpr;
           var height = renderer.domElement.height / dpr;
           renderer.enableScissorTest(false);

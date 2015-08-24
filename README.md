@@ -151,7 +151,7 @@ var three = THREE.Bootstrap({
 
 The following aliases are available:
 
-* `empty` = `fallback`, `renderer`, `bind`, `size`, `fill`, `loop`, `time`
+* `empty` = `fallback`, `bind`, `renderer`, `size`, `fill`, `loop`, `time`
 * `core` = `empty` + `scene`, `camera`, `render`, `warmup`
 
 Events
