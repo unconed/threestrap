@@ -20,6 +20,7 @@ describe("time", function () {
     expect(three.Time.clock !== undefined).toBeTruthy();
     expect(three.Time.step !== undefined).toBeTruthy();
     expect(three.Time.frames !== undefined).toBeTruthy();
+    expect(three.Time.time !== undefined).toBeTruthy();
     expect(three.Time.delta !== undefined).toBeTruthy();
     expect(three.Time.average !== undefined).toBeTruthy();
     expect(three.Time.fps !== undefined).toBeTruthy();
@@ -57,6 +58,7 @@ describe("time", function () {
     expect(three.Time.step).toBeGreaterThan(0);
 
     expect(three.Time.frames).toBe(frames);
+    expect(three.Time.time).toBeGreaterThan(0);
     expect(three.Time.delta).toBeGreaterThan(0);
 
     expect(three.Time.average).toBeGreaterThan(0);
@@ -95,9 +97,11 @@ describe("time", function () {
       three.trigger({ type: 'pre' });
     }
 
-    var realTime = three.Time.now - start;
+    var nowTime = three.Time.now - start;
+    var realTime = three.Time.time;
     var clockTime = three.Time.clock;
 
+    expect(nowTime).toBeGreaterThan(0);
     expect(realTime).toBeGreaterThan(0);
     expect(clockTime).toBeGreaterThan(0);
 

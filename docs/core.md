@@ -278,6 +278,7 @@ three.Time.clock   // Clock (seconds since start)
 three.Time.step    // Clock step (seconds)
 
 three.Time.frames  // Frame count
+three.Time.time    // Real time (seconds since start)
 three.Time.delta   // Last frame time (seconds)
 
 three.Time.average // Average frame time (seconds)

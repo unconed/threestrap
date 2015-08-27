@@ -2,6 +2,7 @@ Changes
 ----
 0.0.11-dev
 * Time: Provide `delay` option to wait N frames before starting clock (complements warmup)
+* Time: Add `time` real time clock.
 
 0.0.10
 * Bootstrap: Can pass in CSS selector for { element: ... } option.
