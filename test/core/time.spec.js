@@ -123,7 +123,7 @@ describe("time", function () {
 
     var options = {
       plugins: ['bind', 'time'],
-      time: { delay: delay }
+      time: { warmup: delay }
     };
 
     var three = new THREE.Bootstrap(options);
@@ -151,6 +151,48 @@ describe("time", function () {
 
     expect(clockTime).toBeGreaterThan(0);
     expect(clockTime).toBeLessThan(delta * 2);
+
+    three.destroy();
+
+  });
+
+  it("clock ignores frames longer than timeout", function (cb) {
+
+    var pre, update, render, post, three;
+
+    var delay = 5/60;
+
+    var options = {
+      plugins: ['bind', 'time'],
+      time: { timeout: delay }
+    };
+
+    var three = new THREE.Bootstrap(options);
+    var frames = 3;
+    var fps = 60;
+    var delta = 1/fps;
+
+    for (var i = 0; i < frames; ++i) {
+      stall(three.Time.now, delta);
+      three.trigger({ type: 'pre' });
+    }
+
+    var start = three.Time.clock;
+
+    stall(three.Time.now, delay);
+    three.trigger({ type: 'pre' });
+
+    var clockTime = three.Time.clock;
+
+    expect(clockTime - start).toBe(0);
+
+    stall(three.Time.now, delta);
+    three.trigger({ type: 'pre' });
+
+    clockTime = three.Time.clock;
+
+    expect(clockTime - start).toBeGreaterThan(0);
+    expect(clockTime - start).toBeLessThan(delta * 2);
 
     three.destroy();
 

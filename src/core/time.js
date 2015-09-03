@@ -1,8 +1,9 @@
 THREE.Bootstrap.registerPlugin('time', {
 
   defaults: {
-    speed: 1, // Clock speed
-    delay: 0, // Wait N frames before starting clock
+    speed: 1,  // Clock speed
+    warmup: 0, // Wait N frames before starting clock
+    timeout: 1 // Timeout in seconds. Pause if no tick happens in this time.
   },
 
   listen: ['pre:tick', 'this.change'],
@@ -30,7 +31,7 @@ THREE.Bootstrap.registerPlugin('time', {
     this.last  = 0;
     this.time  = 0;
     this.clock = 0;
-    this.wait  = this.options.delay;
+    this.wait  = this.options.warmup;
 
     this.clockStart = 0;
     this.timeStart  = 0;
@@ -38,6 +39,7 @@ THREE.Bootstrap.registerPlugin('time', {
 
   tick: function (event, three) {
     var speed = this.options.speed;
+    var timeout = this.options.timeout;
 
     var api = three.Time;
     var now = api.now = this.now();
@@ -48,6 +50,11 @@ THREE.Bootstrap.registerPlugin('time', {
     if (last) {
       var delta   = api.delta = now - last;
       var average = api.average || delta;
+
+      if (delta > timeout) {
+        delta = 0;
+      }
+
       var step = delta * speed;
 
       time  += delta;

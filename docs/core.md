@@ -265,6 +265,8 @@ Measures time and fps in seconds.
 ```javascript
 {
   speed: 1,        // Clock speed (2 = fast forward, 0.5 = slow motion)
+  warmup: 0,       // Wait N frames before starting clock
+  timeout: 1       // Ignore ticks longer than this, effectively pausing the clock
 }
 ```
 
