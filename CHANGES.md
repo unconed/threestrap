@@ -1,7 +1,7 @@
 Changes
 ----
-0.0.11-dev
-* Time: Provide `delay` option to wait N frames before starting clock (complements warmup)
+0.0.11
+* Time: Provide `warmup` option to wait N frames before starting clock (complements render warmup)
 * Time: Add `time` real time clock.
 
 0.0.10
