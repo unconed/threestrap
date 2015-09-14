@@ -1,7 +1,7 @@
 THREE.Bootstrap.registerPlugin('camera', {
 
   defaults: {
-    near: .1,
+    near: .001,
     far: 10000,
 
     type: 'perspective',
