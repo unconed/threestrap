@@ -926,7 +926,7 @@ THREE.Bootstrap.registerPlugin('scene', {
 THREE.Bootstrap.registerPlugin('camera', {
 
   defaults: {
-    near: .001,
+    near: .01,
     far: 10000,
 
     type: 'perspective',
