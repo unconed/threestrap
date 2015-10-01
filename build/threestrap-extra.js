@@ -2181,7 +2181,7 @@ THREE.Bootstrap.registerPlugin('ui', {
     }
 
     var vr = this.ui.vr = ui.querySelector('button.vr');
-    if (vr) {
+    if (vr && three.VR) {
       three.VR.set({ mode: '2d' });
       three.bind([ vr, 'click:goVR' ], this);
     }
@@ -2193,7 +2193,7 @@ THREE.Bootstrap.registerPlugin('ui', {
 
   fullscreen: function (event, three) {
     this.ui.style.display = event.active ? 'none' : 'block';
-    if (!event.active) three.VR.set({ mode: '2d' });
+    if (!event.active) three.VR && three.VR.set({ mode: '2d' });
   },
 
   goFullscreen: function (event, three) {
