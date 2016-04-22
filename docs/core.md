@@ -265,6 +265,8 @@ Measures time and fps in seconds.
 ```javascript
 {
   speed: 1,        // Clock speed (2 = fast forward, 0.5 = slow motion)
+  warmup: 0,       // Wait N frames before starting clock
+  timeout: 1       // Ignore ticks longer than this, effectively pausing the clock
 }
 ```
 
@@ -278,6 +280,7 @@ three.Time.clock   // Clock (seconds since start)
 three.Time.step    // Clock step (seconds)
 
 three.Time.frames  // Frame count
+three.Time.time    // Real time (seconds since start)
 three.Time.delta   // Last frame time (seconds)
 
 three.Time.average // Average frame time (seconds)

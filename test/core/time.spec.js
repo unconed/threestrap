@@ -20,6 +20,7 @@ describe("time", function () {
     expect(three.Time.clock !== undefined).toBeTruthy();
     expect(three.Time.step !== undefined).toBeTruthy();
     expect(three.Time.frames !== undefined).toBeTruthy();
+    expect(three.Time.time !== undefined).toBeTruthy();
     expect(three.Time.delta !== undefined).toBeTruthy();
     expect(three.Time.average !== undefined).toBeTruthy();
     expect(three.Time.fps !== undefined).toBeTruthy();
@@ -57,6 +58,7 @@ describe("time", function () {
     expect(three.Time.step).toBeGreaterThan(0);
 
     expect(three.Time.frames).toBe(frames);
+    expect(three.Time.time).toBeGreaterThan(0);
     expect(three.Time.delta).toBeGreaterThan(0);
 
     expect(three.Time.average).toBeGreaterThan(0);
@@ -95,9 +97,11 @@ describe("time", function () {
       three.trigger({ type: 'pre' });
     }
 
-    var realTime = three.Time.now - start;
+    var nowTime = three.Time.now - start;
+    var realTime = three.Time.time;
     var clockTime = three.Time.clock;
 
+    expect(nowTime).toBeGreaterThan(0);
     expect(realTime).toBeGreaterThan(0);
     expect(clockTime).toBeGreaterThan(0);
 
@@ -106,6 +110,89 @@ describe("time", function () {
     expect(diff).toBeLessThan(0.05);
 
     expect(Math.abs(1.0 / three.Time.step - fps / RATIO)).toBeLessThan(5);
+
+    three.destroy();
+
+  });
+
+  it("clock waits N frames then starts from 0", function (cb) {
+
+    var pre, update, render, post, three;
+
+    var delay = 5;
+
+    var options = {
+      plugins: ['bind', 'time'],
+      time: { warmup: delay }
+    };
+
+    var three = new THREE.Bootstrap(options);
+    var frames = delay;
+    var fps = 60;
+    var delta = 1/fps;
+
+    three.trigger({ type: 'pre' });
+
+    var start = three.Time.clock;
+
+    for (var i = 0; i < frames; ++i) {
+      stall(three.Time.now, delta);
+      three.trigger({ type: 'pre' });
+    }
+
+    var clockTime = three.Time.clock;
+
+    expect(clockTime).toBe(0);
+
+    stall(three.Time.now, delta);
+    three.trigger({ type: 'pre' });
+
+    clockTime = three.Time.clock;
+
+    expect(clockTime).toBeGreaterThan(0);
+    expect(clockTime).toBeLessThan(delta * 2);
+
+    three.destroy();
+
+  });
+
+  it("clock ignores frames longer than timeout", function (cb) {
+
+    var pre, update, render, post, three;
+
+    var delay = 5/60;
+
+    var options = {
+      plugins: ['bind', 'time'],
+      time: { timeout: delay }
+    };
+
+    var three = new THREE.Bootstrap(options);
+    var frames = 3;
+    var fps = 60;
+    var delta = 1/fps;
+
+    for (var i = 0; i < frames; ++i) {
+      stall(three.Time.now, delta);
+      three.trigger({ type: 'pre' });
+    }
+
+    var start = three.Time.clock;
+
+    stall(three.Time.now, delay);
+    three.trigger({ type: 'pre' });
+
+    var clockTime = three.Time.clock;
+
+    expect(clockTime - start).toBe(0);
+
+    stall(three.Time.now, delta);
+    three.trigger({ type: 'pre' });
+
+    clockTime = three.Time.clock;
+
+    expect(clockTime - start).toBeGreaterThan(0);
+    expect(clockTime - start).toBeLessThan(delta * 2);
 
     three.destroy();
 
