@@ -7269,7 +7269,7 @@ THREE.Bootstrap.registerPlugin('renderer', {
       depth: true,
       stencil: true,
       preserveDrawingBuffer: true,
-      antialias: true,
+      antialias: true
     },
   },
 
@@ -7432,8 +7432,8 @@ THREE.Bootstrap.registerPlugin('size', {
     }
 
     // Apply scale and resolution max
-    rw = Math.min(w * ratio * options.scale, options.maxRenderWidth);
-    rh = Math.min(h * ratio * options.scale, options.maxRenderHeight);
+    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
+    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
 
     // Retain aspect ratio
     raspect = rw / rh;
