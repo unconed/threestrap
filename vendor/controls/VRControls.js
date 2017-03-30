@@ -1,73 +1,173 @@
 /**
- * VRControls
- *
- * Mixes vrstate with OrbitControls / DeviceOrientationControls
-
- * When real vrstate is supplied, it is used.
- * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
- * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), for regular interaction
- * 
- * @author unconed / https://github.com/unconed
+ * @author dmarcos / https://github.com/dmarcos
+ * @author mrdoob / http://mrdoob.com
  */
 
+THREE.VRControls = function ( object, onError ) {
 
-THREE.VRControls = function (object, domElement) {
-  var EPSILON = 1e-5;
+	var scope = this;
 
-  // Prepare real object and dummy object to swap out
-  var dummy   = this.dummy = new THREE.Object3D();
-  this.object = object;
+	var vrDisplay, vrDisplays;
 
-  // Two camera controls
-  this.device = new THREE.DeviceOrientationControls(dummy, domElement);
-  this.orbit  = new THREE.OrbitControls            (dummy, domElement);
+	var standingMatrix = new THREE.Matrix4();
 
-  // Ensure position/target are not identical
-  this.orbit.target.copy(object.position);
-  this.orbit.target.z += EPSILON;
-  this.orbit.rotateSpeed = -0.25;
+	var frameData = null;
 
-  // Check device orientation support
-  this.supported = false;
-  var callback = function (event) {
-    this.supported = event && event.alpha == +event.alpha;
-    window.removeEventListener('deviceorientation', callback, false);
-  }.bind(this);
-  window.addEventListener('deviceorientation', callback, false);
-}
+	if ( 'VRFrameData' in window ) {
 
-THREE.VRControls.prototype.vr = function (vrstate) {
-  this.vrstate = vrstate;
-}
+		frameData = new VRFrameData();
 
-THREE.VRControls.prototype.update = function (delta) {
-  var freeze = false;
+	}
 
-  if (this.vrstate && this.vrstate.orientation) {
-    freeze = true;
+	function gotVRDisplays( displays ) {
 
-    this.object.quaternion.copy(this.vrstate.orientation);
-    this.object.position  .copy(this.vrstate.position);
+		vrDisplays = displays;
 
-    this.device.object = this.dummy;
-    this.orbit .object = this.dummy;
-  }
-  else if (this.vrstate && this.supported) {
-    if (this.device.freeze) this.device.connect();
+		if ( displays.length > 0 ) {
 
-    this.device.object = this.object;
-    this.orbit .object = this.dummy;
+			vrDisplay = displays[ 0 ];
 
-    this.device.update(delta);
-  }
-  else {
-    freeze = true;
+		} else {
 
-    this.device.object = this.dummy;
-    this.orbit .object = this.object;
+			if ( onError ) onError( 'VR input not available.' );
 
-    this.orbit.update(delta);
-  }
+		}
 
-  if (freeze && !this.device.freeze) this.device.disconnect();
-}
+	}
+
+	if ( navigator.getVRDisplays ) {
+
+		navigator.getVRDisplays().then( gotVRDisplays ).catch ( function () {
+
+			console.warn( 'THREE.VRControls: Unable to get VR Displays' );
+
+		} );
+
+	}
+
+	// the Rift SDK returns the position in meters
+	// this scale factor allows the user to define how meters
+	// are converted to scene units.
+
+	this.scale = 1;
+
+	// If true will use "standing space" coordinate system where y=0 is the
+	// floor and x=0, z=0 is the center of the room.
+	this.standing = false;
+
+	// Distance from the users eyes to the floor in meters. Used when
+	// standing=true but the VRDisplay doesn't provide stageParameters.
+	this.userHeight = 1.6;
+
+	this.getVRDisplay = function () {
+
+		return vrDisplay;
+
+	};
+
+	this.setVRDisplay = function ( value ) {
+
+		vrDisplay = value;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		console.warn( 'THREE.VRControls: getVRDisplays() is being deprecated.' );
+		return vrDisplays;
+
+	};
+
+	this.getStandingMatrix = function () {
+
+		return standingMatrix;
+
+	};
+
+	this.update = function () {
+
+		if ( vrDisplay ) {
+
+			var pose;
+
+			if ( vrDisplay.getFrameData ) {
+
+				vrDisplay.getFrameData( frameData );
+				pose = frameData.pose;
+
+			} else if ( vrDisplay.getPose ) {
+
+				pose = vrDisplay.getPose();
+
+			}
+
+			if ( pose.orientation !== null ) {
+
+				object.quaternion.fromArray( pose.orientation );
+
+			}
+
+			if ( pose.position !== null ) {
+
+				object.position.fromArray( pose.position );
+
+			} else {
+
+				object.position.set( 0, 0, 0 );
+
+			}
+
+			if ( this.standing ) {
+
+				if ( vrDisplay.stageParameters ) {
+
+					object.updateMatrix();
+
+					standingMatrix.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
+					object.applyMatrix( standingMatrix );
+
+				} else {
+
+					object.position.setY( object.position.y + this.userHeight );
+
+				}
+
+			}
+
+			object.position.multiplyScalar( scope.scale );
+
+		}
+
+	};
+
+	this.resetPose = function () {
+
+		if ( vrDisplay ) {
+
+			vrDisplay.resetPose();
+
+		}
+
+	};
+
+	this.resetSensor = function () {
+
+		console.warn( 'THREE.VRControls: .resetSensor() is now .resetPose().' );
+		this.resetPose();
+
+	};
+
+	this.zeroSensor = function () {
+
+		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetPose().' );
+		this.resetPose();
+
+	};
+
+	this.dispose = function () {
+
+		vrDisplay = null;
+
+	};
+
+};
