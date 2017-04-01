@@ -9,11 +9,13 @@ THREE.Bootstrap.registerPlugin('loop', {
   install: function (three) {
 
     this.running = false;
+    this.lastRequestId = null;
 
     three.Loop = this.api({
       start: this.start.bind(this),
       stop: this.stop.bind(this),
       running: false,
+      window: window,
     }, three);
 
     this.events =
@@ -38,11 +40,12 @@ THREE.Bootstrap.registerPlugin('loop', {
 
     var trigger = three.trigger.bind(three);
     var loop = function () {
-      this.running && requestAnimationFrame(loop);
+      if (!this.running) return;
+      this.lastRequestId = three.Loop.window.requestAnimationFrame(loop);
       this.events.map(trigger);
     }.bind(this);
 
-    requestAnimationFrame(loop);
+    this.lastRequestId = three.Loop.window.requestAnimationFrame(loop);
 
     three.trigger({ type: 'start' });
   },
@@ -50,6 +53,9 @@ THREE.Bootstrap.registerPlugin('loop', {
   stop: function (three) {
     if (!this.running) return;
     three.Loop.running = this.running = false;
+
+    three.Loop.window.cancelAnimationFrame(this.lastRequestId);
+    this.lastRequestId = null;
 
     three.trigger({ type: 'stop' });
   },
