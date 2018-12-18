@@ -2,6 +2,7 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   defaults: {
     start: true,
+    each: 1,
   },
 
   listen: ['ready'],
@@ -37,9 +38,13 @@ THREE.Bootstrap.registerPlugin('loop', {
     three.Loop.running = this.running = true;
 
     var trigger = three.trigger.bind(three);
+    var frames = 0;
     var loop = function () {
       this.running && requestAnimationFrame(loop);
-      this.events.map(trigger);
+      frames = (frames + 1) % Math.max(1, this.options.each);
+      if (frames == 0) {
+        this.events.map(trigger);
+      }
     }.bind(this);
 
     requestAnimationFrame(loop);

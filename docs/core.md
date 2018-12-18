@@ -208,6 +208,7 @@ Runs the rendering loop and asks plugins to update or render themselves.
 ```javascript
 {
   start: true,       // Begin immediately on ready
+  each: 1,           // Render only every n'th frame
 }
 ```
 
