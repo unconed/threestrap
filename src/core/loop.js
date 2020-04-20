@@ -2,13 +2,16 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   defaults: {
     start: true,
+    force: true,
+    rate:  1,
   },
 
-  listen: ['ready'],
+  listen: ['ready', 'window.resize:reset', 'dirty', 'post'],
 
   install: function (three) {
 
     this.running = false;
+    this.pending = false;
 
     three.Loop = this.api({
       start: this.start.bind(this),
@@ -16,11 +19,7 @@ THREE.Bootstrap.registerPlugin('loop', {
       running: false,
     }, three);
 
-    this.events =
-      ['pre', 'update', 'render', 'post'].map(function (type) {
-        return { type: type };
-      });
-
+    this.frame = 0;
   },
 
   uninstall: function (three) {
@@ -31,6 +30,22 @@ THREE.Bootstrap.registerPlugin('loop', {
     if (this.options.start) this.start(three);
   },
 
+  dirty: function (event, three)  {
+    if (!this.running && this.options.force && !this.pending) {
+      this.reset();
+      requestAnimationFrame(three.frame);
+      this.pending = true;
+    }
+  },
+
+  post: function (event, three) {
+    this.pending = false
+  },
+
+  reset: function () {
+    this.frame = 0;
+  },
+
   start: function (three) {
     if (this.running) return;
 
@@ -39,7 +54,13 @@ THREE.Bootstrap.registerPlugin('loop', {
     var trigger = three.trigger.bind(three);
     var loop = function () {
       this.running && requestAnimationFrame(loop);
-      this.events.map(trigger);
+
+      var rate = this.options.rate;
+      if (rate <= 1 || (this.frame % rate) == 0) {
+        three.frame();
+      }
+
+      this.frame++;
     }.bind(this);
 
     requestAnimationFrame(loop);

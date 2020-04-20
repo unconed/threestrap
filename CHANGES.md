@@ -1,8 +1,14 @@
 Changes
 ----
 0.0.11
+* Three: Update controls to r76
 * Time: Provide `warmup` option to wait N frames before starting clock (complements render warmup)
 * Time: Add `time` real time clock.
+* Size: Fix rounding bug with non-integer scales.
+* Loop: Add `rate` option for frame skipping.
+* Loop: Add `force` option to force rendering if loop is not running and changes occurred.
+* Loop: Add `dirty` event to trigger sparse updates on changes.
+* Bootstrap: Add `.frame()` option to trigger a single frame update.
 
 0.0.10
 * Bootstrap: Can pass in CSS selector for { element: ... } option.
