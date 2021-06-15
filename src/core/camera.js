@@ -1,10 +1,12 @@
-THREE.Bootstrap.registerPlugin('camera', {
+import * as THREE from "three";
+import "../bootstrap";
 
+THREE.Bootstrap.registerPlugin("camera", {
   defaults: {
-    near: .01,
+    near: 0.01,
     far: 10000,
 
-    type: 'perspective',
+    type: "perspective",
     fov: 60,
     aspect: null,
 
@@ -18,10 +20,9 @@ THREE.Bootstrap.registerPlugin('camera', {
     parameters: null,
   },
 
-  listen: ['resize', 'this.change'],
+  listen: ["resize", "this.change"],
 
   install: function (three) {
-
     three.Camera = this.api();
     three.camera = null;
 
@@ -39,25 +40,31 @@ THREE.Bootstrap.registerPlugin('camera', {
     var old = three.camera;
 
     if (!three.camera || event.changes.type || event.changes.klass) {
-      var klass = o.klass ||
-      {
-        'perspective': THREE.PerspectiveCamera,
-        'orthographic': THREE.OrthographicCamera,
-      }[o.type] || THREE.Camera;
+      var klass =
+        o.klass ||
+        {
+          perspective: THREE.PerspectiveCamera,
+          orthographic: THREE.OrthographicCamera,
+        }[o.type] ||
+        THREE.Camera;
 
       three.camera = o.parameters ? new klass(o.parameters) : new klass();
     }
 
-    _.each(o, function (value, key) {
-      if (three.camera.hasOwnProperty(key)) three.camera[key] = o[key];
-    }.bind(this));
+    Object.entries(o).forEach(
+      function ([key]) {
+        if (Object.prototype.hasOwnProperty.call(three.camera, key))
+          three.camera[key] = o[key];
+      }.bind(this)
+    );
 
     this.update(three);
 
-    (old === three.camera) || three.trigger({
-      type: 'camera',
-      camera: three.camera,
-    });
+    old === three.camera ||
+      three.trigger({
+        type: "camera",
+        camera: three.camera,
+      });
   },
 
   resize: function (event, three) {
@@ -70,5 +77,4 @@ THREE.Bootstrap.registerPlugin('camera', {
     three.camera.aspect = this.options.aspect || this.aspect;
     three.camera.updateProjectionMatrix();
   },
-
 });

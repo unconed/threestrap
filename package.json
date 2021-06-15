@@ -1,38 +1,37 @@
 {
-  "name": "threestrap",
+  "name": "@mentat/threestrap",
   "version": "0.0.12-dev",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
     "url": "https://github.com/unconed/threestrap.git"
   },
-  "main": "build/threestrap.js",
+  "main": "src/threestrap.js",
   "dependencies": {
-    "gulp": "^3.7.0",
-    "gulp-concat": "^2.2.0",
-    "gulp-karma": "0.0.2",
-    "gulp-rename": "^0.2.2",
-    "gulp-uglify": "^0.1.0",
-    "gulp-watch": "^0.5.4",
-    "karma": "^0.10.10",
-    "optimist": "^0.6.1",
+    "stats.js": "^0.17.0"
+  },
+  "peerDependencies": {
     "three": ">=0.58.10"
   },
   "scripts": {
     "build": "gulp",
     "test": "gulp test"
   },
+  "prettier": {},
   "devDependencies": {
-    "gulp": "^3.4.0",
-    "gulp-uglify": "^0.1.0",
-    "gulp-concat": "^2.1.7",
-    "gulp-rename": "^0.2.2",
-    "gulp-karma": "^0.0.2",
-    "karma": "^0.10.10",
-    "lodash": "^2.4.1",
-    "run-sequence": "^0.3.6",
-    "gulp-watch": "^0.5.2",
-    "optimist": "^0.6.1"
+    "eslint": "^7.28.0",
+    "eslint-plugin-jasmine": "^4.1.2",
+    "gulp": "^4.0.2",
+    "gulp-eslint": "^6.0.0",
+    "gulp-watch": "^5.0.1",
+    "jasmine-core": "^3.7.1",
+    "karma": "^6.3.3",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^4.0.1",
+    "prettier": "2.3.1",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-stream": "^6.1.2"
   },
   "author": "Steven Wittens",
   "license": "MIT"

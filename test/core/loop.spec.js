@@ -1,9 +1,7 @@
 describe("loop", function () {
-
   it("installs start/stop methods", function () {
-
     var options = {
-      plugins: ['loop'],
+      plugins: ["loop"],
       loop: {
         start: false,
       },
@@ -15,13 +13,11 @@ describe("loop", function () {
     expect(three.Loop.stop.call).toBeTruthy();
 
     three.destroy();
-
   });
 
   it("starts and stops", function (cb) {
-
     var options = {
-      plugins: ['loop'],
+      plugins: ["loop"],
       loop: {
         start: false,
       },
@@ -32,11 +28,11 @@ describe("loop", function () {
     var started = false;
     var stopped = false;
 
-    three.on('start', function () {
+    three.on("start", function () {
       started = true;
     });
 
-    three.on('stop', function () {
+    three.on("stop", function () {
       stopped = true;
     });
 
@@ -62,15 +58,14 @@ describe("loop", function () {
     expect(stopped).toBe(true);
 
     three.destroy();
-
   });
 
   it("loops correctly", function (cb) {
-
     var pre, update, render, post, three;
 
     function stall(val) {
-      var k, i = 0;
+      var k,
+        i = 0;
       var delay = 10;
       while (+new Date() <= val + delay) {
         k = ++i * ++i * ++i * ++i * ++i;
@@ -80,45 +75,61 @@ describe("loop", function () {
     runs(function () {
       var options = {
         init: false,
-        plugins: ['bind','loop'],
+        plugins: ["bind", "loop"],
       };
 
       three = new THREE.Bootstrap(options);
 
-      three.on('pre', function () {
+      three.on("pre", function () {
         pre = +new Date();
         stall(pre);
       });
-      three.on('update', function () {
+      three.on("update", function () {
         update = +new Date();
         stall(update);
       });
-      three.on('render', function () {
+      three.on("render", function () {
         render = +new Date();
         stall(render);
       });
-      three.on('post', function () {
+      three.on("post", function () {
         post = +new Date();
       });
 
       three.init();
     });
 
-    waitsFor(function() {
-      return pre > 0;
-    }, "The pre event should be called", 100);
+    waitsFor(
+      function () {
+        return pre > 0;
+      },
+      "The pre event should be called",
+      100
+    );
 
-    waitsFor(function() {
-      return update > 0;
-    }, "The update event should be called", 100);
+    waitsFor(
+      function () {
+        return update > 0;
+      },
+      "The update event should be called",
+      100
+    );
 
-    waitsFor(function() {
-      return render > 0;
-    }, "The render event should be called", 100);
+    waitsFor(
+      function () {
+        return render > 0;
+      },
+      "The render event should be called",
+      100
+    );
 
-    waitsFor(function() {
-      return post > 0;
-    }, "The post event should be called", 100);
+    waitsFor(
+      function () {
+        return post > 0;
+      },
+      "The post event should be called",
+      100
+    );
 
     runs(function () {
       expect(pre).toBeGreaterThan(0);
@@ -132,7 +143,5 @@ describe("loop", function () {
 
       three.destroy();
     });
-
   });
-
 });

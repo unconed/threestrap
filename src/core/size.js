@@ -1,5 +1,7 @@
-THREE.Bootstrap.registerPlugin('size', {
+import * as THREE from "three";
+import "../bootstrap";
 
+THREE.Bootstrap.registerPlugin("size", {
   defaults: {
     width: null,
     height: null,
@@ -11,15 +13,14 @@ THREE.Bootstrap.registerPlugin('size', {
   },
 
   listen: [
-    'window.resize:queue',
-    'element.resize:queue',
-    'this.change:queue',
-    'ready:resize',
-    'pre:pre',
+    "window.resize:queue",
+    "element.resize:queue",
+    "this.change:queue",
+    "ready:resize",
+    "pre:pre",
   ],
 
   install: function (three) {
-
     three.Size = this.api({
       renderWidth: 0,
       renderHeight: 0,
@@ -34,7 +35,7 @@ THREE.Bootstrap.registerPlugin('size', {
     delete three.Size;
   },
 
-  queue: function (event, three) {
+  queue: function (_event, _three) {
     this.resized = true;
   },
 
@@ -49,17 +50,28 @@ THREE.Bootstrap.registerPlugin('size', {
     var element = three.element;
     var renderer = three.renderer;
 
-    var w, h, ew, eh, rw, rh, aspect, cut, style, ratio,
-        ml = 0 , mt = 0;
+    var w,
+      h,
+      ew,
+      eh,
+      rw,
+      rh,
+      aspect,
+      style,
+      ratio,
+      ml = 0,
+      mt = 0;
 
     // Measure element
-    w = ew = (options.width === undefined || options.width == null)
-      ? element.offsetWidth || element.innerWidth || 0
-      : options.width;
+    w = ew =
+      options.width === undefined || options.width == null
+        ? element.offsetWidth || element.innerWidth || 0
+        : options.width;
 
-    h = eh = (options.height === undefined || options.height == null)
-      ? element.offsetHeight || element.innerHeight || 0
-      : options.height;
+    h = eh =
+      options.height === undefined || options.height == null
+        ? element.offsetHeight || element.innerHeight || 0
+        : options.height;
 
     // Force aspect ratio
     aspect = w / h;
@@ -67,8 +79,7 @@ THREE.Bootstrap.registerPlugin('size', {
       if (options.aspect > aspect) {
         h = Math.round(w / options.aspect);
         mt = Math.floor((eh - h) / 2);
-      }
-      else {
+      } else {
         w = Math.round(h * options.aspect);
         ml = Math.floor((ew - w) / 2);
       }
@@ -76,9 +87,9 @@ THREE.Bootstrap.registerPlugin('size', {
     }
 
     // Get device pixel ratio
-    ratio = 1
-    if (options.devicePixelRatio && typeof window != 'undefined') {
-      ratio = window.devicePixelRatio || 1
+    ratio = 1;
+    if (options.devicePixelRatio && typeof window != "undefined") {
+      ratio = window.devicePixelRatio || 1;
     }
 
     // Apply scale and resolution max
@@ -86,16 +97,15 @@ THREE.Bootstrap.registerPlugin('size', {
     rh = Math.min(h * ratio * options.scale, options.maxRenderHeight);
 
     // Retain aspect ratio
-    raspect = rw / rh;
+    const raspect = rw / rh;
     if (raspect > aspect) {
       rw = Math.round(rh * aspect);
-    }
-    else {
+    } else {
       rh = Math.round(rw / aspect);
     }
 
     // Measure final pixel ratio
-    ratio = rh / h
+    ratio = rh / h;
 
     // Resize and position renderer element
     style = renderer.domElement.style;
@@ -105,7 +115,7 @@ THREE.Bootstrap.registerPlugin('size', {
     style.marginTop = mt + "px";
 
     // Notify
-    _.extend(three.Size, {
+    Object.assign(three.Size, {
       renderWidth: rw,
       renderHeight: rh,
       viewWidth: w,
@@ -115,7 +125,7 @@ THREE.Bootstrap.registerPlugin('size', {
     });
 
     three.trigger({
-      type: 'resize',
+      type: "resize",
       renderWidth: rw,
       renderHeight: rh,
       viewWidth: w,
@@ -124,5 +134,4 @@ THREE.Bootstrap.registerPlugin('size', {
       pixelRatio: ratio,
     });
   },
-
 });

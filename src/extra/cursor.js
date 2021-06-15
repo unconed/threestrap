@@ -1,6 +1,15 @@
-THREE.Bootstrap.registerPlugin('cursor', {
+import * as THREE from "three";
+import "../bootstrap";
 
-  listen: ['update', 'this.change', 'install:change', 'uninstall:change', 'element.mousemove', 'vr'],
+THREE.Bootstrap.registerPlugin("cursor", {
+  listen: [
+    "update",
+    "this.change",
+    "install:change",
+    "uninstall:change",
+    "element.mousemove",
+    "vr",
+  ],
 
   defaults: {
     cursor: null,
@@ -30,12 +39,12 @@ THREE.Bootstrap.registerPlugin('cursor', {
   },
 
   update: function (event, three) {
-    var delta = three.Time && three.Time.delta || 1/60;
+    var delta = (three.Time && three.Time.delta) || 1 / 60;
 
     if (this.options.hide) {
       this.timeout -= delta;
       if (this.timeout < 0) {
-        this.applyCursor(three, 'none');
+        this.applyCursor(three, "none");
       }
     }
   },
@@ -46,12 +55,11 @@ THREE.Bootstrap.registerPlugin('cursor', {
   },
 
   applyCursor: function (three, cursor) {
-    var auto = three.controls ? 'move' : '';
+    var auto = three.controls ? "move" : "";
     cursor = cursor || this.options.cursor || auto;
-    if (this.hide) cursor = 'none';
+    if (this.hide) cursor = "none";
     if (this.cursor != cursor) {
       this.element.style.cursor = cursor;
     }
   },
-
 });

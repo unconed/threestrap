@@ -1,13 +1,15 @@
-THREE.Bootstrap.registerPlugin('stats', {
+import * as THREE from "three";
+import { default as Stats } from "stats.js";
+import "../bootstrap";
 
-  listen: ['pre', 'post'],
+THREE.Bootstrap.registerPlugin("stats", {
+  listen: ["pre", "post"],
 
   install: function (three) {
-
-    var stats = this.stats = new THREE.Stats();
+    var stats = (this.stats = new Stats());
     var style = stats.domElement.style;
 
-    style.position = 'absolute';
+    style.position = "absolute";
     style.top = style.left = 0;
     three.element.appendChild(stats.domElement);
 
@@ -20,12 +22,11 @@ THREE.Bootstrap.registerPlugin('stats', {
     delete three.stats;
   },
 
-  pre: function (event, three) {
+  pre: function (_event, _three) {
     this.stats.begin();
   },
 
-  post: function (event, three) {
+  post: function (_event, _three) {
     this.stats.end();
   },
-
 });

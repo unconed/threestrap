@@ -1,5 +1,7 @@
-THREE.Bootstrap.registerPlugin('renderer', {
+import * as THREE from "three";
+import "../bootstrap";
 
+THREE.Bootstrap.registerPlugin("renderer", {
   defaults: {
     klass: THREE.WebGLRenderer,
     parameters: {
@@ -10,11 +12,13 @@ THREE.Bootstrap.registerPlugin('renderer', {
     },
   },
 
-  listen: ['resize'],
+  listen: ["resize"],
 
   install: function (three) {
     // Instantiate Three renderer
-    var renderer = three.renderer = new this.options.klass(this.options.parameters);
+    var renderer = (three.renderer = new this.options.klass(
+      this.options.parameters
+    ));
     three.canvas = renderer.domElement;
 
     // Add to DOM
@@ -34,7 +38,7 @@ THREE.Bootstrap.registerPlugin('renderer', {
     var el = renderer.domElement;
 
     // Resize renderer to render size if it's a canvas
-    if (el && el.tagName == 'CANVAS') {
+    if (el && el.tagName == "CANVAS") {
       renderer.setSize(event.renderWidth, event.renderHeight, false);
     }
     // Or view size if it's just a DOM element or multi-renderer
@@ -45,5 +49,4 @@ THREE.Bootstrap.registerPlugin('renderer', {
       renderer.setSize(event.viewWidth, event.viewHeight, false);
     }
   },
-
 });

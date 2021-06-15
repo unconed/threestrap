@@ -1,60 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Threestrap - Multiple Renderers</title>
-  <script type="text/javascript" src="../vendor/three.js"></script>
-  <script type="text/javascript" src="../vendor/renderers/CSS3DRenderer.js"></script>
-  <script type="text/javascript" src="../vendor/renderers/MultiRenderer.js"></script>
-  <script type="text/javascript" src="../build/threestrap.js"></script>
-</head>
-<body>
-  <script>
+  <head>
+    <meta charset="utf-8" />
+    <title>Threestrap - Multiple Renderers</title>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/72/three.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../vendor/renderers/CSS3DRenderer.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../vendor/renderers/MultiRenderer.js"
+    ></script>
+    <script type="text/javascript" src="../build/threestrap.js"></script>
+  </head>
+  <body>
+    <script>
+      var three = THREE.Bootstrap({
+        renderer: {
+          klass: THREE.MultiRenderer,
+          parameters: {
+            renderers: [THREE.WebGLRenderer, THREE.CSS3DRenderer],
+            parameters: [
+              {
+                // WebGLRenderer parameters
+                depth: true,
+                stencil: true,
+                preserveDrawingBuffer: true,
+                antialias: true,
+                alpha: true,
+              },
+              {}, // CSS3DRenderer paramters
+            ],
+          },
+        },
+      });
 
-    var three = THREE.Bootstrap({
-      renderer: {
-        klass: THREE.MultiRenderer,
-        parameters: {
-          renderers: [THREE.WebGLRenderer, THREE.CSS3DRenderer],
-          parameters: [
-            { // WebGLRenderer parameters
-              depth: true,
-              stencil: true,
-              preserveDrawingBuffer: true,
-              antialias: true,
-              alpha: true,
-            },
-            {} // CSS3DRenderer paramters
-          ]
-        }
-      }
-    });
+      // Insert a cube
+      var mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.5, 0.5),
+        new THREE.MeshNormalMaterial()
+      );
+      three.scene.add(mesh);
 
-    // Insert a cube
-    var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-    three.scene.add(mesh)
+      // Insert some text
+      var greeting = document.createElement("div");
+      greeting.textContent = "Hello World!";
+      greeting.style.width = "400px";
+      greeting.style.height = "400px";
+      greeting.style.fontSize = "120px";
+      greeting.style.fontFamily = "Helvetica";
+      greeting.style.textAlign = "center";
+      greeting.style.backfaceVisibility = "hidden";
+      var greetingObject = new THREE.CSS3DObject(greeting);
+      greetingObject.scale.set(0.00125, 0.00125, 0.00125);
+      greetingObject.position.z = 0.25;
+      three.scene.add(greetingObject);
 
-    // Insert some text
-    var greeting = document.createElement( 'div' )
-    greeting.textContent = 'Hello World!'
-    greeting.style.width = '400px'
-    greeting.style.height = '400px'
-    greeting.style.fontSize = '120px'
-    greeting.style.fontFamily = 'Helvetica'
-    greeting.style.textAlign = 'center'
-    greeting.style.backfaceVisibility = 'hidden'
-    var greetingObject = new THREE.CSS3DObject(greeting)
-    greetingObject.scale.set( 0.00125, 0.00125, 0.00125 )
-    greetingObject.position.z = 0.25
-    three.scene.add(greetingObject)
-
-    // Orbit the camera
-    three.on('update', function () {
-      var t = three.Time.now;
-      three.camera.position.set(-Math.cos(t), Math.sin(t), Math.sin(t * .718));
-      three.camera.lookAt(new THREE.Vector3());
-    });
-
-  </script>
-</body>
+      // Orbit the camera
+      three.on("update", function () {
+        var t = three.Time.now;
+        three.camera.position.set(
+          -Math.cos(t),
+          Math.sin(t),
+          Math.sin(t * 0.718)
+        );
+        three.camera.lookAt(new THREE.Vector3());
+      });
+    </script>
+  </body>
 </html>

@@ -1,85 +1,108 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Threestrap - VR</title>
-  <script type="text/javascript" src="../vendor/three.js"></script>
-  <script type="text/javascript" src="../build/threestrap.js"></script>
-  <script type="text/javascript" src="../vendor/renderers/VRRenderer.js"></script>
-  <script type="text/javascript" src="../vendor/controls/DeviceOrientationControls.js"></script>
-  <script type="text/javascript" src="../vendor/controls/OrbitControls.js"></script>
-  <script type="text/javascript" src="../vendor/controls/VRControls.js"></script>
-  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-</head>
-<body>
-  <script>
+  <head>
+    <meta charset="utf-8" />
+    <title>Threestrap - VR</title>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/72/three.min.js"
+    ></script>
+    <script type="text/javascript" src="../build/threestrap.js"></script>
+    <script
+      type="text/javascript"
+      src="../vendor/renderers/VRRenderer.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../vendor/controls/DeviceOrientationControls.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../vendor/controls/OrbitControls.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../vendor/controls/VRControls.js"
+    ></script>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
+  </head>
+  <body>
+    <script>
+      // Bootstrap core + basic VR set up
+      var three = THREE.Bootstrap({
+        plugins: ["VR", "ui", "controls"],
+        // Equivalent to:
+        //   plugins: ['core', 'cursor', 'fullscreen', 'render:vr', 'ui', 'controls']
+        controls: {
+          klass: THREE.VRControls,
+        },
+      });
 
-    // Bootstrap core + basic VR set up
-    var three = THREE.Bootstrap({
-      plugins: ['VR', 'ui', 'controls'],
-      // Equivalent to:
-      //   plugins: ['core', 'cursor', 'fullscreen', 'render:vr', 'ui', 'controls']
-      controls: {
-        klass: THREE.VRControls,
-      },
-    });
-
-    // Random generator
-    var sd = 12348;
-    function rnd() {
-      sd = (Math.abs(Math.sin(sd * 10000) * 1000)) % 1;
-      return sd * 2 - 1;
-    }
-
-    // Insert cubes
-    var colors = [
-      new THREE.Color(0x3090FF),
-      new THREE.Color(0x10A0FF),
-      new THREE.Color(0x60109F),
-    ];
-    var n = colors.length;
-    var cubes = [];
-    var centers = [];
-    for (var i = 0; i < 300; ++i) {
-      var sz = 1 + rnd() * .2;
-      var mesh = new THREE.Mesh(new THREE.BoxGeometry(sz, sz, sz),
-                                new THREE.MeshPhongMaterial({ color: colors[i % n] }));
-      while (mesh.position.length() < 3) {
-        mesh.position.set(rnd() * 10, rnd() * 10, rnd() * 10);
+      // Random generator
+      var sd = 12348;
+      function rnd() {
+        sd = Math.abs(Math.sin(sd * 10000) * 1000) % 1;
+        return sd * 2 - 1;
       }
-      three.scene.add(mesh);
 
-      cubes.push(mesh);
-      centers.push(mesh.position.clone());
-    }
+      // Insert cubes
+      var colors = [
+        new THREE.Color(0x3090ff),
+        new THREE.Color(0x10a0ff),
+        new THREE.Color(0x60109f),
+      ];
+      var n = colors.length;
+      var cubes = [];
+      var centers = [];
+      for (var i = 0; i < 300; ++i) {
+        var sz = 1 + rnd() * 0.2;
+        var mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(sz, sz, sz),
+          new THREE.MeshPhongMaterial({ color: colors[i % n] })
+        );
+        while (mesh.position.length() < 3) {
+          mesh.position.set(rnd() * 10, rnd() * 10, rnd() * 10);
+        }
+        three.scene.add(mesh);
 
-    // Lights
-    var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
-    hemiLight.color.setHSL(0.6, 1, 0.6);
-    hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-    hemiLight.position.set(0, 500, 0);
-    three.scene.add(hemiLight);
-
-    var dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.color.setHSL(0.1, 1, 0.95);
-    dirLight.position.set(-1, 1.75, 1);
-    dirLight.position.multiplyScalar(50);
-    three.scene.add(dirLight);
-
-    // Animate
-    three.on('update', function () {
-      var time = three.Time.frames / 140;
-      var n = cubes.length;
-      for (var i = 0; i < n; ++i) {
-        var cube = cubes[i];
-        var j = i % 3;
-        cube.position.set(j == 0, j == 1, j == 2);
-        cube.position.multiplyScalar(1.8 + .8 * Math.cos(i * 11.105 + i * i * 13.5101));
-        cube.position.multiplyScalar(Math.cos(time * (1 + .8 * Math.cos(i * 11.005 + i * i * 13.5101)) + i * 1.009 + i * i * .306));
-        cube.position.add(centers[i]);
+        cubes.push(mesh);
+        centers.push(mesh.position.clone());
       }
-    });
 
-  </script>
-</body>
+      // Lights
+      var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+      hemiLight.color.setHSL(0.6, 1, 0.6);
+      hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+      hemiLight.position.set(0, 500, 0);
+      three.scene.add(hemiLight);
+
+      var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.color.setHSL(0.1, 1, 0.95);
+      dirLight.position.set(-1, 1.75, 1);
+      dirLight.position.multiplyScalar(50);
+      three.scene.add(dirLight);
+
+      // Animate
+      three.on("update", function () {
+        var time = three.Time.frames / 140;
+        var n = cubes.length;
+        for (var i = 0; i < n; ++i) {
+          var cube = cubes[i];
+          var j = i % 3;
+          cube.position.set(j == 0, j == 1, j == 2);
+          cube.position.multiplyScalar(
+            1.8 + 0.8 * Math.cos(i * 11.105 + i * i * 13.5101)
+          );
+          cube.position.multiplyScalar(
+            Math.cos(
+              time * (1 + 0.8 * Math.cos(i * 11.005 + i * i * 13.5101)) +
+                i * 1.009 +
+                i * i * 0.306
+            )
+          );
+          cube.position.add(centers[i]);
+        }
+      });
+    </script>
+  </body>
 </html>

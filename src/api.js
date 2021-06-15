@@ -1,19 +1,21 @@
+import * as THREE from "three";
+
+// eslint-disable-next-line no-import-assign
 THREE.Api = {
   apply: function (object) {
-
     object.set = function (options) {
       var o = this.options || {};
 
       // Diff out changes
-      var changes = _.reduce(options, function (result, value, key) {
+      var changes = options.reduce(function (result, value, key) {
         if (o[key] !== value) result[key] = value;
         return result;
       }, {});
 
-      this.options = _.extend(o, changes);
+      this.options = Object.assign(o, changes);
 
       // Notify
-      this.trigger({ type: 'change', options: options, changes: changes });
+      this.trigger({ type: "change", options: options, changes: changes });
     };
 
     object.get = function () {
@@ -21,20 +23,20 @@ THREE.Api = {
     };
 
     object.api = function (object, context) {
-      object = object || {};
+      object ||= {};
 
       // Append context argument to API methods
-      context && _.each(object, function (callback, key, object) {
-        if (_.isFunction(callback)) {
-          object[key] = _.partialRight(callback, context);
-        }
-      })
+      context &&
+        Object.entries(object).forEach(function ([key, callback]) {
+          if (typeof callback === "function") {
+            object[key] = (...args) => callback(...args, context);
+          }
+        });
 
       object.set = this.set.bind(this);
       object.get = this.get.bind(this);
 
       return object;
     };
-
   },
 };

@@ -1,29 +1,37 @@
+import * as THREE from "three";
+
+import "./api";
+import "./binder";
+
+function isString(str) {
+  return str && typeof str.valueOf() === "string";
+}
+
+// eslint-disable-next-line no-import-assign
 THREE.Bootstrap = function (options) {
   if (options) {
-    var args = [].slice.apply(arguments);
+    let args = [].slice.apply(arguments);
     options = {};
 
     // (element, ...)
     if (args[0] instanceof Node) {
-      node = args[0];
+      const node = args[0];
       args = args.slice(1);
-
       options.element = node;
     }
 
     // (..., plugin, plugin, plugin)
-    if (_.isString(args[0])) {
+    if (isString(args[0])) {
       options.plugins = args;
-    }
-
-    // (..., [plugin, plugin, plugin])
-    if (_.isArray(args[0])) {
+    } else if (Array.isArray(args[0])) {
+      // (..., [plugin, plugin, plugin])
       options.plugins = args[0];
-    }
+    } else if (args[0]) {
+      // (..., options)
 
-    // (..., options)
-    if (args[0]) {
-      options = _.defaults(options, args[0]);
+      // else, merge any arguments on the right that have NOT been set into the
+      // options dict on the left.
+      options = Object.assign({}, args[0], options);
     }
   }
 
@@ -31,15 +39,16 @@ THREE.Bootstrap = function (options) {
   if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
 
   // Apply defaults
-  var defaults = {
+  var defaultOpts = {
     init: true,
     element: document.body,
-    plugins: ['core'],
+    plugins: ["core"],
     aliases: {},
     plugindb: THREE.Bootstrap.Plugins || {},
     aliasdb: THREE.Bootstrap.Aliases || {},
   };
-  this.__options = _.defaults(options || {}, defaults);
+
+  this.__options = Object.assign({}, defaultOpts, options || {});
 
   // Hidden state
   this.__inited = false;
@@ -48,7 +57,7 @@ THREE.Bootstrap = function (options) {
 
   // Query element
   var element = this.__options.element;
-  if (element === '' + element) {
+  if (element === "" + element) {
     element = document.querySelector(element);
   }
 
@@ -63,7 +72,6 @@ THREE.Bootstrap = function (options) {
 };
 
 THREE.Bootstrap.prototype = {
-
   init: function () {
     if (this.__inited) return;
     this.__inited = true;
@@ -80,7 +88,7 @@ THREE.Bootstrap.prototype = {
     this.__destroyed = true;
 
     // Notify of imminent destruction
-    this.trigger({ type: 'destroy' });
+    this.trigger({ type: "destroy" });
 
     // Then uninstall plugins
     this.uninstall();
@@ -89,36 +97,35 @@ THREE.Bootstrap.prototype = {
   },
 
   resolve: function (plugins) {
-    plugins = _.isArray(plugins) ? plugins : [plugins];
+    plugins = Array.isArray(plugins) ? plugins : [plugins];
 
     // Resolve alias database
     var o = this.__options;
-    var aliases = _.extend({}, o.aliasdb, o.aliases);
+    var aliases = Object.assign({}, o.aliasdb, o.aliases);
 
     // Remove inline alias defs from plugins
-    var filter = function (name) {
-      var key = name.split(':');
+    var pred = function (name) {
+      var key = name.split(":");
       if (!key[1]) return true;
       aliases[key[0]] = [key[1]];
       return false;
     };
-    plugins = _.filter(plugins, filter);
+    plugins = plugins.filter(pred);
 
     // Unify arrays
-    _.each(aliases, function (alias, key) {
-      aliases[key] = _.isArray(alias) ? alias : [alias];
+    Object.entries(aliases).forEach(function ([key, alias]) {
+      aliases[key] = Array.isArray(alias) ? alias : [alias];
     });
 
     // Look up aliases recursively
     function recurse(list, out, level) {
       if (level >= 256) throw "Plug-in alias recursion detected.";
-      list = _.filter(list, filter);
-      _.each(list, function (name) {
+      list = list.filter(pred);
+      list.forEach(function (name) {
         var alias = aliases[name];
         if (!alias) {
           out.push(name);
-        }
-        else {
+        } else {
           out = out.concat(recurse(alias, [], level + 1));
         }
       });
@@ -129,13 +136,13 @@ THREE.Bootstrap.prototype = {
   },
 
   install: function (plugins) {
-    plugins = _.isArray(plugins) ? plugins : [plugins];
+    plugins = Array.isArray(plugins) ? plugins : [plugins];
 
     // Resolve aliases
     plugins = this.resolve(plugins);
 
     // Install in order
-    _.each(plugins, this.__install, this);
+    plugins.forEach((name) => this.__install(name));
 
     // Fire off ready event
     this.__ready();
@@ -143,21 +150,26 @@ THREE.Bootstrap.prototype = {
 
   uninstall: function (plugins) {
     if (plugins) {
-      plugins = _.isArray(plugins) ? plugins : [plugins];
+      plugins = Array.isArray(plugins) ? plugins : [plugins];
 
       // Resolve aliases
       plugins = this.resolve(plugins);
     }
 
     // Uninstall in reverse order
-    _.eachRight(plugins || this.__installed, this.__uninstall, this);
+    (plugins || this.__installed)
+      .reverse()
+      .forEach((p) => this.__uninstall(p.__name));
   },
 
   __install: function (name) {
     // Sanity check
     var ctor = this.__options.plugindb[name];
-    if (!ctor) throw "[three.install] Cannot install. '" + name + "' is not registered.";
-    if (this.plugins[name]) return console.warn("[three.install] "+ name + " is already installed.");
+    if (!ctor)
+      throw "[three.install] Cannot install. '" + name + "' is not registered.";
+
+    if (this.plugins[name])
+      return console.warn("[three.install] " + name + " is already installed.");
 
     // Construct
     var Plugin = ctor;
@@ -165,37 +177,77 @@ THREE.Bootstrap.prototype = {
     this.plugins[name] = plugin;
 
     // Install
-    flag = plugin.install(this);
+    const flag = plugin.install(this);
     this.__installed.push(plugin);
 
     // Then notify
-    this.trigger({ type: 'install', plugin: plugin });
+    this.trigger({ type: "install", plugin: plugin });
 
     // Allow early abort
     return flag;
   },
 
-  __uninstall: function (name, alias) {
+  __uninstall: function (name) {
     // Sanity check
-    plugin = _.isString(name) ? this.plugins[name] : name;
-    if (!plugin) return console.warn("[three.uninstall] " + name + "' is not installed.");
+    const plugin = isString(name) ? this.plugins[name] : name;
+    if (!plugin)
+      return console.warn("[three.uninstall] " + name + "' is not installed.");
     name = plugin.__name;
 
     // Uninstall
     plugin.uninstall(this);
-    this.__installed = _.without(this.__installed, plugin);
+    this.__installed = this.__installed.filter((p) => p !== plugin);
     delete this.plugins[name];
 
     // Then notify
-    this.trigger({ type: 'uninstall', plugin: plugin });
+    this.trigger({ type: "uninstall", plugin: plugin });
   },
 
   __ready: function () {
     // Notify and remove event handlers
-    this.triggerOnce({ type: 'ready' });
+    this.triggerOnce({ type: "ready" });
   },
-
 };
 
 THREE.Binder.apply(THREE.Bootstrap.prototype);
 
+// Former contents of plugin.js.
+
+THREE.Bootstrap.Plugins = {};
+THREE.Bootstrap.Aliases = {};
+
+THREE.Bootstrap.Plugin = function (options) {
+  this.options = Object.assign({}, this.defaults, options || {});
+};
+
+THREE.Bootstrap.Plugin.prototype = {
+  listen: [],
+  defaults: {},
+  install: function (_three) {},
+  uninstall: function (_three) {},
+};
+
+THREE.Binder.apply(THREE.Bootstrap.Plugin.prototype);
+THREE.Api.apply(THREE.Bootstrap.Plugin.prototype);
+
+THREE.Bootstrap.registerPlugin = function (name, spec) {
+  var ctor = function (options) {
+    THREE.Bootstrap.Plugin.call(this, options);
+    this.__name = name;
+  };
+  ctor.prototype = Object.assign(new THREE.Bootstrap.Plugin(), spec);
+
+  THREE.Bootstrap.Plugins[name] = ctor;
+};
+
+THREE.Bootstrap.unregisterPlugin = function (name) {
+  delete THREE.Bootstrap.Plugins[name];
+};
+
+THREE.Bootstrap.registerAlias = function (name, plugins) {
+  THREE.Bootstrap.Aliases[name] = plugins;
+};
+
+THREE.Bootstrap.unregisterAlias = function (name) {
+  delete THREE.Bootstrap.Aliases[name];
+};

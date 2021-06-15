@@ -1,6 +1,8 @@
-THREE.Bootstrap.registerPlugin('controls', {
+import * as THREE from "three";
+import "../bootstrap";
 
-  listen: ['update', 'resize', 'camera', 'this.change'],
+THREE.Bootstrap.registerPlugin("controls", {
+  listen: ["update", "resize", "camera", "this.change"],
 
   defaults: {
     klass: null,
@@ -23,18 +25,20 @@ THREE.Bootstrap.registerPlugin('controls', {
   change: function (event, three) {
     if (this.options.klass) {
       if (!event || event.changes.klass) {
-        three.controls = new this.options.klass(this._camera, three.renderer.domElement);
+        three.controls = new this.options.klass(
+          this._camera,
+          three.renderer.domElement
+        );
       }
 
-      _.extend(three.controls, this.options.parameters);
-    }
-    else {
+      Object.assign(three.controls, this.options.parameters);
+    } else {
       three.controls = null;
     }
   },
 
   update: function (event, three) {
-    var delta = three.Time && three.Time.delta || 1/60;
+    var delta = (three.Time && three.Time.delta) || 1 / 60;
     var vr = three.VR && three.VR.state;
 
     if (three.controls.vr) three.controls.vr(vr);
@@ -48,5 +52,4 @@ THREE.Bootstrap.registerPlugin('controls', {
   resize: function (event, three) {
     three.controls.handleResize && three.controls.handleResize();
   },
-
 });

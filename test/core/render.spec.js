@@ -1,9 +1,7 @@
 describe("render", function () {
-
   it("renders the scene on update", function () {
-
     var options = {
-      plugins: ['bind', 'renderer', 'render'],
+      plugins: ["bind", "renderer", "render"],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -12,14 +10,14 @@ describe("render", function () {
     three.camera = new THREE.PerspectiveCamera();
 
     called = 0;
-    three.renderer.render = function () { called++; }
+    three.renderer.render = function () {
+      called++;
+    };
 
-    three.dispatchEvent({ type: 'render' });
+    three.dispatchEvent({ type: "render" });
 
     expect(called).toBe(1);
 
     three.destroy();
-
   });
-
 });

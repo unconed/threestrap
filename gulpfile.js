@@ -1,131 +1,85 @@
-var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var rename = require("gulp-rename");
-var karma = require('gulp-karma');
-var runSequence = require('run-sequence');
-var watch = require('gulp-watch');
+const gulp = require("gulp");
+const eslint = require("gulp-eslint");
+const compiler = require("webpack");
+const webpack = require("webpack-stream");
+const watch = require("gulp-watch");
+const karma = require("karma");
 
-var builds = {
-  core: 'build/threestrap-core.js',
-  extra: 'build/threestrap-extra.js',
-  bundle: 'build/threestrap.js',
-};
+const parseConfig = karma.config.parseConfig;
+const KarmaServer = karma.Server;
 
-var products = [
-  builds.core,
-  builds.extra,
-  builds.bundle,
-];
+const webpackConfig = require("./webpack.config.js");
 
-var vendor = [
-  'node_modules/lodash/dist/lodash.js',
-];
+const source = ["src/**/*.js"];
 
-var core = [
-  'src/binder.js',
-  'src/api.js',
-  'src/bootstrap.js',
-  'src/plugin.js',
-  'src/aliases.js',
-  'src/core/fallback.js',
-  'src/core/renderer.js',
-  'src/core/bind.js',
-  'src/core/size.js',
-  'src/core/fill.js',
-  'src/core/loop.js',
-  'src/core/time.js',
-  'src/core/scene.js',
-  'src/core/camera.js',
-  'src/core/render.js',
-  'src/core/warmup.js',
-];
+const test = source.concat(["test/**/*.spec.js"]);
 
-var extra = [
-  'vendor/stats.min.js',
-  'vendor/controls/*.js',
-  'src/extra/stats.js',
-  'src/extra/controls.js',
-  'src/extra/cursor.js',
-  'src/extra/fullscreen.js',
-  'src/extra/vr.js',
-  'src/extra/ui.js',
-];
-
-var bundle = vendor.concat(core).concat(extra);
-
-var test = [
-  'vendor/three.js',
-].concat(bundle).concat([
-  'test/**/*.spec.js',
-]);
-
-gulp.task('core', function () {
-  return gulp.src(core)
-    .pipe(concat(builds.core))
-    .pipe(gulp.dest(''));
-});
-
-gulp.task('extra', function () {
-  return gulp.src(extra)
-    .pipe(concat(builds.extra))
-    .pipe(gulp.dest(''));
-});
-
-gulp.task('bundle', function () {
-  return gulp.src(bundle)
-    .pipe(concat(builds.bundle))
-    .pipe(gulp.dest(''));
-});
-
-gulp.task('uglify', function () {
-  return gulp.src(products)
-    .pipe(uglify())
-    .pipe(rename({
-      ext: ".min.js"
-    }))
-    .pipe(gulp.dest('build'));
-});
-
-gulp.task('karma', function() {
-  return gulp.src(test)
-    .pipe(karma({
-      configFile: 'karma.conf.js',
-      action: 'single',
-    }));
-});
-
-gulp.task('watch-karma', function() {
-  return gulp.src(test)
-    .pipe(karma({
-      configFile: 'karma.conf.js',
-      action: 'watch',
-    }));
-});
-
-gulp.task('watch-build', function () {
-  gulp.src(bundle)
+gulp.task("pack", function () {
+  return gulp
+    .src("src/index.js")
     .pipe(
-      watch(function(files) {
-        return gulp.start('build');
+      webpack(webpackConfig, compiler, function (_err, _stats) {
+        /* Use stats to do more things if needed */
       })
-    );
+    )
+    .pipe(gulp.dest("build/"));
+});
+
+gulp.task("lint", function () {
+  return (
+    gulp
+      // Define the source files
+      .src("src/**/*.js")
+      .pipe(eslint({}))
+      // Output the results in the console
+      .pipe(eslint.format())
+  );
+});
+
+gulp.task("karma", function (done) {
+  parseConfig(
+    __dirname + "/karma.conf.js",
+    { files: test, singleRun: true },
+    { promiseConfig: true, throwErrors: true }
+  ).then(
+    (karmaConfig) => {
+      new KarmaServer(karmaConfig, done).start();
+    },
+    (_rejectReason) => {}
+  );
+});
+
+gulp.task("karma", function () {
+  return gulp.src(test).pipe(
+    karma({
+      configFile: "karma.conf.js",
+      action: "single",
+    })
+  );
+});
+
+gulp.task("watch-karma", function () {
+  return gulp.src(test).pipe(
+    karma({
+      configFile: "karma.conf.js",
+      action: "watch",
+    })
+  );
+});
+
+gulp.task("watch-build-watch", function () {
+  watch(source, gulp.series("build"));
 });
 
 // Main tasks
 
-gulp.task('build', function (callback) {
-  runSequence(['core', 'extra', 'bundle'], callback);
-})
+const buildTask = gulp.series("pack");
 
-gulp.task('default', function (callback) {
-  runSequence('build', 'uglify', callback);
-});
+gulp.task("default", buildTask);
+gulp.task("build", buildTask);
 
-gulp.task('test', function (callback) {
-  runSequence('build', 'karma', callback);
-});
+gulp.task("test", gulp.series("build", "karma"));
 
-gulp.task('watch', function (callback) {
-  runSequence('watch-build', 'watch-karma', callback);
-});
+gulp.task("watch-build", gulp.series("build", "watch-build-watch"));
+
+gulp.task("watch", gulp.series("watch-build", "watch-karma"));

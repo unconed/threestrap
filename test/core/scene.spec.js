@@ -1,8 +1,7 @@
 describe("scene", function () {
   it("makes a scene", function () {
-
     var options = {
-      plugins: ['scene'],
+      plugins: ["scene"],
     };
 
     var three = new THREE.Bootstrap(options);
@@ -11,5 +10,4 @@ describe("scene", function () {
 
     three.destroy();
   });
-
 });
