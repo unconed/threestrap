@@ -1,6 +1,10 @@
 ## Changes
 
-0.0.12-dev
+  0.1.0-dev
+
+- TODO fill in!
+
+  0.0.12-dev
 
 - Camera: Lower near distance to 0.01 by default.
 - Controls: Ship TrackballControls.

@@ -1,10 +1,10 @@
 {
   "name": "@mentat/threestrap",
-  "version": "0.0.12-dev",
+  "version": "0.1.0-dev",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unconed/threestrap.git"
+    "url": "https://github.com/mentat-collective/threestrap.git"
   },
   "main": "src/threestrap.js",
   "dependencies": {
