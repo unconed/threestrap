@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/mentat-collective/threestrap.git"
   },
-  "main": "src/threestrap.js",
+  "main": "src/index.js",
   "dependencies": {
     "stats.js": "^0.17.0"
   },

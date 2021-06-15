@@ -4,4 +4,3 @@ coverage
 docs
 vendor
 .*
-karma.conf.js
