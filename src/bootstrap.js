@@ -39,7 +39,7 @@ THREE.Bootstrap = function (options) {
   if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
 
   // Apply defaults
-  var defaultOpts = {
+  const defaultOpts = {
     init: true,
     element: document.body,
     plugins: ["core"],

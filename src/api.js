@@ -7,10 +7,14 @@ THREE.Api = {
       var o = this.options || {};
 
       // Diff out changes
-      var changes = options.reduce(function (result, value, key) {
+      var changes = Object.entries(options).reduce(function (
+        result,
+        [key, value]
+      ) {
         if (o[key] !== value) result[key] = value;
         return result;
-      }, {});
+      },
+      {});
 
       this.options = Object.assign(o, changes);
 

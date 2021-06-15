@@ -208,7 +208,7 @@ THREE.Bootstrap.registerPlugin("vr", {
           var dpr = renderer.getPixelRatio();
           var width = renderer.domElement.width / dpr;
           var height = renderer.domElement.height / dpr;
-          renderer.enableScissorTest(false);
+          renderer.setScissorTest(false);
           renderer.setViewport(0, 0, width, height);
         }
       }

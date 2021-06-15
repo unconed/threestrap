@@ -87,10 +87,14 @@ external_THREE_namespaceObject.Api = {
       var o = this.options || {};
 
       // Diff out changes
-      var changes = options.reduce(function (result, value, key) {
+      var changes = Object.entries(options).reduce(function (
+        result,
+        [key, value]
+      ) {
         if (o[key] !== value) result[key] = value;
         return result;
-      }, {});
+      },
+      {});
 
       this.options = Object.assign(o, changes);
 
@@ -212,7 +216,7 @@ external_THREE_namespaceObject.Binder = {
   },
 
   apply: function (object) {
-    external_THREE_namespaceObject.EventDispatcher.prototype.apply(object);
+    Object.assign(object, external_THREE_namespaceObject.EventDispatcher.prototype);
 
     object.trigger = external_THREE_namespaceObject.Binder._trigger;
     object.triggerOnce = external_THREE_namespaceObject.Binder._triggerOnce;
@@ -298,7 +302,7 @@ external_THREE_namespaceObject.Bootstrap = function (options) {
   if (!(this instanceof external_THREE_namespaceObject.Bootstrap)) return new external_THREE_namespaceObject.Bootstrap(options);
 
   // Apply defaults
-  var defaultOpts = {
+  const defaultOpts = {
     init: true,
     element: document.body,
     plugins: ["core"],
@@ -1769,7 +1773,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
           var dpr = renderer.getPixelRatio();
           var width = renderer.domElement.width / dpr;
           var height = renderer.domElement.height / dpr;
-          renderer.enableScissorTest(false);
+          renderer.setScissorTest(false);
           renderer.setViewport(0, 0, width, height);
         }
       }
@@ -1789,10 +1793,291 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
 
 
 
+;// CONCATENATED MODULE: ./src/controls/VRControls.js
+/**
+ * VRControls
+ *
+ * Mixes vrstate with OrbitControls / DeviceOrientationControls
+
+ * When real vrstate is supplied, it is used.
+ * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
+ * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), for regular interaction
+ *
+ * @author unconed / https://github.com/unconed
+ */
+
+
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.VRControls = function (object, domElement) {
+  var EPSILON = 1e-5;
+
+  // Prepare real object and dummy object to swap out
+  var dummy = (this.dummy = new external_THREE_namespaceObject.Object3D());
+  this.object = object;
+
+  // Two camera controls
+  this.device = new external_THREE_namespaceObject.DeviceOrientationControls(dummy, domElement);
+  this.orbit = new external_THREE_namespaceObject.OrbitControls(dummy, domElement);
+
+  // Ensure position/target are not identical
+  this.orbit.target.copy(object.position);
+  this.orbit.target.z += EPSILON;
+  this.orbit.rotateSpeed = -0.25;
+
+  // Check device orientation support
+  this.supported = false;
+  var callback = function (event) {
+    this.supported = event && event.alpha == +event.alpha;
+    window.removeEventListener("deviceorientation", callback, false);
+  }.bind(this);
+  window.addEventListener("deviceorientation", callback, false);
+};
+
+external_THREE_namespaceObject.VRControls.prototype.vr = function (vrstate) {
+  this.vrstate = vrstate;
+};
+
+external_THREE_namespaceObject.VRControls.prototype.update = function (delta) {
+  var freeze = false;
+
+  if (this.vrstate && this.vrstate.orientation) {
+    freeze = true;
+
+    this.object.quaternion.copy(this.vrstate.orientation);
+    this.object.position.copy(this.vrstate.position);
+
+    this.device.object = this.dummy;
+    this.orbit.object = this.dummy;
+  } else if (this.vrstate && this.supported) {
+    if (this.device.freeze) this.device.connect();
+
+    this.device.object = this.object;
+    this.orbit.object = this.dummy;
+
+    this.device.update(delta);
+  } else {
+    freeze = true;
+
+    this.device.object = this.dummy;
+    this.orbit.object = this.object;
+
+    this.orbit.update(delta);
+  }
+
+  if (freeze && !this.device.freeze) this.device.disconnect();
+};
+
+;// CONCATENATED MODULE: ./src/controls/index.js
+
+
+;// CONCATENATED MODULE: ./src/renderers/MultiRenderer.js
+/**
+ * Allows a stack of renderers to be treated as a single renderer.
+ * @author Gheric Speiginer
+ */
+
+
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.MultiRenderer = function (parameters) {
+  console.log("THREE.MultiRenderer", external_THREE_namespaceObject.REVISION);
+
+  this.domElement = document.createElement("div");
+  this.domElement.style.position = "relative";
+
+  this.renderers = [];
+  this._renderSizeSet = false;
+
+  var rendererClasses = parameters.renderers || [];
+  var rendererParameters = parameters.parameters || [];
+
+  // elements are stacked back-to-front
+  for (var i = 0; i < rendererClasses.length; i++) {
+    var renderer = new rendererClasses[i](rendererParameters[i]);
+    renderer.domElement.style.position = "absolute";
+    renderer.domElement.style.top = "0px";
+    renderer.domElement.style.left = "0px";
+    this.domElement.appendChild(renderer.domElement);
+    this.renderers.push(renderer);
+  }
+};
+
+external_THREE_namespaceObject.MultiRenderer.prototype.setSize = function (w, h) {
+  this.domElement.style.width = w + "px";
+  this.domElement.style.height = h + "px";
+
+  for (var i = 0; i < this.renderers.length; i++) {
+    var renderer = this.renderers[i];
+    var el = renderer.domElement;
+
+    if (!this._renderSizeSet || (el && el.tagName !== "CANVAS")) {
+      renderer.setSize(w, h);
+    }
+
+    el.style.width = w + "px";
+    el.style.height = h + "px";
+  }
+};
+
+external_THREE_namespaceObject.MultiRenderer.prototype.setRenderSize = function (rw, rh) {
+  this._renderSizeSet = true;
+
+  for (var i = 0; i < this.renderers.length; i++) {
+    var renderer = this.renderers[i];
+    var el = renderer.domElement;
+
+    if (el && el.tagName === "CANVAS") {
+      renderer.setSize(rw, rh, false);
+    }
+  }
+};
+
+external_THREE_namespaceObject.MultiRenderer.prototype.render = function (scene, camera) {
+  for (var i = 0; i < this.renderers.length; i++) {
+    this.renderers[i].render(scene, camera);
+  }
+};
+
+;// CONCATENATED MODULE: ./src/renderers/VRRenderer.js
+/**
+ * VRRenderer
+ *
+ * @author wwwtyro https://github.com/wwwtyro
+ * @author unconed https://github.com/unconed
+ */
+
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
+  var self = this;
+
+  self.initialize = function () {
+    var et = hmd.getEyeTranslation("left");
+    self.halfIPD = new external_THREE_namespaceObject.Vector3(et.x, et.y, et.z).length();
+    self.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
+    self.fovRight = hmd.getRecommendedEyeFieldOfView("right");
+  };
+
+  self.FovToNDCScaleOffset = function (fov) {
+    var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
+    var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
+    var pyscale = 2.0 / (fov.upTan + fov.downTan);
+    var pyoffset = (fov.upTan - fov.downTan) * pyscale * 0.5;
+    return {
+      scale: [pxscale, pyscale],
+      offset: [pxoffset, pyoffset],
+    };
+  };
+
+  self.FovPortToProjection = function (
+    matrix,
+    fov,
+    rightHanded /* = true */,
+    zNear /* = 0.01 */,
+    zFar /* = 10000.0 */
+  ) {
+    rightHanded = rightHanded === undefined ? true : rightHanded;
+    zNear = zNear === undefined ? 0.01 : zNear;
+    zFar = zFar === undefined ? 10000.0 : zFar;
+    var handednessScale = rightHanded ? -1.0 : 1.0;
+    var m = matrix.elements;
+    var scaleAndOffset = self.FovToNDCScaleOffset(fov);
+    m[0 * 4 + 0] = scaleAndOffset.scale[0];
+    m[0 * 4 + 1] = 0.0;
+    m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
+    m[0 * 4 + 3] = 0.0;
+    m[1 * 4 + 0] = 0.0;
+    m[1 * 4 + 1] = scaleAndOffset.scale[1];
+    m[1 * 4 + 2] = -scaleAndOffset.offset[1] * handednessScale;
+    m[1 * 4 + 3] = 0.0;
+    m[2 * 4 + 0] = 0.0;
+    m[2 * 4 + 1] = 0.0;
+    m[2 * 4 + 2] = (zFar / (zNear - zFar)) * -handednessScale;
+    m[2 * 4 + 3] = (zFar * zNear) / (zNear - zFar);
+    m[3 * 4 + 0] = 0.0;
+    m[3 * 4 + 1] = 0.0;
+    m[3 * 4 + 2] = handednessScale;
+    m[3 * 4 + 3] = 0.0;
+    matrix.transpose();
+  };
+
+  self.FovToProjection = function (
+    matrix,
+    fov,
+    rightHanded /* = true */,
+    zNear /* = 0.01 */,
+    zFar /* = 10000.0 */
+  ) {
+    var fovPort = {
+      upTan: Math.tan((fov.upDegrees * Math.PI) / 180.0),
+      downTan: Math.tan((fov.downDegrees * Math.PI) / 180.0),
+      leftTan: Math.tan((fov.leftDegrees * Math.PI) / 180.0),
+      rightTan: Math.tan((fov.rightDegrees * Math.PI) / 180.0),
+    };
+    return self.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
+  };
+
+  var right = new external_THREE_namespaceObject.Vector3();
+
+  var cameraLeft = new external_THREE_namespaceObject.PerspectiveCamera();
+  var cameraRight = new external_THREE_namespaceObject.PerspectiveCamera();
+
+  self.render = function (scene, camera) {
+    self.FovToProjection(
+      cameraLeft.projectionMatrix,
+      self.fovLeft,
+      true,
+      camera.near,
+      camera.far
+    );
+    self.FovToProjection(
+      cameraRight.projectionMatrix,
+      self.fovRight,
+      true,
+      camera.near,
+      camera.far
+    );
+
+    right.set(self.halfIPD, 0, 0);
+    right.applyQuaternion(camera.quaternion);
+
+    cameraLeft.position.copy(camera.position).sub(right);
+    cameraRight.position.copy(camera.position).add(right);
+
+    cameraLeft.quaternion.copy(camera.quaternion);
+    cameraRight.quaternion.copy(camera.quaternion);
+
+    var dpr = renderer.devicePixelRatio || 1;
+    var width = renderer.domElement.width / 2 / dpr;
+    var height = renderer.domElement.height / dpr;
+
+    renderer.enableScissorTest(true);
+
+    renderer.setViewport(0, 0, width, height);
+    renderer.setScissor(0, 0, width, height);
+    renderer.render(scene, cameraLeft);
+
+    renderer.setViewport(width, 0, width, height);
+    renderer.setScissor(width, 0, width, height);
+    renderer.render(scene, cameraRight);
+  };
+
+  self.initialize();
+};
+
+;// CONCATENATED MODULE: ./src/renderers/index.js
+
+
+
 ;// CONCATENATED MODULE: ./src/index.js
 
 
 
+
+
+
+// These should probably be in their own build!
 
 
 
