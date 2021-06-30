@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 describe("cursor", function () {
   it("sets and autohides the cursor", function () {
     var options = {
@@ -17,7 +19,7 @@ describe("cursor", function () {
 
     expect(three.element.style.cursor).toBe("pointer");
 
-    for (var i = 0; i < 65; ++i) {
+    for (let i = 0; i < 65; ++i) {
       three.trigger({ type: "update" });
     }
 
@@ -27,7 +29,7 @@ describe("cursor", function () {
 
     expect(three.element.style.cursor).toBe("pointer");
 
-    for (var i = 0; i < 65; ++i) {
+    for (let i = 0; i < 65; ++i) {
       three.trigger({ type: "update" });
     }
 

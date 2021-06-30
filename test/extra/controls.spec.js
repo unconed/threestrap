@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 describe("controls", function () {
   it("install controls", function () {
     var captured = false;

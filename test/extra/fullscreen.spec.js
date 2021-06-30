@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 describe("fullscreen", function () {
   it("adds fullscreen api", function () {
     var options = {
