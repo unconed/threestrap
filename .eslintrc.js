@@ -8,7 +8,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   plugins: ['prettier', '@typescript-eslint'],
-  ignorePatterns: ['dist/', 'src/**/*.js', 'old/', 'webpack.config.js'],
+  ignorePatterns: ['dist/', '**/*.js', 'old/', 'webpack.config.js'],
   rules: {
     'prettier/prettier': ['error'],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
