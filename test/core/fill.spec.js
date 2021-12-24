@@ -1,10 +1,10 @@
-describe("fill", function () {
-
-  it("sets/unsets html, body height", function () {
-
+describe('fill', function () {
+  it('sets/unsets html, body height', function () {
     function test() {
-      return document.body.style.height == '100%' &&
-             document.documentElement.style.height == '100%';
+      return (
+        document.body.style.height == '100%' &&
+        document.documentElement.style.height == '100%'
+      );
     }
 
     var options = {
@@ -22,8 +22,7 @@ describe("fill", function () {
     expect(test()).toBe(false);
   });
 
-  it("makes the canvas a block element", function () {
-
+  it('makes the canvas a block element', function () {
     function test() {
       canvas = document.querySelector('canvas');
       return canvas && canvas.style.display == 'block';
@@ -44,8 +43,7 @@ describe("fill", function () {
     expect(test()).toBeFalsy();
   });
 
-  it("makes the containing element have layout", function () {
-
+  it('makes the containing element have layout', function () {
     function test() {
       canvas = document.querySelector('canvas');
       return canvas && canvas.parentNode.style.position == 'relative';
@@ -53,6 +51,8 @@ describe("fill", function () {
 
     var element = document.createElement('div');
     document.body.appendChild(element);
+    // Jest uses JSDom, which seems not to set this when appending to body
+    element.style.position = 'static';
 
     var options = {
       plugins: ['renderer', 'fill'],
@@ -62,7 +62,6 @@ describe("fill", function () {
     expect(test()).toBeFalsy();
 
     var three = new THREE.Bootstrap(options);
-
     expect(test()).toBe(true);
 
     three.destroy();
@@ -71,5 +70,4 @@ describe("fill", function () {
 
     document.body.removeChild(element);
   });
-
 });
