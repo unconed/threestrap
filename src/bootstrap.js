@@ -58,11 +58,11 @@ THREE.Bootstrap = function (options) {
 
   // Update cycle
   this.trigger = this.trigger.bind(this);
-  this.frame   = this.frame.bind(this);
+  this.frame = this.frame.bind(this);
   this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
     return { type: type };
   });
-  
+
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -70,7 +70,6 @@ THREE.Bootstrap = function (options) {
 };
 
 THREE.Bootstrap.prototype = {
-
   init: function () {
     if (this.__inited) return;
     this.__inited = true;
@@ -94,9 +93,9 @@ THREE.Bootstrap.prototype = {
 
     return this;
   },
-  
+
   frame: function () {
-    this.events.map(this.trigger);    
+    this.events.map(this.trigger);
   },
 
   resolve: function (plugins) {
@@ -122,14 +121,13 @@ THREE.Bootstrap.prototype = {
 
     // Look up aliases recursively
     function recurse(list, out, level) {
-      if (level >= 256) throw "Plug-in alias recursion detected.";
+      if (level >= 256) throw 'Plug-in alias recursion detected.';
       list = _.filter(list, filter);
       _.each(list, function (name) {
         var alias = aliases[name];
         if (!alias) {
           out.push(name);
-        }
-        else {
+        } else {
           out = out.concat(recurse(alias, [], level + 1));
         }
       });
@@ -146,7 +144,7 @@ THREE.Bootstrap.prototype = {
     plugins = this.resolve(plugins);
 
     // Install in order
-    _.each(plugins, this.__install, this);
+    plugins.forEach(this.__install, this);
 
     // Fire off ready event
     this.__ready();
@@ -167,8 +165,10 @@ THREE.Bootstrap.prototype = {
   __install: function (name) {
     // Sanity check
     var ctor = this.__options.plugindb[name];
-    if (!ctor) throw "[three.install] Cannot install. '" + name + "' is not registered.";
-    if (this.plugins[name]) return console.warn("[three.install] "+ name + " is already installed.");
+    if (!ctor)
+      throw "[three.install] Cannot install. '" + name + "' is not registered.";
+    if (this.plugins[name])
+      return console.warn('[three.install] ' + name + ' is already installed.');
 
     // Construct
     var Plugin = ctor;
@@ -189,7 +189,8 @@ THREE.Bootstrap.prototype = {
   __uninstall: function (name, alias) {
     // Sanity check
     plugin = _.isString(name) ? this.plugins[name] : name;
-    if (!plugin) return console.warn("[three.uninstall] " + name + "' is not installed.");
+    if (!plugin)
+      return console.warn('[three.uninstall] ' + name + "' is not installed.");
     name = plugin.__name;
 
     // Uninstall
@@ -205,8 +206,6 @@ THREE.Bootstrap.prototype = {
     // Notify and remove event handlers
     this.triggerOnce({ type: 'ready' });
   },
-
 };
 
 THREE.Binder.apply(THREE.Bootstrap.prototype);
-

@@ -6,34 +6,42 @@
     "type": "git",
     "url": "https://github.com/unconed/threestrap.git"
   },
-  "main": "build/threestrap.js",
-  "dependencies": {
-    "gulp": "^3.7.0",
-    "gulp-concat": "^2.2.0",
-    "gulp-karma": "0.0.2",
-    "gulp-rename": "^0.2.2",
-    "gulp-uglify": "^0.1.0",
-    "gulp-watch": "^0.5.4",
-    "karma": "^0.10.10",
-    "optimist": "^0.6.1",
-    "three": ">=0.58.10"
-  },
   "scripts": {
-    "build": "gulp",
-    "test": "gulp test"
+    "start:dev": "webpack --mode=development --watch --progress",
+    "build:prod": "webpack --mode=production",
+    "prepublishOnly": "webpack --mode=production && npm run expose",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "jest ./test",
+    "test:watch": "jest --watch test",
+    "test:cov": "jest --coverage"
+  },
+  "main": "dist/index.js",
+  "dependencies": {
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "gulp": "^3.4.0",
-    "gulp-uglify": "^0.1.0",
-    "gulp-concat": "^2.1.7",
-    "gulp-rename": "^0.2.2",
-    "gulp-karma": "^0.0.2",
-    "karma": "^0.10.10",
-    "lodash": "^2.4.1",
-    "run-sequence": "^0.3.6",
-    "gulp-watch": "^0.5.2",
-    "optimist": "^0.6.1"
+    "@types/jest": "^26.0.23",
+    "@types/lodash": "^4.14.170",
+    "@types/three": "^0.129.0",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^27.0.4",
+    "prettier": "^2.3.0",
+    "three": "^0.129.0",
+    "ts-jest": "^27.0.2",
+    "ts-loader": "^9.2.2",
+    "typescript": "^4.3.2",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-node-externals": "^3.0.0"
   },
-  "author": "Steven Wittens",
   "license": "MIT"
 }
