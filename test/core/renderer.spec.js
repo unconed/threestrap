@@ -1,7 +1,5 @@
 describe('renderer', function () {
-
-  it("installs the canvas into the body", function () {
-
+  it('installs the canvas into the body', function () {
     var options = {
       init: false,
       plugins: ['renderer'],
@@ -15,17 +13,15 @@ describe('renderer', function () {
 
     expect(document.querySelectorAll('canvas').length).toBe(1);
 
-    expect(three.renderer).toEqual(jasmine.any(THREE.WebGLRenderer));
+    expect(three.renderer).toBeInstanceOf(THREE.WebGLRenderer);
     expect(three.renderer.domElement.parentNode).toEqual(document.body);
 
     three.destroy();
 
     expect(document.querySelectorAll('canvas').length).toBe(0);
-
   });
 
-  it("installs the canvas into an element", function () {
-
+  it('installs the canvas into an element', function () {
     var element = document.createElement('div');
     document.body.appendChild(element);
 
@@ -43,7 +39,7 @@ describe('renderer', function () {
 
     expect(document.querySelectorAll('canvas').length).toBe(1);
 
-    expect(three.renderer).toEqual(jasmine.any(THREE.WebGLRenderer));
+    expect(three.renderer).toBeInstanceOf(THREE.WebGLRenderer);
     expect(three.renderer.domElement.parentNode).toEqual(element);
 
     three.destroy();
@@ -53,8 +49,7 @@ describe('renderer', function () {
     document.body.removeChild(element);
   });
 
-  it("calls renderer setSize", function () {
-
+  it('calls renderer setSize', function () {
     var element = document.createElement('div');
     document.body.appendChild(element);
 
@@ -67,18 +62,28 @@ describe('renderer', function () {
     var three = new THREE.Bootstrap(options);
 
     var called = 0;
-    var callback = function () { called++; };
+    var callback = function () {
+      called++;
+    };
 
     three.init();
     three.renderer.setSize = callback;
-    three.plugins.renderer.resize({ renderWidth: 5, renderHeight: 4, viewWidth: 3, viewHeight: 2, aspect: 3/2 }, three);
+    three.plugins.renderer.resize(
+      {
+        renderWidth: 5,
+        renderHeight: 4,
+        viewWidth: 3,
+        viewHeight: 2,
+        aspect: 3 / 2,
+      },
+      three,
+    );
     three.destroy();
 
     expect(called).toBe(1);
   });
 
-  it("calls renderer setSize and setRenderSize", function () {
-
+  it('calls renderer setSize and setRenderSize', function () {
     var element = document.createElement('div');
     document.body.appendChild(element);
 
@@ -91,18 +96,28 @@ describe('renderer', function () {
     var three = new THREE.Bootstrap(options);
 
     var called = 0;
-    var callback = function () { called++; };
+    var callback = function () {
+      called++;
+    };
 
     three.init();
-    el = three.renderer.domElement
-    three.renderer.domElement = document.createElement('div')
+    el = three.renderer.domElement;
+    three.renderer.domElement = document.createElement('div');
     three.renderer.setSize = callback;
     three.renderer.setRenderSize = callback;
-    three.plugins.renderer.resize({ renderWidth: 5, renderHeight: 4, viewWidth: 3, viewHeight: 2, aspect: 3/2 }, three);
-    three.renderer.domElement = el
+    three.plugins.renderer.resize(
+      {
+        renderWidth: 5,
+        renderHeight: 4,
+        viewWidth: 3,
+        viewHeight: 2,
+        aspect: 3 / 2,
+      },
+      three,
+    );
+    three.renderer.domElement = el;
     three.destroy();
 
     expect(called).toBe(2);
   });
-
 });
