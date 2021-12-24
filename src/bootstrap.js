@@ -159,7 +159,9 @@ THREE.Bootstrap.prototype = {
     }
 
     // Uninstall in reverse order
-    _.eachRight(plugins || this.__installed, this.__uninstall, this);
+    [...(plugins || this.__installed)]
+      .reverse()
+      .forEach(this.__uninstall, this);
   },
 
   __install: function (name) {
@@ -196,6 +198,7 @@ THREE.Bootstrap.prototype = {
     // Uninstall
     plugin.uninstall(this);
     this.__installed = _.without(this.__installed, plugin);
+
     delete this.plugins[name];
 
     // Then notify
