@@ -1,7 +1,5 @@
-describe("binder", function () {
-
-  it("binds/unbinds events", function () {
-
+describe('binder', function () {
+  it('binds/unbinds events', function () {
     var ready = 0;
     var foo = 0;
     var wtf = 0;
@@ -60,11 +58,9 @@ describe("binder", function () {
     expect(ready).toBe(1);
     expect(foo).toBe(1);
     expect(wtf).toBe(1);
-
   });
 
-  it("binds/unbinds once events", function () {
-
+  it('binds/unbinds once events', function () {
     var ready = 0;
 
     var context = {};
@@ -101,8 +97,5 @@ describe("binder", function () {
     unbind(object);
 
     expect(ready).toBe(1);
-
   });
-
-
 });
