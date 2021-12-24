@@ -144,7 +144,9 @@ THREE.Bootstrap.prototype = {
     plugins = this.resolve(plugins);
 
     // Install in order
-    plugins.forEach(this.__install, this);
+    _.each(plugins, (plugin) => {
+      return this.__install.call(this, plugin);
+    });
 
     // Fire off ready event
     this.__ready();

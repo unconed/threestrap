@@ -1,5 +1,4 @@
 THREE.Bootstrap.registerPlugin('renderer', {
-
   defaults: {
     klass: THREE.WebGLRenderer,
     parameters: {
@@ -14,7 +13,9 @@ THREE.Bootstrap.registerPlugin('renderer', {
 
   install: function (three) {
     // Instantiate Three renderer
-    var renderer = three.renderer = new this.options.klass(this.options.parameters);
+    var renderer = (three.renderer = new this.options.klass(
+      this.options.parameters,
+    ));
     three.canvas = renderer.domElement;
 
     // Add to DOM
@@ -45,5 +46,4 @@ THREE.Bootstrap.registerPlugin('renderer', {
       renderer.setSize(event.viewWidth, event.viewHeight, false);
     }
   },
-
 });
