@@ -1,5 +1,4 @@
 THREE.Bootstrap.registerPlugin('size', {
-
   defaults: {
     width: null,
     height: null,
@@ -19,7 +18,6 @@ THREE.Bootstrap.registerPlugin('size', {
   ],
 
   install: function (three) {
-
     three.Size = this.api({
       renderWidth: 0,
       renderHeight: 0,
@@ -49,17 +47,30 @@ THREE.Bootstrap.registerPlugin('size', {
     var element = three.element;
     var renderer = three.renderer;
 
-    var w, h, ew, eh, rw, rh, aspect, cut, style, ratio,
-        ml = 0 , mt = 0;
+    var w,
+      h,
+      ew,
+      eh,
+      rw,
+      rh,
+      aspect,
+      cut,
+      style,
+      ratio,
+      ml = 0,
+      mt = 0;
 
     // Measure element
-    w = ew = (options.width === undefined || options.width == null)
-      ? element.offsetWidth || element.innerWidth || 0
-      : options.width;
+    const boundingRect = element.getBoundingClientRect();
+    w = ew =
+      options.width === undefined || options.width == null
+        ? boundingRect.width
+        : options.width;
 
-    h = eh = (options.height === undefined || options.height == null)
-      ? element.offsetHeight || element.innerHeight || 0
-      : options.height;
+    h = eh =
+      options.height === undefined || options.height == null
+        ? boundingRect.height
+        : options.height;
 
     // Force aspect ratio
     aspect = w / h;
@@ -67,8 +78,7 @@ THREE.Bootstrap.registerPlugin('size', {
       if (options.aspect > aspect) {
         h = Math.round(w / options.aspect);
         mt = Math.floor((eh - h) / 2);
-      }
-      else {
+      } else {
         w = Math.round(h * options.aspect);
         ml = Math.floor((ew - w) / 2);
       }
@@ -76,33 +86,36 @@ THREE.Bootstrap.registerPlugin('size', {
     }
 
     // Get device pixel ratio
-    ratio = 1
+    ratio = 1;
     if (options.devicePixelRatio && typeof window != 'undefined') {
-      ratio = window.devicePixelRatio || 1
+      ratio = window.devicePixelRatio || 1;
     }
 
     // Apply scale and resolution max
-    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
-    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
+    rw = Math.round(
+      Math.min(w * ratio * options.scale, options.maxRenderWidth),
+    );
+    rh = Math.round(
+      Math.min(h * ratio * options.scale, options.maxRenderHeight),
+    );
 
     // Retain aspect ratio
     raspect = rw / rh;
     if (raspect > aspect) {
       rw = Math.round(rh * aspect);
-    }
-    else {
+    } else {
       rh = Math.round(rw / aspect);
     }
 
     // Measure final pixel ratio
-    ratio = rh / h
+    ratio = rh / h;
 
     // Resize and position renderer element
     style = renderer.domElement.style;
-    style.width = w + "px";
-    style.height = h + "px";
-    style.marginLeft = ml + "px";
-    style.marginTop = mt + "px";
+    style.width = w + 'px';
+    style.height = h + 'px';
+    style.marginLeft = ml + 'px';
+    style.marginTop = mt + 'px';
 
     // Notify
     _.extend(three.Size, {
@@ -124,5 +137,4 @@ THREE.Bootstrap.registerPlugin('size', {
       pixelRatio: ratio,
     });
   },
-
 });

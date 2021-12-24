@@ -1,8 +1,6 @@
-describe("camera", function () {
-
-  it("installs a perspective camera", function () {
-
-    var options = {
+describe('camera', function () {
+  it('installs a perspective camera', function () {
+    const options = {
       plugins: ['camera'],
       camera: {
         fov: 42,
@@ -11,7 +9,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    const three = new THREE.Bootstrap(options);
 
     expect(three.camera instanceof THREE.PerspectiveCamera).toBeTruthy();
     expect(three.camera.fov).toEqual(42);
@@ -19,12 +17,10 @@ describe("camera", function () {
     expect(three.camera.far).toEqual(2);
 
     three.destroy();
-
   });
 
-  it("installs an orthographic camera", function () {
-
-    var options = {
+  it('installs an orthographic camera', function () {
+    const options = {
       plugins: ['camera'],
       camera: {
         type: 'orthographic',
@@ -37,7 +33,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    const three = new THREE.Bootstrap(options);
 
     expect(three.camera instanceof THREE.OrthographicCamera).toBeTruthy();
     expect(three.camera.left).toEqual(0);
@@ -48,14 +44,12 @@ describe("camera", function () {
     expect(three.camera.far).toEqual(5);
 
     three.destroy();
-
   });
 
-  it("installs a custom camera", function () {
+  it('installs a custom camera', function () {
+    let captured;
 
-    var captured = null;
-
-    var klass = function (parameters) {
+    const klass = function (parameters) {
       captured = parameters.foo;
       this.left = -1;
       this.right = 0;
@@ -66,7 +60,7 @@ describe("camera", function () {
     };
     klass.prototype = new THREE.OrthographicCamera();
 
-    var options = {
+    const options = {
       plugins: ['camera'],
       camera: {
         klass: klass,
@@ -80,7 +74,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    const three = new THREE.Bootstrap(options);
 
     expect(captured).toBe('bar');
 
@@ -93,22 +87,23 @@ describe("camera", function () {
     expect(three.camera.far).toEqual(5);
 
     three.destroy();
-
   });
 
-  it("sets the aspect ratio when resizing", function () {
+  it('sets the aspect ratio when resizing', function () {
+    const element = document.createElement('div');
+    element.getBoundingClientRect = jest.fn(() => ({
+      width: 12,
+      height: 8,
+    }));
 
-    var element = document.createElement('div');
-    element.style.width = "12px";
-    element.style.height = "8px";
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       element: element,
       plugins: ['bind', 'renderer', 'size', 'camera'],
     };
 
-    var three = new THREE.Bootstrap(options);
+    const three = new THREE.Bootstrap(options);
 
     expect(three.camera.aspect).toBe(1.5);
 
@@ -117,8 +112,7 @@ describe("camera", function () {
     document.body.removeChild(element);
   });
 
-  it("recreates the camera when needed", function () {
-
+  it('recreates the camera when needed', function () {
     var options = {
       plugins: ['bind', 'camera'],
       camera: {
@@ -164,7 +158,5 @@ describe("camera", function () {
     expect(three.camera.far).toEqual(2);
 
     three.destroy();
-
   });
-
 });
