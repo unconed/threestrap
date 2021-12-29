@@ -65,6 +65,13 @@ THREE.Bootstrap = function (options) {
   this.plugins = {};
   this.element = element;
 
+  // Update cycle
+  this.trigger = this.trigger.bind(this);
+  this.frame   = this.frame.bind(this);
+  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
+    return { type: type };
+  });
+  
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -94,6 +101,10 @@ THREE.Bootstrap.prototype = {
     this.uninstall();
 
     return this;
+  },
+  
+  frame: function () {
+    this.events.map(this.trigger);    
   },
 
   resolve: function (plugins) {
