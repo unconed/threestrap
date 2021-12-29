@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("renderer", function () {
   it("installs the canvas into the body", function () {
     var options = {

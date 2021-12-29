@@ -1,7 +1,8 @@
+/* global THREE */
+
 describe("api", function () {
   it("sends change events", function () {
     var captured = {};
-    var fired = true;
     var api;
 
     var klass = function () {

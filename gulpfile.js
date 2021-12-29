@@ -49,15 +49,6 @@ gulp.task("karma", function (done) {
   );
 });
 
-gulp.task("karma", function () {
-  return gulp.src(test).pipe(
-    karma({
-      configFile: "karma.conf.js",
-      action: "single",
-    })
-  );
-});
-
 gulp.task("watch-karma", function () {
   return gulp.src(test).pipe(
     karma({

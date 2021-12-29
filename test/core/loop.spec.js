@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("loop", function () {
   it("installs start/stop methods", function () {
     var options = {

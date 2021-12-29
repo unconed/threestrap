@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("plugin", function () {
   it("registers a plugin", function () {
     var spec = {};

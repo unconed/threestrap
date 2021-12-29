@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("time", function () {
   function stall(val, delay) {
     delay = delay || 0;

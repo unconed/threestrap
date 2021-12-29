@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("vr", function () {
   it("adds vr api", function () {

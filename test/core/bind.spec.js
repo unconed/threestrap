@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("bind", function () {
   it("binds events", function () {
     var ready = false;

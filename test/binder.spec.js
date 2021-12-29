@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("binder", function () {
   it("binds/unbinds events", function () {
     var ready = 0;

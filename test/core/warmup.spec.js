@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("warmup", function () {
   it("hides canvas", function () {
     var n = 3;

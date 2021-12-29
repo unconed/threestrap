@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 describe("render", function () {
   it("renders the scene on update", function () {
     var options = {

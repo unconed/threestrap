@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("fill", function () {
   it("sets/unsets html, body height", function () {
     function test() {
@@ -24,7 +26,7 @@ describe("fill", function () {
 
   it("makes the canvas a block element", function () {
     function test() {
-      canvas = document.querySelector("canvas");
+      let canvas = document.querySelector("canvas");
       return canvas && canvas.style.display == "block";
     }
 
@@ -45,7 +47,7 @@ describe("fill", function () {
 
   it("makes the containing element have layout", function () {
     function test() {
-      canvas = document.querySelector("canvas");
+      let canvas = document.querySelector("canvas");
       return canvas && canvas.parentNode.style.position == "relative";
     }
 

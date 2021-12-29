@@ -1,3 +1,5 @@
+/* global THREE */
+
 describe("three", function () {
   it("initializes and destroys once", function () {
     var options = {
