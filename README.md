@@ -61,26 +61,6 @@ Configuration
 
 Threestrap is made out of plugins that each do one thing. The basic set up of `empty` or `core` gets you a fully-functional canvas in the body or a specific DOM element.
 
-Empty:
-
- * `fallback` - Displays a standard message with a link if WebGL is unavailable.
- * `bind`     - Enables event/method binding.
- * `renderer` - Creates the `THREE.WebGLRenderer` (or a given class).
- * `size`     - Autosizes canvas to fit or size to given dimensions.
- * `fill`     - Removes margin/padding and sets positioning on the element.
- * `loop`     - Runs the rendering loop.
- * `time`     - Measures time and fps in seconds. Provides clocks.
-
-Core:
-
- * `scene`    - Creates the `THREE.Scene`
- * `camera`   - Creates the `THREE.Camera`
- * `render`   - Renders the global scene and camera directly.
- * `warmup`   - Hide canvas for first few frames to avoid stuttering.
-
-Additional plug-ins can be added, or the default set can be overridden on a case by case basis. `empty` is a do-it-yourself set up.
-
-
 Shorthands:
 ```javascript
 // Core only
@@ -118,6 +98,25 @@ var three = THREE.Bootstrap({
   },
 });
 ```
+
+Empty:
+
+ * `fallback` - Displays a standard message with a link if WebGL is unavailable.
+ * `bind`     - Enables event/method binding.
+ * `renderer` - Creates the `THREE.WebGLRenderer` (or a given class).
+ * `size`     - Autosizes canvas to fit or size to given dimensions.
+ * `fill`     - Removes margin/padding and sets positioning on the element.
+ * `loop`     - Runs the rendering loop.
+ * `time`     - Measures time and fps in seconds. Provides clocks.
+
+Core:
+
+ * `scene`    - Creates the `THREE.Scene`
+ * `camera`   - Creates the `THREE.Camera`
+ * `render`   - Renders the global scene and camera directly.
+ * `warmup`   - Hide canvas for first few frames to avoid stuttering.
+
+Additional plug-ins can be added, or the default set can be overridden on a case by case basis. `empty` is a do-it-yourself set up.
 
 When `init` is set to false, initialization only happens when manually calling `three.init()`. To destroy the widget, call `three.destroy()`.
 
