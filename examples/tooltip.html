@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Threestrap - Tooltip</title>
+  <script type="text/javascript" src="./three.js"></script>
+  <script type="text/javascript" src="./threestrap.js"></script>
+</head>
+<body>
+  <style type="text/css" media="screen">
+    #three {
+      width: 500px;
+      height: 500px;
+      position: relative;
+    }
+    #tooltip {
+      position: absolute;
+      background: #ccc;
+    }
+  </style>
+  <div id="three">
+    <div id="tooltip">o shit waddup</div>
+  </div>
+  <script>
+
+    // Bootstrap into element
+    var three = THREE.Bootstrap({
+      plugins: ['core', 'controls', 'cursor'],
+      controls: {
+        klass: THREE.OrbitControls,
+      },
+      element: '#three',
+    });
+
+
+    var color = new THREE.Color(0x3090FF);
+    var mesh = new THREE.Mesh(new THREE.BoxGeometry(.2, .2, .2),
+                              new THREE.MeshPhongMaterial({ color: color }));
+
+    mesh.position.set(1, 2, 3);
+    three.scene.add(mesh);
+
+    // Lights
+    var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+    hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+    hemiLight.position.set(0, 500, 200);
+    three.scene.add(hemiLight);
+
+    three.camera.position.set(0, 4, 6); 
+
+    // Project tooltip
+    var div = document.querySelector('#tooltip');
+    var v4 = new THREE.Vector4();
+    var width = three.canvas.offsetWidth;
+    var height = three.canvas.offsetHeight;
+    three.on('update', function () {
+      
+      // Make 4-vector (projective coordinates)
+      v4.copy(mesh.position);
+      v4.w = 1;
+
+      // Move into camera frame
+      v4.applyMatrix4(three.camera.matrixWorldInverse);
+      
+      // Apply camera projection
+      v4.applyMatrix4(three.camera.projectionMatrix);
+      
+      // Perspective divide
+      v4.x /= v4.w;
+      v4.y /= -v4.w; // Y is inverted between GL and CSS
+      
+      // Scale -1...1 to 0...size
+      var x = (v4.x * .5 + .5) * width;
+      var y = (v4.y * .5 + .5) * height;
+      
+      div.style.left = x + 'px';
+      div.style.top  = y + 'px';
+    });
+
+  </script>
+</body>
+</html>
