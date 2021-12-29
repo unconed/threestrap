@@ -218,13 +218,6 @@ THREE.Bootstrap = function (options) {
   this.plugins = {};
   this.element = element;
 
-  // Update cycle
-  this.trigger = this.trigger.bind(this);
-  this.frame   = this.frame.bind(this);
-  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
-    return { type: type };
-  });
-  
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -255,10 +248,6 @@ THREE.Bootstrap.prototype = {
     this.uninstall();
 
     return this;
-  },
-  
-  frame: function () {
-    this.events.map(this.trigger);    
   },
 
   resolve: function (plugins) {
@@ -657,8 +646,8 @@ THREE.Bootstrap.registerPlugin('size', {
     }
 
     // Apply scale and resolution max
-    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
-    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
+    rw = Math.min(w * ratio * options.scale, options.maxRenderWidth);
+    rh = Math.min(h * ratio * options.scale, options.maxRenderHeight);
 
     // Retain aspect ratio
     raspect = rw / rh;
@@ -779,16 +768,14 @@ THREE.Bootstrap.registerPlugin('loop', {
 
   defaults: {
     start: true,
-    force: true,
-    rate:  1,
+    each: 1,
   },
 
-  listen: ['ready', 'window.resize:reset', 'dirty', 'post'],
+  listen: ['ready'],
 
   install: function (three) {
 
     this.running = false;
-    this.pending = false;
 
     three.Loop = this.api({
       start: this.start.bind(this),
@@ -796,7 +783,11 @@ THREE.Bootstrap.registerPlugin('loop', {
       running: false,
     }, three);
 
-    this.frame = 0;
+    this.events =
+      ['pre', 'update', 'render', 'post'].map(function (type) {
+        return { type: type };
+      });
+
   },
 
   uninstall: function (three) {
@@ -807,37 +798,19 @@ THREE.Bootstrap.registerPlugin('loop', {
     if (this.options.start) this.start(three);
   },
 
-  dirty: function (event, three)  {
-    if (!this.running && this.options.force && !this.pending) {
-      this.reset();
-      requestAnimationFrame(three.frame);
-      this.pending = true;
-    }
-  },
-
-  post: function (event, three) {
-    this.pending = false
-  },
-
-  reset: function () {
-    this.frame = 0;
-  },
-
   start: function (three) {
     if (this.running) return;
 
     three.Loop.running = this.running = true;
 
     var trigger = three.trigger.bind(three);
+    var frames = 0;
     var loop = function () {
       this.running && requestAnimationFrame(loop);
-
-      var rate = this.options.rate;
-      if (rate <= 1 || (this.frame % rate) == 0) {
-        three.frame();
+      frames = (frames + 1) % Math.max(1, this.options.each);
+      if (frames == 0) {
+        this.events.map(trigger);
       }
-
-      this.frame++;
     }.bind(this);
 
     requestAnimationFrame(loop);
@@ -958,7 +931,7 @@ THREE.Bootstrap.registerPlugin('scene', {
 THREE.Bootstrap.registerPlugin('camera', {
 
   defaults: {
-    near: .1,
+    near: .01,
     far: 10000,
 
     type: 'perspective',

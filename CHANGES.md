@@ -1,5 +1,10 @@
 Changes
 ----
+0.0.12-dev
+* Camera: Lower near distance to 0.01 by default.
+* Controls: Ship TrackballControls.
+* Loop: Add `each` option for rendering at (integer) reduced frame rates.
+
 0.0.11
 * Three: Update controls to r76
 * Time: Provide `warmup` option to wait N frames before starting clock (complements render warmup)
