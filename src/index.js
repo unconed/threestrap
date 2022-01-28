@@ -5,5 +5,4 @@ import "./core";
 import "./extra";
 
 // These should probably be in their own build!
-import "./controls";
 import "./renderers";
