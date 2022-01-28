@@ -6,9 +6,11 @@ _Use Three.js with zero hassle._
 
 ---
 
-Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of your way.
+Threestrap is a minimal, pluggable bootstrapper for Three.js that gets out of
+your way.
 
-While this is definitely a miniature framework, it's not really meant to wrap _your_ code, but rather the code you don't care about.
+While this is definitely a miniature framework, it's not really meant to wrap
+_your_ code, but rather the code you don't care about.
 
 Examples:
 
@@ -38,9 +40,11 @@ Get a threestrap context:
 var three = THREE.Bootstrap();
 ```
 
-This will create a full-page Three.js WebGL canvas, initialize the scene and camera, and set up a rendering loop.
+This will create a full-page Three.js WebGL canvas, initialize the scene and
+camera, and set up a rendering loop.
 
-You can access the globals `three.scene` and `three.camera`, and bind events on the `three` context:
+You can access the globals `three.scene` and `three.camera`, and bind events on
+the `three` context:
 
 ```javascript
 // Insert a cube
@@ -60,7 +64,9 @@ three.on("update", function () {
 
 ## Configuration
 
-Threestrap is made out of plugins that each do one thing. The basic set up of `empty` or `core` gets you a fully-functional canvas in the body or a specific DOM element.
+Threestrap is made out of plugins that each do one thing. The basic set up of
+`empty` or `core` gets you a fully-functional canvas in the body or a specific
+DOM element.
 
 Empty:
 
@@ -79,7 +85,8 @@ Core:
 - `render` - Renders the global scene and camera directly.
 - `warmup` - Hide canvas for first few frames to avoid stuttering.
 
-Additional plug-ins can be added, or the default set can be overridden on a case by case basis. `empty` is a do-it-yourself set up.
+Additional plug-ins can be added, or the default set can be overridden on a case
+by case basis. `empty` is a do-it-yourself set up.
 
 Shorthands:
 
@@ -122,9 +129,11 @@ var three = THREE.Bootstrap({
 });
 ```
 
-When `init` is set to false, initialization only happens when manually calling `three.init()`. To destroy the widget, call `three.destroy()`.
+When `init` is set to false, initialization only happens when manually calling
+`three.init()`. To destroy the widget, call `three.destroy()`.
 
-Plugins can make objects and methods available on the threestrap context, like `three.Time.now` or `three.Loop.start()`.
+Plugins can make objects and methods available on the threestrap context, like
+`three.Time.now` or `three.Loop.start()`.
 
 ## Builds
 
@@ -134,7 +143,8 @@ Plugins can make objects and methods available on the threestrap context, like `
 
 ## Plugins
 
-To enable a plug-in, include its name in the `plugins` field. Plugins are installed in the given order.
+To enable a plug-in, include its name in the `plugins` field. Plugins are
+installed in the given order.
 
 Plug-in specific options are grouped under the plug-in's name:
 

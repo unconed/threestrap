@@ -328,6 +328,13 @@ external_THREE_namespaceObject.Bootstrap = function (options) {
   this.plugins = {};
   this.element = element;
 
+  // Update cycle
+  this.trigger = this.trigger.bind(this);
+  this.frame   = this.frame.bind(this);
+  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
+    return { type: type };
+  });
+  
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -357,6 +364,10 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
     this.uninstall();
 
     return this;
+  },
+  
+  frame: function () {
+    this.events.map(this.trigger);    
   },
 
   resolve: function (plugins) {
@@ -818,12 +829,14 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
 
   install: function (three) {
     this.running = false;
+    this.lastRequestId = null;
 
     three.Loop = this.api(
       {
         start: this.start.bind(this),
         stop: this.stop.bind(this),
         running: false,
+        window: window,
       },
       three
     );
@@ -847,16 +860,13 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
     three.Loop.running = this.running = true;
 
     var trigger = three.trigger.bind(three);
-    var frames = 0;
     var loop = function () {
-      this.running && requestAnimationFrame(loop);
-      frames = (frames + 1) % Math.max(1, this.options.each);
-      if (frames == 0) {
-        this.events.map(trigger);
-      }
+      if (!this.running) return;
+      this.lastRequestId = three.Loop.window.requestAnimationFrame(loop);
+      this.events.map(trigger);
     }.bind(this);
 
-    requestAnimationFrame(loop);
+    this.lastRequestId = three.Loop.window.requestAnimationFrame(loop);
 
     three.trigger({ type: "start" });
   },
@@ -864,6 +874,9 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
   stop: function (three) {
     if (!this.running) return;
     three.Loop.running = this.running = false;
+
+    three.Loop.window.cancelAnimationFrame(this.lastRequestId);
+    this.lastRequestId = null;
 
     three.trigger({ type: "stop" });
   },
@@ -1047,8 +1060,8 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
     }
 
     // Apply scale and resolution max
-    rw = Math.min(w * ratio * options.scale, options.maxRenderWidth);
-    rh = Math.min(h * ratio * options.scale, options.maxRenderHeight);
+    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
+    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
 
     // Retain aspect ratio
     const raspect = rw / rh;
@@ -1793,84 +1806,6 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
 
 
 
-;// CONCATENATED MODULE: ./src/controls/VRControls.js
-/**
- * VRControls
- *
- * Mixes vrstate with OrbitControls / DeviceOrientationControls
-
- * When real vrstate is supplied, it is used.
- * When empty vrstate {} is supplied, device orientation is used if supported, for Cardboard VR mode.
- * When no vrstate (null/undef) is supplied, orbit controls are used (mouse/touch), for regular interaction
- *
- * @author unconed / https://github.com/unconed
- */
-
-
-
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.VRControls = function (object, domElement) {
-  var EPSILON = 1e-5;
-
-  // Prepare real object and dummy object to swap out
-  var dummy = (this.dummy = new external_THREE_namespaceObject.Object3D());
-  this.object = object;
-
-  // Two camera controls
-  this.device = new external_THREE_namespaceObject.DeviceOrientationControls(dummy, domElement);
-  this.orbit = new external_THREE_namespaceObject.OrbitControls(dummy, domElement);
-
-  // Ensure position/target are not identical
-  this.orbit.target.copy(object.position);
-  this.orbit.target.z += EPSILON;
-  this.orbit.rotateSpeed = -0.25;
-
-  // Check device orientation support
-  this.supported = false;
-  var callback = function (event) {
-    this.supported = event && event.alpha == +event.alpha;
-    window.removeEventListener("deviceorientation", callback, false);
-  }.bind(this);
-  window.addEventListener("deviceorientation", callback, false);
-};
-
-external_THREE_namespaceObject.VRControls.prototype.vr = function (vrstate) {
-  this.vrstate = vrstate;
-};
-
-external_THREE_namespaceObject.VRControls.prototype.update = function (delta) {
-  var freeze = false;
-
-  if (this.vrstate && this.vrstate.orientation) {
-    freeze = true;
-
-    this.object.quaternion.copy(this.vrstate.orientation);
-    this.object.position.copy(this.vrstate.position);
-
-    this.device.object = this.dummy;
-    this.orbit.object = this.dummy;
-  } else if (this.vrstate && this.supported) {
-    if (this.device.freeze) this.device.connect();
-
-    this.device.object = this.object;
-    this.orbit.object = this.dummy;
-
-    this.device.update(delta);
-  } else {
-    freeze = true;
-
-    this.device.object = this.dummy;
-    this.orbit.object = this.object;
-
-    this.orbit.update(delta);
-  }
-
-  if (freeze && !this.device.freeze) this.device.disconnect();
-};
-
-;// CONCATENATED MODULE: ./src/controls/index.js
-
-
 ;// CONCATENATED MODULE: ./src/renderers/MultiRenderer.js
 /**
  * Allows a stack of renderers to be treated as a single renderer.
@@ -2078,7 +2013,6 @@ external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
 
 
 // These should probably be in their own build!
-
 
 
 })();
