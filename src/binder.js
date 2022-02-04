@@ -90,17 +90,18 @@ THREE.Binder = {
   },
 
   apply: function (object) {
-    Object.assign(object, THREE.EventDispatcher.prototype);
-
     object.trigger = THREE.Binder._trigger;
     object.triggerOnce = THREE.Binder._triggerOnce;
+
+    object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
+    object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
+    object.removeEventListener =
+      THREE.EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
     object.dispatchEvent = object.trigger;
   },
-
-  ////
 
   _triggerOnce: function (event) {
     this.trigger(event);

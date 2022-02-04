@@ -214,9 +214,6 @@ THREE.Bootstrap.prototype = {
     // Notify and remove event handlers
     this.triggerOnce({ type: "ready" });
   },
-  addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-  hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-  removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
 };
 
 THREE.Binder.apply(THREE.Bootstrap.prototype);
@@ -228,10 +225,6 @@ THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
-  this.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
-  this.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
-  this.removeEventListener =
-    THREE.EventDispatcher.prototype.removeEventListener;
 };
 
 THREE.Bootstrap.Plugin.prototype = {

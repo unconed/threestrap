@@ -218,17 +218,18 @@ external_THREE_namespaceObject.Binder = {
   },
 
   apply: function (object) {
-    Object.assign(object, external_THREE_namespaceObject.EventDispatcher.prototype);
-
     object.trigger = external_THREE_namespaceObject.Binder._trigger;
     object.triggerOnce = external_THREE_namespaceObject.Binder._triggerOnce;
+
+    object.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
+    object.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
+    object.removeEventListener =
+      external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
     object.dispatchEvent = object.trigger;
   },
-
-  ////
 
   _triggerOnce: function (event) {
     this.trigger(event);
@@ -479,9 +480,6 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
     // Notify and remove event handlers
     this.triggerOnce({ type: "ready" });
   },
-  addEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener,
-  hasEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener,
-  removeEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener,
 };
 
 external_THREE_namespaceObject.Binder.apply(external_THREE_namespaceObject.Bootstrap.prototype);
@@ -493,10 +491,6 @@ external_THREE_namespaceObject.Bootstrap.Aliases = {};
 
 external_THREE_namespaceObject.Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
-  this.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
-  this.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
-  this.removeEventListener =
-    external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 };
 
 external_THREE_namespaceObject.Bootstrap.Plugin.prototype = {
