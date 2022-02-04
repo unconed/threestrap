@@ -169,10 +169,6 @@ external_THREE_namespaceObject.Binder = {
       }
 
       // Attach event handler at last level
-      console.log("BLOCK");
-      console.log(target);
-      console.log(target.on);
-      // console.log(target.addEventListener);
       if (target && (target.on || target.addEventListener)) {
         var callback = function (event) {
           object[dest] && object[dest](event, context);
@@ -519,7 +515,6 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin = function (name, spec) 
     this.__name = name;
   };
   ctor.prototype = Object.assign(new external_THREE_namespaceObject.Bootstrap.Plugin(), spec);
-  console.log(name, ctor.prototype);
 
   external_THREE_namespaceObject.Bootstrap.Plugins[name] = ctor;
 };

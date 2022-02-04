@@ -11,10 +11,8 @@
   </head>
   <body>
     <script>
-      console.log(THREE.Bootstrap);
       // Bootstrap core + stats plugin
       var three = THREE.Bootstrap("core", "stats");
-      console.log("face");
 
       // Random generator
       var sd = 12345;
@@ -29,7 +27,6 @@
         new THREE.Color(0x10a0ff),
         new THREE.Color(0x60109f),
       ];
-
       var n = colors.length;
       for (var i = 0; i < 100; ++i) {
         var sz = 1 + rnd() * 0.2;

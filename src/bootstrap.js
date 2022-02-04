@@ -250,7 +250,6 @@ THREE.Bootstrap.registerPlugin = function (name, spec) {
     this.__name = name;
   };
   ctor.prototype = Object.assign(new THREE.Bootstrap.Plugin(), spec);
-  console.log(name, ctor.prototype);
 
   THREE.Bootstrap.Plugins[name] = ctor;
 };

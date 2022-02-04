@@ -12,7 +12,7 @@ const webpackConfig = require("./webpack.config.js");
 
 const source = ["src/**/*.js"];
 
-const test = [].concat(["test/**/*.spec.js"]);
+const test = source.concat(["test/**/*.spec.js"]);
 
 gulp.task("pack", function () {
   return gulp

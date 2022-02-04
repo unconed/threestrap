@@ -41,10 +41,6 @@ THREE.Binder = {
       }
 
       // Attach event handler at last level
-      console.log("BLOCK");
-      console.log(target);
-      console.log(target.on);
-      // console.log(target.addEventListener);
       if (target && (target.on || target.addEventListener)) {
         var callback = function (event) {
           object[dest] && object[dest](event, context);
