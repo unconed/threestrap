@@ -901,7 +901,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
 
 external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
   defaults: {
-    klass: external_THREE_namespaceObject.WebGLRenderer,
+    klass: external_THREE_namespaceObject.WebGL1Renderer,
     parameters: {
       depth: true,
       stencil: true,
