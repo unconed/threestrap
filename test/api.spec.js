@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("api", function () {
   it("sends change events", function () {

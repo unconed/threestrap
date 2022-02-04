@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("warmup", function () {
   it("hides canvas", function () {

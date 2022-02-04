@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("controls", function () {
   it("install controls", function () {

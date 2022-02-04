@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("bind", function () {
   it("binds events", function () {

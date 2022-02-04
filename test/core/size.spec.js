@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("size", function () {
   it("fits the canvas in an element", function () {

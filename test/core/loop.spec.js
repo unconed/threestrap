@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("loop", function () {
   it("installs start/stop methods", function () {

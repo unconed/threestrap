@@ -1,4 +1,4 @@
-import * as THREE from "three";
+/* global THREE */
 
 describe("fill", function () {
   it("sets/unsets html, body height", function () {
