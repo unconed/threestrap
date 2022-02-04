@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("stats", function () {
   it("adds stats to the dom", function () {

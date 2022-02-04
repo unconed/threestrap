@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("three", function () {
   it("initializes and destroys once", function () {

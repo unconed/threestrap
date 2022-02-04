@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("renderer", function () {
   it("installs the canvas into the body", function () {

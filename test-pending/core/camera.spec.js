@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("camera", function () {
   it("installs a perspective camera", function () {

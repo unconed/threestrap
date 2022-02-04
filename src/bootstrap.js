@@ -67,11 +67,11 @@ THREE.Bootstrap = function (options) {
 
   // Update cycle
   this.trigger = this.trigger.bind(this);
-  this.frame   = this.frame.bind(this);
-  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
+  this.frame = this.frame.bind(this);
+  this.events = ["pre", "update", "render", "post"].map(function (type) {
     return { type: type };
   });
-  
+
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -85,8 +85,6 @@ THREE.Bootstrap.prototype = {
 
     // Install plugins
     this.install(this.__options.plugins);
-
-    return this;
   },
 
   destroy: function () {
@@ -99,12 +97,10 @@ THREE.Bootstrap.prototype = {
 
     // Then uninstall plugins
     this.uninstall();
-
-    return this;
   },
-  
+
   frame: function () {
-    this.events.map(this.trigger);    
+    this.events.map(this.trigger);
   },
 
   resolve: function (plugins) {
@@ -218,6 +214,9 @@ THREE.Bootstrap.prototype = {
     // Notify and remove event handlers
     this.triggerOnce({ type: "ready" });
   },
+  addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+  hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+  removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
 };
 
 THREE.Binder.apply(THREE.Bootstrap.prototype);
@@ -229,6 +228,10 @@ THREE.Bootstrap.Aliases = {};
 
 THREE.Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
+  this.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
+  this.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
+  this.removeEventListener =
+    THREE.EventDispatcher.prototype.removeEventListener;
 };
 
 THREE.Bootstrap.Plugin.prototype = {
@@ -247,6 +250,7 @@ THREE.Bootstrap.registerPlugin = function (name, spec) {
     this.__name = name;
   };
   ctor.prototype = Object.assign(new THREE.Bootstrap.Plugin(), spec);
+  console.log(name, ctor.prototype);
 
   THREE.Bootstrap.Plugins[name] = ctor;
 };

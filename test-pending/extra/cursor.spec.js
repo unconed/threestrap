@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("cursor", function () {
   it("sets and autohides the cursor", function () {

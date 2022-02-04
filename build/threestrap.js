@@ -139,6 +139,7 @@ external_THREE_namespaceObject.Binder = {
 
       // Set base target
       var fallback = context;
+
       if (Array.isArray(key)) {
         fallback = key[0];
         key = key[1];
@@ -153,6 +154,7 @@ external_THREE_namespaceObject.Binder = {
 
       // Whitelisted objects
       var selector = path.shift();
+
       var target =
         {
           this: object,
@@ -167,6 +169,10 @@ external_THREE_namespaceObject.Binder = {
       }
 
       // Attach event handler at last level
+      console.log("BLOCK");
+      console.log(target);
+      console.log(target.on);
+      // console.log(target.addEventListener);
       if (target && (target.on || target.addEventListener)) {
         var callback = function (event) {
           object[dest] && object[dest](event, context);
@@ -330,11 +336,11 @@ external_THREE_namespaceObject.Bootstrap = function (options) {
 
   // Update cycle
   this.trigger = this.trigger.bind(this);
-  this.frame   = this.frame.bind(this);
-  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
+  this.frame = this.frame.bind(this);
+  this.events = ["pre", "update", "render", "post"].map(function (type) {
     return { type: type };
   });
-  
+
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -348,8 +354,6 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Install plugins
     this.install(this.__options.plugins);
-
-    return this;
   },
 
   destroy: function () {
@@ -362,12 +366,10 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Then uninstall plugins
     this.uninstall();
-
-    return this;
   },
-  
+
   frame: function () {
-    this.events.map(this.trigger);    
+    this.events.map(this.trigger);
   },
 
   resolve: function (plugins) {
@@ -481,6 +483,9 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
     // Notify and remove event handlers
     this.triggerOnce({ type: "ready" });
   },
+  addEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener,
+  hasEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener,
+  removeEventListener: external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener,
 };
 
 external_THREE_namespaceObject.Binder.apply(external_THREE_namespaceObject.Bootstrap.prototype);
@@ -492,6 +497,10 @@ external_THREE_namespaceObject.Bootstrap.Aliases = {};
 
 external_THREE_namespaceObject.Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
+  this.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
+  this.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
+  this.removeEventListener =
+    external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 };
 
 external_THREE_namespaceObject.Bootstrap.Plugin.prototype = {
@@ -510,6 +519,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin = function (name, spec) 
     this.__name = name;
   };
   ctor.prototype = Object.assign(new external_THREE_namespaceObject.Bootstrap.Plugin(), spec);
+  console.log(name, ctor.prototype);
 
   external_THREE_namespaceObject.Bootstrap.Plugins[name] = ctor;
 };

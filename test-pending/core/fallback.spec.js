@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("fallback", function () {
   it("displays a fallback, halts install, and cleans up on uninstall", function () {

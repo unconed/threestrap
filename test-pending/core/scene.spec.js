@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("scene", function () {
   it("makes a scene", function () {

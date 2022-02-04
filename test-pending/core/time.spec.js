@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("time", function () {
   function stall(val, delay) {

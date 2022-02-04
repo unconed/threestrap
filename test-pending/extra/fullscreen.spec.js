@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("fullscreen", function () {
   it("adds fullscreen api", function () {

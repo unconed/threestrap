@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from "three";
 
 describe("plugin", function () {
   it("registers a plugin", function () {
