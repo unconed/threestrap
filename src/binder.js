@@ -1,8 +1,7 @@
 import * as THREE from "three";
 
-// eslint-disable-next-line no-import-assign
-THREE.Binder = {
-  bind: function (context, globals) {
+export class Binder {
+  static bind(context, globals) {
     return function (key, object) {
       // Prepare object
       if (!object.__binds) {
@@ -47,13 +46,9 @@ THREE.Binder = {
         };
 
         // Polyfill for both styles of event listener adders
-        THREE.Binder._polyfill(
-          target,
-          ["addEventListener", "on"],
-          function (method) {
-            target[method](name, callback);
-          }
-        );
+        Binder._polyfill(target, ["addEventListener", "on"], function (method) {
+          target[method](name, callback);
+        });
 
         // Store bind for removal later
         var bind = { target: target, name: name, callback: callback };
@@ -65,16 +60,16 @@ THREE.Binder = {
         throw "Cannot bind '" + key + "' in " + this.__name;
       }
     };
-  },
+  }
 
-  unbind: function () {
+  static unbind() {
     return function (object) {
       // Remove all binds belonging to object
       if (object.__binds) {
         object.__binds.forEach(
           function (bind) {
             // Polyfill for both styles of event listener removers
-            THREE.Binder._polyfill(
+            Binder._polyfill(
               bind.target,
               ["removeEventListener", "off"],
               function (method) {
@@ -87,11 +82,11 @@ THREE.Binder = {
         object.__binds = [];
       }
     };
-  },
+  }
 
-  apply: function (object) {
-    object.trigger = THREE.Binder._trigger;
-    object.triggerOnce = THREE.Binder._triggerOnce;
+  static apply(object) {
+    object.trigger = Binder._trigger;
+    object.triggerOnce = Binder._triggerOnce;
 
     object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
     object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
@@ -101,16 +96,16 @@ THREE.Binder = {
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
     object.dispatchEvent = object.trigger;
-  },
+  }
 
-  _triggerOnce: function (event) {
+  static _triggerOnce(event) {
     this.trigger(event);
     if (this._listeners) {
       delete this._listeners[event.type];
     }
-  },
+  }
 
-  _trigger: function (event) {
+  static _trigger(event) {
     if (this._listeners === undefined) return;
 
     var type = event.type;
@@ -125,12 +120,12 @@ THREE.Binder = {
         listeners[i].call(this, event, this);
       }
     }
-  },
+  }
 
-  _polyfill: function (object, methods, callback) {
+  static _polyfill(object, methods, callback) {
     methods.map(function (_method) {
       return object.method;
     });
     if (methods.length) callback(methods[0]);
-  },
-};
+  }
+}

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import "./api";
-import "./binder";
+import { Binder } from "./binder";
 
 function isString(str) {
   return str && typeof str.valueOf() === "string";
@@ -216,7 +216,7 @@ THREE.Bootstrap.prototype = {
   },
 };
 
-THREE.Binder.apply(THREE.Bootstrap.prototype);
+Binder.apply(THREE.Bootstrap.prototype);
 
 // Former contents of plugin.js.
 
@@ -234,7 +234,7 @@ THREE.Bootstrap.Plugin.prototype = {
   uninstall: function (_three) {},
 };
 
-THREE.Binder.apply(THREE.Bootstrap.Plugin.prototype);
+Binder.apply(THREE.Bootstrap.Plugin.prototype);
 THREE.Api.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
