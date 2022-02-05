@@ -37,7 +37,7 @@ Add `build/threestrap.js` to your Three.js:
 Get a threestrap context:
 
 ```javascript
-var three = THREE.Bootstrap();
+var three = new THREE.Bootstrap();
 ```
 
 This will create a full-page Three.js WebGL canvas, initialize the scene and
@@ -92,25 +92,25 @@ Shorthands:
 
 ```javascript
 // Core only
-var three = THREE.Bootstrap();
+var three = new THREE.Bootstrap();
 
 // Pass in list of plugins
-var three = THREE.Bootstrap("core", "stats");
-var three = THREE.Bootstrap(["core", "stats"]);
+var three = new THREE.Bootstrap("core", "stats");
+var three = new THREE.Bootstrap(["core", "stats"]);
 
 // Insert into specific element
-var three = THREE.Bootstrap(element);
-var three = THREE.Bootstrap(element, "core", "stats");
-var three = THREE.Bootstrap(element, ["core", "stats"]);
+var three = new THREE.Bootstrap(element);
+var three = new THREE.Bootstrap(element, "core", "stats");
+var three = new THREE.Bootstrap(element, ["core", "stats"]);
 
 // Replace plugins ad-hoc
-var three = THREE.Bootstrap(["core", "stats", "render:myRender"]);
+var three = new THREE.Bootstrap(["core", "stats", "render:myRender"]);
 ```
 
 The following global options are available with these defaults:
 
 ```javascript
-var three = THREE.Bootstrap({
+var three = new THREE.Bootstrap({
   init: true, // Initialize on creation
 
   element: document.body, // Containing element
@@ -149,7 +149,7 @@ installed in the given order.
 Plug-in specific options are grouped under the plug-in's name:
 
 ```javascript
-var three = THREE.Bootstrap({
+var three = new THREE.Bootstrap({
   plugins: ["core", "stats"],
   size: {
     width: 1280,
