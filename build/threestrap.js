@@ -139,6 +139,7 @@ external_THREE_namespaceObject.Binder = {
 
       // Set base target
       var fallback = context;
+
       if (Array.isArray(key)) {
         fallback = key[0];
         key = key[1];
@@ -153,6 +154,7 @@ external_THREE_namespaceObject.Binder = {
 
       // Whitelisted objects
       var selector = path.shift();
+
       var target =
         {
           this: object,
@@ -216,17 +218,18 @@ external_THREE_namespaceObject.Binder = {
   },
 
   apply: function (object) {
-    Object.assign(object, external_THREE_namespaceObject.EventDispatcher.prototype);
-
     object.trigger = external_THREE_namespaceObject.Binder._trigger;
     object.triggerOnce = external_THREE_namespaceObject.Binder._triggerOnce;
+
+    object.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
+    object.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
+    object.removeEventListener =
+      external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
     object.dispatchEvent = object.trigger;
   },
-
-  ////
 
   _triggerOnce: function (event) {
     this.trigger(event);
@@ -330,11 +333,11 @@ external_THREE_namespaceObject.Bootstrap = function (options) {
 
   // Update cycle
   this.trigger = this.trigger.bind(this);
-  this.frame   = this.frame.bind(this);
-  this.events = ['pre', 'update', 'render', 'post'].map(function (type) {
+  this.frame = this.frame.bind(this);
+  this.events = ["pre", "update", "render", "post"].map(function (type) {
     return { type: type };
   });
-  
+
   // Auto-init
   if (this.__options.init) {
     this.init();
@@ -348,8 +351,6 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Install plugins
     this.install(this.__options.plugins);
-
-    return this;
   },
 
   destroy: function () {
@@ -362,12 +363,10 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Then uninstall plugins
     this.uninstall();
-
-    return this;
   },
-  
+
   frame: function () {
-    this.events.map(this.trigger);    
+    this.events.map(this.trigger);
   },
 
   resolve: function (plugins) {
@@ -902,7 +901,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
 
 external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
   defaults: {
-    klass: external_THREE_namespaceObject.WebGLRenderer,
+    klass: external_THREE_namespaceObject.WebGL1Renderer,
     parameters: {
       depth: true,
       stencil: true,
