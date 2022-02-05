@@ -78,11 +78,8 @@ var __webpack_exports__ = {};
 ;// CONCATENATED MODULE: external "THREE"
 const external_THREE_namespaceObject = THREE;
 ;// CONCATENATED MODULE: ./src/api.js
-
-
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.Api = {
-  apply: function (object) {
+class Api {
+  static apply(object) {
     object.set = function (options) {
       var o = this.options || {};
 
@@ -122,8 +119,8 @@ external_THREE_namespaceObject.Api = {
 
       return object;
     };
-  },
-};
+  }
+}
 
 ;// CONCATENATED MODULE: ./src/binder.js
 
@@ -496,7 +493,7 @@ external_THREE_namespaceObject.Bootstrap.Plugin.prototype = {
 };
 
 Binder.apply(external_THREE_namespaceObject.Bootstrap.Plugin.prototype);
-external_THREE_namespaceObject.Api.apply(external_THREE_namespaceObject.Bootstrap.Plugin.prototype);
+Api.apply(external_THREE_namespaceObject.Bootstrap.Plugin.prototype);
 
 external_THREE_namespaceObject.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {
@@ -1816,111 +1813,113 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
 
 
 
-external_THREE_namespaceObject.VRControls = function (object, onError) {
-  var scope = this;
+class VRControls {
+  constructor(object, onError) {
+    this.object = object;
+    this.standingMatrix = new external_THREE_namespaceObject.Matrix4();
+    this.frameData = null;
 
-  var vrDisplay, vrDisplays;
-
-  var standingMatrix = new external_THREE_namespaceObject.Matrix4();
-
-  var frameData = null;
-
-  if ("VRFrameData" in window) {
-    frameData = new VRFrameData();
-  }
-
-  function gotVRDisplays(displays) {
-    vrDisplays = displays;
-
-    if (displays.length > 0) {
-      vrDisplay = displays[0];
-    } else {
-      if (onError) onError("VR input not available.");
+    if ("VRFrameData" in window) {
+      // eslint-disable-next-line no-undef
+      this.frameData = new VRFrameData();
     }
+
+    function gotVRDisplays(displays) {
+      this.vrDisplays = displays;
+
+      if (displays.length > 0) {
+        this.vrDisplay = displays[0];
+      } else {
+        if (onError) onError("VR input not available.");
+      }
+    }
+
+    if (navigator.getVRDisplays) {
+      navigator
+        .getVRDisplays()
+        .then(gotVRDisplays)
+        .catch(function () {
+          console.warn("THREE.VRControls: Unable to get VR Displays");
+        });
+    }
+
+    // the Rift SDK returns the position in meters
+    // this scale factor allows the user to define how meters
+    // are converted to scene units.
+
+    this.scale = 1;
+
+    // If true will use "standing space" coordinate system where y=0 is the
+    // floor and x=0, z=0 is the center of the room.
+    this.standing = false;
+
+    // Distance from the users eyes to the floor in meters. Used when
+    // standing=true but the VRDisplay doesn't provide stageParameters.
+    this.userHeight = 1.6;
   }
 
-  if (navigator.getVRDisplays) {
-    navigator
-      .getVRDisplays()
-      .then(gotVRDisplays)
-      .catch(function () {
-        console.warn("THREE.VRControls: Unable to get VR Displays");
-      });
+  getVRDisplay() {
+    return this.vrDisplay;
   }
 
-  // the Rift SDK returns the position in meters
-  // this scale factor allows the user to define how meters
-  // are converted to scene units.
+  setVRDisplay(value) {
+    this.vrDisplay = value;
+  }
 
-  this.scale = 1;
-
-  // If true will use "standing space" coordinate system where y=0 is the
-  // floor and x=0, z=0 is the center of the room.
-  this.standing = false;
-
-  // Distance from the users eyes to the floor in meters. Used when
-  // standing=true but the VRDisplay doesn't provide stageParameters.
-  this.userHeight = 1.6;
-
-  this.getVRDisplay = function () {
-    return vrDisplay;
-  };
-
-  this.setVRDisplay = function (value) {
-    vrDisplay = value;
-  };
-
-  this.getVRDisplays = function () {
+  getVRDisplays() {
     console.warn("THREE.VRControls: getVRDisplays() is being deprecated.");
-    return vrDisplays;
-  };
+    return this.vrDisplays;
+  }
 
-  this.getStandingMatrix = function () {
-    return standingMatrix;
-  };
+  getStandingMatrix() {
+    return this.standingMatrix;
+  }
 
-  this.update = function () {
-    if (vrDisplay) {
+  update() {
+    if (this.vrDisplay) {
       var pose;
 
-      if (vrDisplay.getFrameData) {
-        vrDisplay.getFrameData(frameData);
-        pose = frameData.pose;
-      } else if (vrDisplay.getPose) {
-        pose = vrDisplay.getPose();
+      if (this.vrDisplay.getFrameData) {
+        this.vrDisplay.getFrameData(this.frameData);
+        pose = this.frameData.pose;
+      } else if (this.vrDisplay.getPose) {
+        pose = this.vrDisplay.getPose();
       }
 
       if (pose.orientation !== null) {
-        object.quaternion.fromArray(pose.orientation);
+        this.object.quaternion.fromArray(pose.orientation);
       }
 
       if (pose.position !== null) {
-        object.position.fromArray(pose.position);
+        this.object.position.fromArray(pose.position);
       } else {
-        object.position.set(0, 0, 0);
+        this.object.position.set(0, 0, 0);
       }
 
       if (this.standing) {
-        if (vrDisplay.stageParameters) {
-          object.updateMatrix();
+        if (this.vrDisplay.stageParameters) {
+          this.object.updateMatrix();
 
-          standingMatrix.fromArray(
-            vrDisplay.stageParameters.sittingToStandingTransform
+          this.standingMatrix.fromArray(
+            this.vrDisplay.stageParameters.sittingToStandingTransform
           );
-          object.applyMatrix(standingMatrix);
+          this.object.applyMatrix(this.standingMatrix);
         } else {
-          object.position.setY(object.position.y + this.userHeight);
+          this.object.position.setY(this.object.position.y + this.userHeight);
         }
       }
 
-      object.position.multiplyScalar(scope.scale);
+      this.object.position.multiplyScalar(this.scale);
     }
-  };
+  }
 
-  this.dispose = function () {
-    vrDisplay = null;
-  };
-};
+  dispose() {
+    this.vrDisplay = null;
+  }
+}
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.VRControls = VRControls;
 
 ;// CONCATENATED MODULE: ./src/controls/index.js
 
@@ -1934,64 +1933,69 @@ external_THREE_namespaceObject.VRControls = function (object, onError) {
 
 
 // eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.MultiRenderer = function (parameters) {
-  console.log("THREE.MultiRenderer", external_THREE_namespaceObject.REVISION);
+class MultiRenderer {
+  constructor(parameters) {
+    console.log("THREE.MultiRenderer", external_THREE_namespaceObject.REVISION);
 
-  this.domElement = document.createElement("div");
-  this.domElement.style.position = "relative";
+    this.domElement = document.createElement("div");
+    this.domElement.style.position = "relative";
 
-  this.renderers = [];
-  this._renderSizeSet = false;
+    this.renderers = [];
+    this._renderSizeSet = false;
 
-  var rendererClasses = parameters.renderers || [];
-  var rendererParameters = parameters.parameters || [];
+    var rendererClasses = parameters.renderers || [];
+    var rendererParameters = parameters.parameters || [];
 
-  // elements are stacked back-to-front
-  for (var i = 0; i < rendererClasses.length; i++) {
-    var renderer = new rendererClasses[i](rendererParameters[i]);
-    renderer.domElement.style.position = "absolute";
-    renderer.domElement.style.top = "0px";
-    renderer.domElement.style.left = "0px";
-    this.domElement.appendChild(renderer.domElement);
-    this.renderers.push(renderer);
-  }
-};
-
-external_THREE_namespaceObject.MultiRenderer.prototype.setSize = function (w, h) {
-  this.domElement.style.width = w + "px";
-  this.domElement.style.height = h + "px";
-
-  for (var i = 0; i < this.renderers.length; i++) {
-    var renderer = this.renderers[i];
-    var el = renderer.domElement;
-
-    if (!this._renderSizeSet || (el && el.tagName !== "CANVAS")) {
-      renderer.setSize(w, h);
-    }
-
-    el.style.width = w + "px";
-    el.style.height = h + "px";
-  }
-};
-
-external_THREE_namespaceObject.MultiRenderer.prototype.setRenderSize = function (rw, rh) {
-  this._renderSizeSet = true;
-
-  for (var i = 0; i < this.renderers.length; i++) {
-    var renderer = this.renderers[i];
-    var el = renderer.domElement;
-
-    if (el && el.tagName === "CANVAS") {
-      renderer.setSize(rw, rh, false);
+    // elements are stacked back-to-front
+    for (var i = 0; i < rendererClasses.length; i++) {
+      var renderer = new rendererClasses[i](rendererParameters[i]);
+      renderer.domElement.style.position = "absolute";
+      renderer.domElement.style.top = "0px";
+      renderer.domElement.style.left = "0px";
+      this.domElement.appendChild(renderer.domElement);
+      this.renderers.push(renderer);
     }
   }
-};
 
-external_THREE_namespaceObject.MultiRenderer.prototype.render = function (scene, camera) {
-  for (var i = 0; i < this.renderers.length; i++) {
-    this.renderers[i].render(scene, camera);
+  setSize(w, h) {
+    this.domElement.style.width = w + "px";
+    this.domElement.style.height = h + "px";
+
+    for (var i = 0; i < this.renderers.length; i++) {
+      var renderer = this.renderers[i];
+      var el = renderer.domElement;
+
+      if (!this._renderSizeSet || (el && el.tagName !== "CANVAS")) {
+        renderer.setSize(w, h);
+      }
+
+      el.style.width = w + "px";
+      el.style.height = h + "px";
+    }
   }
-};
+
+  setRenderSize(rw, rh) {
+    this._renderSizeSet = true;
+
+    for (var i = 0; i < this.renderers.length; i++) {
+      var renderer = this.renderers[i];
+      var el = renderer.domElement;
+
+      if (el && el.tagName === "CANVAS") {
+        renderer.setSize(rw, rh, false);
+      }
+    }
+  }
+
+  render(scene, camera) {
+    for (var i = 0; i < this.renderers.length; i++) {
+      this.renderers[i].render(scene, camera);
+    }
+  }
+}
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.MultiRenderer = MultiRenderer;
 
 ;// CONCATENATED MODULE: ./src/renderers/VRRenderer.js
 /**

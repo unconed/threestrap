@@ -1,1 +1,1 @@
-import "./VRControls";
+import "./VRControls.js";

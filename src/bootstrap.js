@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import "./api";
+import { Api } from "./api";
 import { Binder } from "./binder";
 
 function isString(str) {
@@ -235,7 +235,7 @@ THREE.Bootstrap.Plugin.prototype = {
 };
 
 Binder.apply(THREE.Bootstrap.Plugin.prototype);
-THREE.Api.apply(THREE.Bootstrap.Plugin.prototype);
+Api.apply(THREE.Bootstrap.Plugin.prototype);
 
 THREE.Bootstrap.registerPlugin = function (name, spec) {
   var ctor = function (options) {
