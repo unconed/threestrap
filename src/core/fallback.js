@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("fallback", {
+Bootstrap.registerPlugin("fallback", {
   defaults: {
     force: false,
     fill: true,

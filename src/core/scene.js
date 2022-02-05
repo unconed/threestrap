@@ -1,9 +1,9 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Scene } from "three";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("scene", {
+Bootstrap.registerPlugin("scene", {
   install: function (three) {
-    three.scene = new THREE.Scene();
+    three.scene = new Scene();
   },
 
   uninstall: function (three) {

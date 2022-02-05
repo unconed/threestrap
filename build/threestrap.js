@@ -215,8 +215,7 @@ class Binder {
 
     object.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
     object.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
-    object.removeEventListener =
-      external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
+    object.removeEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
@@ -320,17 +319,14 @@ class Bootstrap {
       }
     }
 
-    // 'new' is optional
-    if (!(this instanceof external_THREE_namespaceObject.Bootstrap)) return new external_THREE_namespaceObject.Bootstrap(options);
-
     // Apply defaults
     const defaultOpts = {
       init: true,
       element: document.body,
       plugins: ["core"],
       aliases: {},
-      plugindb: external_THREE_namespaceObject.Bootstrap.Plugins || {},
-      aliasdb: external_THREE_namespaceObject.Bootstrap.Aliases || {},
+      plugindb: Bootstrap.Plugins || {},
+      aliasdb: Bootstrap.Aliases || {},
     };
 
     this.__options = Object.assign({}, defaultOpts, options || {});
@@ -481,8 +477,11 @@ class Bootstrap {
   __uninstall(name) {
     // Sanity check
     const plugin = isString(name) ? this.plugins[name] : name;
-    if (!plugin)
-      return console.warn("[three.uninstall] " + name + "' is not installed.");
+    if (!plugin) {
+      console.warn("[three.uninstall] " + name + "' is not installed.");
+      return;
+    }
+
     name = plugin.__name;
 
     // Uninstall
@@ -500,9 +499,8 @@ class Bootstrap {
   }
 }
 Bootstrap.initClass();
-Binder.apply(Bootstrap.prototype);
 
-// Old
+// Plugin Creation
 
 Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
@@ -515,22 +513,9 @@ Bootstrap.Plugin.prototype = {
   uninstall: function (_three) {},
 };
 
-// class Plugin {
-//   static build(target, options) {
-//     target.options = Object.assign({}, target.defaults, options || {});
-//     target.listen = [];
-//     target.defaults = {};
-//   }
-//   constructor(options) {
-//     Plugin.build(this, options);
-//   }
-//   install(_three) {}
-//   uninstall(_three) {}
-// }
+Binder.apply(Bootstrap.prototype);
 Binder.apply(Bootstrap.Plugin.prototype);
 Api.apply(Bootstrap.Plugin.prototype);
-
-// Bootstrap.Plugin = Plugin;
 
 // eslint-disable-next-line no-import-assign
 external_THREE_namespaceObject.Bootstrap = Bootstrap;
@@ -538,8 +523,7 @@ external_THREE_namespaceObject.Bootstrap = Bootstrap;
 ;// CONCATENATED MODULE: ./src/aliases.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerAlias("empty", [
+Bootstrap.registerAlias("empty", [
   "fallback",
   "bind",
   "renderer",
@@ -548,26 +532,22 @@ external_THREE_namespaceObject.Bootstrap.registerAlias("empty", [
   "loop",
   "time",
 ]);
-external_THREE_namespaceObject.Bootstrap.registerAlias("core", [
+
+Bootstrap.registerAlias("core", [
   "empty",
   "scene",
   "camera",
   "render",
   "warmup",
 ]);
-external_THREE_namespaceObject.Bootstrap.registerAlias("VR", [
-  "core",
-  "cursor",
-  "fullscreen",
-  "render:vr",
-]);
+
+Bootstrap.registerAlias("VR", ["core", "cursor", "fullscreen", "render:vr"]);
 
 ;// CONCATENATED MODULE: ./src/core/bind.js
 
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("bind", {
+Bootstrap.registerPlugin("bind", {
   install: function (three) {
     var globals = {
       three: three,
@@ -607,7 +587,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("bind", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("camera", {
+Bootstrap.registerPlugin("camera", {
   defaults: {
     near: 0.01,
     far: 10000,
@@ -688,8 +668,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("camera", {
 ;// CONCATENATED MODULE: ./src/core/fallback.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fallback", {
+Bootstrap.registerPlugin("fallback", {
   defaults: {
     force: false,
     fill: true,
@@ -753,8 +732,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("fallback", {
 ;// CONCATENATED MODULE: ./src/core/fill.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fill", {
+Bootstrap.registerPlugin("fill", {
   defaults: {
     block: true,
     body: true,
@@ -828,8 +806,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("fill", {
 ;// CONCATENATED MODULE: ./src/core/loop.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
+Bootstrap.registerPlugin("loop", {
   defaults: {
     start: true,
     each: 1,
@@ -895,8 +872,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
 ;// CONCATENATED MODULE: ./src/core/render.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
+Bootstrap.registerPlugin("render", {
   listen: ["render"],
 
   render: function (event, three) {
@@ -910,7 +886,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
+Bootstrap.registerPlugin("renderer", {
   defaults: {
     klass: external_THREE_namespaceObject.WebGL1Renderer,
     parameters: {
@@ -964,7 +940,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("scene", {
+Bootstrap.registerPlugin("scene", {
   install: function (three) {
     three.scene = new external_THREE_namespaceObject.Scene();
   },
@@ -977,8 +953,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("scene", {
 ;// CONCATENATED MODULE: ./src/core/size.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
+Bootstrap.registerPlugin("size", {
   defaults: {
     width: null,
     height: null,
@@ -1070,8 +1045,12 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
     }
 
     // Apply scale and resolution max
-    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
-    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
+    rw = Math.round(
+      Math.min(w * ratio * options.scale, options.maxRenderWidth)
+    );
+    rh = Math.round(
+      Math.min(h * ratio * options.scale, options.maxRenderHeight)
+    );
 
     // Retain aspect ratio
     const raspect = rw / rh;
@@ -1116,8 +1095,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
 ;// CONCATENATED MODULE: ./src/core/time.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("time", {
+Bootstrap.registerPlugin("time", {
   defaults: {
     speed: 1, // Clock speed
     warmup: 0, // Wait N frames before starting clock
@@ -1209,8 +1187,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("time", {
 ;// CONCATENATED MODULE: ./src/core/warmup.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("warmup", {
+Bootstrap.registerPlugin("warmup", {
   defaults: {
     delay: 2,
   },
@@ -1249,7 +1226,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("warmup", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("controls", {
+Bootstrap.registerPlugin("controls", {
   listen: ["update", "resize", "camera", "this.change"],
 
   defaults: {
@@ -1305,8 +1282,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("controls", {
 ;// CONCATENATED MODULE: ./src/extra/cursor.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("cursor", {
+Bootstrap.registerPlugin("cursor", {
   listen: [
     "update",
     "this.change",
@@ -1372,8 +1348,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("cursor", {
 ;// CONCATENATED MODULE: ./src/extra/fullscreen.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fullscreen", {
+Bootstrap.registerPlugin("fullscreen", {
   defaults: {
     key: "f",
   },
@@ -1460,8 +1435,7 @@ var stats_min_default = /*#__PURE__*/__webpack_require__.n(stats_min);
 
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("stats", {
+Bootstrap.registerPlugin("stats", {
   listen: ["pre", "post"],
 
   install: function (three) {
@@ -1493,8 +1467,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("stats", {
 ;// CONCATENATED MODULE: ./src/extra/ui.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("ui", {
+Bootstrap.registerPlugin("ui", {
   defaults: {
     theme: "white",
     style:
@@ -1592,7 +1565,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("ui", {
 /*
 VR sensor / HMD hookup.
 */
-external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
+Bootstrap.registerPlugin("vr", {
   defaults: {
     mode: "auto", // 'auto', '2d'
     device: null,

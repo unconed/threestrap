@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { EventDispatcher } from "three";
 
 export class Binder {
   static bind(context, globals) {
@@ -88,10 +88,9 @@ export class Binder {
     object.trigger = Binder._trigger;
     object.triggerOnce = Binder._triggerOnce;
 
-    object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
-    object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
-    object.removeEventListener =
-      THREE.EventDispatcher.prototype.removeEventListener;
+    object.hasEventListener = EventDispatcher.prototype.hasEventListener;
+    object.addEventListener = EventDispatcher.prototype.addEventListener;
+    object.removeEventListener = EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;

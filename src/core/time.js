@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("time", {
+Bootstrap.registerPlugin("time", {
   defaults: {
     speed: 1, // Clock speed
     warmup: 0, // Wait N frames before starting clock

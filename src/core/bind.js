@@ -1,8 +1,7 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 import { Binder } from "../binder";
 
-THREE.Bootstrap.registerPlugin("bind", {
+Bootstrap.registerPlugin("bind", {
   install: function (three) {
     var globals = {
       three: three,

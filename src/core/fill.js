@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("fill", {
+Bootstrap.registerPlugin("fill", {
   defaults: {
     block: true,
     body: true,

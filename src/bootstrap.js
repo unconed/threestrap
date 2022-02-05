@@ -7,7 +7,7 @@ function isString(str) {
   return str && typeof str.valueOf() === "string";
 }
 
-class Bootstrap {
+export class Bootstrap {
   static initClass() {
     this.Plugins = {};
     this.Aliases = {};
@@ -62,17 +62,14 @@ class Bootstrap {
       }
     }
 
-    // 'new' is optional
-    if (!(this instanceof THREE.Bootstrap)) return new THREE.Bootstrap(options);
-
     // Apply defaults
     const defaultOpts = {
       init: true,
       element: document.body,
       plugins: ["core"],
       aliases: {},
-      plugindb: THREE.Bootstrap.Plugins || {},
-      aliasdb: THREE.Bootstrap.Aliases || {},
+      plugindb: Bootstrap.Plugins || {},
+      aliasdb: Bootstrap.Aliases || {},
     };
 
     this.__options = Object.assign({}, defaultOpts, options || {});
@@ -223,8 +220,11 @@ class Bootstrap {
   __uninstall(name) {
     // Sanity check
     const plugin = isString(name) ? this.plugins[name] : name;
-    if (!plugin)
-      return console.warn("[three.uninstall] " + name + "' is not installed.");
+    if (!plugin) {
+      console.warn("[three.uninstall] " + name + "' is not installed.");
+      return;
+    }
+
     name = plugin.__name;
 
     // Uninstall
@@ -242,9 +242,8 @@ class Bootstrap {
   }
 }
 Bootstrap.initClass();
-Binder.apply(Bootstrap.prototype);
 
-// Old
+// Plugin Creation
 
 Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
@@ -257,22 +256,9 @@ Bootstrap.Plugin.prototype = {
   uninstall: function (_three) {},
 };
 
-// class Plugin {
-//   static build(target, options) {
-//     target.options = Object.assign({}, target.defaults, options || {});
-//     target.listen = [];
-//     target.defaults = {};
-//   }
-//   constructor(options) {
-//     Plugin.build(this, options);
-//   }
-//   install(_three) {}
-//   uninstall(_three) {}
-// }
+Binder.apply(Bootstrap.prototype);
 Binder.apply(Bootstrap.Plugin.prototype);
 Api.apply(Bootstrap.Plugin.prototype);
-
-// Bootstrap.Plugin = Plugin;
 
 // eslint-disable-next-line no-import-assign
 THREE.Bootstrap = Bootstrap;

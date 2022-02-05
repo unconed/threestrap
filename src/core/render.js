@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("render", {
+Bootstrap.registerPlugin("render", {
   listen: ["render"],
 
   render: function (event, three) {
