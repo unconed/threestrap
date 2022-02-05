@@ -13,6 +13,10 @@ const config = {
   },
   externals: {
     three: "THREE",
+    "three/src/core/EventDispatcher.js": "THREE",
+    "three/src/renderers/WebGL1Renderer.js": "THREE",
+    "three/src/scenes/Scene.js": "THREE",
+    "three/src/cameras/PerspectiveCamera.js": "THREE",
   },
 
   // The output defines how and where we want the bundles. The special value
