@@ -1,4 +1,4 @@
-import { WebGL1Renderer } from "three";
+import { WebGL1Renderer } from "three/src/renderers/WebGL1Renderer.js";
 import { Bootstrap } from "../bootstrap";
 
 Bootstrap.registerPlugin("renderer", {

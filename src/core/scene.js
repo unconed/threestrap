@@ -1,4 +1,4 @@
-import { Scene } from "three";
+import { Scene } from "three/src/scenes/Scene.js";
 import { Bootstrap } from "../bootstrap";
 
 Bootstrap.registerPlugin("scene", {
