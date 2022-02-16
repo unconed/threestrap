@@ -6,18 +6,21 @@
  */
 import * as THREE from "three";
 
-// eslint-disable-next-line no-import-assign
-THREE.VRRenderer = function (renderer, hmd) {
-  var self = this;
+class VRRenderer {
+  constructor(renderer, hmd) {
+    this.renderer = renderer;
 
-  self.initialize = function () {
+    this.right = new THREE.Vector3();
+    this.cameraLeft = new THREE.PerspectiveCamera();
+    this.cameraRight = new THREE.PerspectiveCamera();
+
     var et = hmd.getEyeTranslation("left");
-    self.halfIPD = new THREE.Vector3(et.x, et.y, et.z).length();
-    self.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
-    self.fovRight = hmd.getRecommendedEyeFieldOfView("right");
-  };
+    this.halfIPD = new THREE.Vector3(et.x, et.y, et.z).length();
+    this.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
+    this.fovRight = hmd.getRecommendedEyeFieldOfView("right");
+  }
 
-  self.FovToNDCScaleOffset = function (fov) {
+  FovToNDCScaleOffset(fov) {
     var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
     var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
     var pyscale = 2.0 / (fov.upTan + fov.downTan);
@@ -26,9 +29,9 @@ THREE.VRRenderer = function (renderer, hmd) {
       scale: [pxscale, pyscale],
       offset: [pxoffset, pyoffset],
     };
-  };
+  }
 
-  self.FovPortToProjection = function (
+  FovPortToProjection(
     matrix,
     fov,
     rightHanded /* = true */,
@@ -40,7 +43,7 @@ THREE.VRRenderer = function (renderer, hmd) {
     zFar = zFar === undefined ? 10000.0 : zFar;
     var handednessScale = rightHanded ? -1.0 : 1.0;
     var m = matrix.elements;
-    var scaleAndOffset = self.FovToNDCScaleOffset(fov);
+    var scaleAndOffset = this.FovToNDCScaleOffset(fov);
     m[0 * 4 + 0] = scaleAndOffset.scale[0];
     m[0 * 4 + 1] = 0.0;
     m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
@@ -58,9 +61,9 @@ THREE.VRRenderer = function (renderer, hmd) {
     m[3 * 4 + 2] = handednessScale;
     m[3 * 4 + 3] = 0.0;
     matrix.transpose();
-  };
+  }
 
-  self.FovToProjection = function (
+  FovToProjection(
     matrix,
     fov,
     rightHanded /* = true */,
@@ -73,53 +76,49 @@ THREE.VRRenderer = function (renderer, hmd) {
       leftTan: Math.tan((fov.leftDegrees * Math.PI) / 180.0),
       rightTan: Math.tan((fov.rightDegrees * Math.PI) / 180.0),
     };
-    return self.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
-  };
+    return this.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
+  }
 
-  var right = new THREE.Vector3();
-
-  var cameraLeft = new THREE.PerspectiveCamera();
-  var cameraRight = new THREE.PerspectiveCamera();
-
-  self.render = function (scene, camera) {
-    self.FovToProjection(
-      cameraLeft.projectionMatrix,
-      self.fovLeft,
+  render(scene, camera) {
+    this.FovToProjection(
+      this.cameraLeft.projectionMatrix,
+      this.fovLeft,
       true,
       camera.near,
       camera.far
     );
-    self.FovToProjection(
-      cameraRight.projectionMatrix,
-      self.fovRight,
+    this.FovToProjection(
+      this.cameraRight.projectionMatrix,
+      this.fovRight,
       true,
       camera.near,
       camera.far
     );
 
-    right.set(self.halfIPD, 0, 0);
-    right.applyQuaternion(camera.quaternion);
+    this.right.set(this.halfIPD, 0, 0);
+    this.right.applyQuaternion(camera.quaternion);
 
-    cameraLeft.position.copy(camera.position).sub(right);
-    cameraRight.position.copy(camera.position).add(right);
+    this.cameraLeft.position.copy(camera.position).sub(this.right);
+    this.cameraRight.position.copy(camera.position).add(this.right);
 
-    cameraLeft.quaternion.copy(camera.quaternion);
-    cameraRight.quaternion.copy(camera.quaternion);
+    this.cameraLeft.quaternion.copy(camera.quaternion);
+    this.cameraRight.quaternion.copy(camera.quaternion);
 
-    var dpr = renderer.devicePixelRatio || 1;
-    var width = renderer.domElement.width / 2 / dpr;
-    var height = renderer.domElement.height / dpr;
+    var dpr = this.renderer.devicePixelRatio || 1;
+    var width = this.renderer.domElement.width / 2 / dpr;
+    var height = this.renderer.domElement.height / dpr;
 
-    renderer.enableScissorTest(true);
+    this.renderer.enableScissorTest(true);
 
-    renderer.setViewport(0, 0, width, height);
-    renderer.setScissor(0, 0, width, height);
-    renderer.render(scene, cameraLeft);
+    this.renderer.setViewport(0, 0, width, height);
+    this.renderer.setScissor(0, 0, width, height);
+    this.renderer.render(scene, this.cameraLeft);
 
-    renderer.setViewport(width, 0, width, height);
-    renderer.setScissor(width, 0, width, height);
-    renderer.render(scene, cameraRight);
-  };
+    this.renderer.setViewport(width, 0, width, height);
+    this.renderer.setScissor(width, 0, width, height);
+    this.renderer.render(scene, this.cameraRight);
+  }
+}
 
-  self.initialize();
-};
+// eslint-disable-next-line no-import-assign
+THREE.VRRenderer = VRRenderer;

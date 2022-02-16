@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
 /*
 VR sensor / HMD hookup.
 */
-THREE.Bootstrap.registerPlugin("vr", {
+Bootstrap.registerPlugin("vr", {
   defaults: {
     mode: "auto", // 'auto', '2d'
     device: null,

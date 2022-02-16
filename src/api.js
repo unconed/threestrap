@@ -1,8 +1,5 @@
-import * as THREE from "three";
-
-// eslint-disable-next-line no-import-assign
-THREE.Api = {
-  apply: function (object) {
+export class Api {
+  static apply(object) {
     object.set = function (options) {
       var o = this.options || {};
 
@@ -42,5 +39,5 @@ THREE.Api = {
 
       return object;
     };
-  },
-};
+  }
+}

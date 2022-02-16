@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("loop", {
+Bootstrap.registerPlugin("loop", {
   defaults: {
     start: true,
     each: 1,

@@ -1,9 +1,9 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { WebGL1Renderer } from "three/src/renderers/WebGL1Renderer.js";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("renderer", {
+Bootstrap.registerPlugin("renderer", {
   defaults: {
-    klass: THREE.WebGL1Renderer,
+    klass: WebGL1Renderer,
     parameters: {
       depth: true,
       stencil: true,

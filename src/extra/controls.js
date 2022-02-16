@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("controls", {
+Bootstrap.registerPlugin("controls", {
   listen: ["update", "resize", "camera", "this.change"],
 
   defaults: {
@@ -14,7 +14,7 @@ THREE.Bootstrap.registerPlugin("controls", {
 
     three.controls = null;
 
-    this._camera = three.camera || new THREE.PerspectiveCamera();
+    this._camera = three.camera || new PerspectiveCamera();
     this.change(null, three);
   },
 

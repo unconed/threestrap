@@ -1,7 +1,6 @@
-import * as THREE from "three";
-import "./bootstrap";
+import { Bootstrap } from "./bootstrap";
 
-THREE.Bootstrap.registerAlias("empty", [
+Bootstrap.registerAlias("empty", [
   "fallback",
   "bind",
   "renderer",
@@ -10,16 +9,13 @@ THREE.Bootstrap.registerAlias("empty", [
   "loop",
   "time",
 ]);
-THREE.Bootstrap.registerAlias("core", [
+
+Bootstrap.registerAlias("core", [
   "empty",
   "scene",
   "camera",
   "render",
   "warmup",
 ]);
-THREE.Bootstrap.registerAlias("VR", [
-  "core",
-  "cursor",
-  "fullscreen",
-  "render:vr",
-]);
+
+Bootstrap.registerAlias("VR", ["core", "cursor", "fullscreen", "render:vr"]);

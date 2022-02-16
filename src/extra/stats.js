@@ -1,8 +1,7 @@
-import * as THREE from "three";
 import { default as Stats } from "stats.js";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("stats", {
+Bootstrap.registerPlugin("stats", {
   listen: ["pre", "post"],
 
   install: function (three) {

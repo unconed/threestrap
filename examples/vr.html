@@ -10,10 +10,6 @@
     <script type="text/javascript" src="../build/threestrap.js"></script>
     <script
       type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/DeviceOrientationControls.js"
-    ></script>
-    <script
-      type="text/javascript"
       src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"
     ></script>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
@@ -21,7 +17,7 @@
   <body>
     <script>
       // Bootstrap core + basic VR set up
-      var three = THREE.Bootstrap({
+      var three = new THREE.Bootstrap({
         plugins: ["VR", "ui", "controls"],
         // Equivalent to:
         //   plugins: ['core', 'cursor', 'fullscreen', 'render:vr', 'ui', 'controls']

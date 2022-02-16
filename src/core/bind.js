@@ -1,15 +1,15 @@
-import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
+import { Binder } from "../binder";
 
-THREE.Bootstrap.registerPlugin("bind", {
+Bootstrap.registerPlugin("bind", {
   install: function (three) {
     var globals = {
       three: three,
       window: window,
     };
 
-    three.bind = THREE.Binder.bind(three, globals);
-    three.unbind = THREE.Binder.unbind(three);
+    three.bind = Binder.bind(three, globals);
+    three.unbind = Binder.unbind(three);
 
     three.bind("install:bind", this);
     three.bind("uninstall:unbind", this);

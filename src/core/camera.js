@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import "../bootstrap";
+import { Bootstrap } from "../bootstrap";
 
-THREE.Bootstrap.registerPlugin("camera", {
+Bootstrap.registerPlugin("camera", {
   defaults: {
     near: 0.01,
     far: 10000,

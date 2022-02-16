@@ -78,11 +78,8 @@ var __webpack_exports__ = {};
 ;// CONCATENATED MODULE: external "THREE"
 const external_THREE_namespaceObject = THREE;
 ;// CONCATENATED MODULE: ./src/api.js
-
-
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.Api = {
-  apply: function (object) {
+class Api {
+  static apply(object) {
     object.set = function (options) {
       var o = this.options || {};
 
@@ -122,15 +119,14 @@ external_THREE_namespaceObject.Api = {
 
       return object;
     };
-  },
-};
+  }
+}
 
 ;// CONCATENATED MODULE: ./src/binder.js
 
 
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.Binder = {
-  bind: function (context, globals) {
+class Binder {
+  static bind(context, globals) {
     return function (key, object) {
       // Prepare object
       if (!object.__binds) {
@@ -175,13 +171,9 @@ external_THREE_namespaceObject.Binder = {
         };
 
         // Polyfill for both styles of event listener adders
-        external_THREE_namespaceObject.Binder._polyfill(
-          target,
-          ["addEventListener", "on"],
-          function (method) {
-            target[method](name, callback);
-          }
-        );
+        Binder._polyfill(target, ["addEventListener", "on"], function (method) {
+          target[method](name, callback);
+        });
 
         // Store bind for removal later
         var bind = { target: target, name: name, callback: callback };
@@ -193,16 +185,16 @@ external_THREE_namespaceObject.Binder = {
         throw "Cannot bind '" + key + "' in " + this.__name;
       }
     };
-  },
+  }
 
-  unbind: function () {
+  static unbind() {
     return function (object) {
       // Remove all binds belonging to object
       if (object.__binds) {
         object.__binds.forEach(
           function (bind) {
             // Polyfill for both styles of event listener removers
-            external_THREE_namespaceObject.Binder._polyfill(
+            Binder._polyfill(
               bind.target,
               ["removeEventListener", "off"],
               function (method) {
@@ -215,30 +207,29 @@ external_THREE_namespaceObject.Binder = {
         object.__binds = [];
       }
     };
-  },
+  }
 
-  apply: function (object) {
-    object.trigger = external_THREE_namespaceObject.Binder._trigger;
-    object.triggerOnce = external_THREE_namespaceObject.Binder._triggerOnce;
+  static apply(object) {
+    object.trigger = Binder._trigger;
+    object.triggerOnce = Binder._triggerOnce;
 
     object.hasEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.hasEventListener;
     object.addEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.addEventListener;
-    object.removeEventListener =
-      external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
+    object.removeEventListener = external_THREE_namespaceObject.EventDispatcher.prototype.removeEventListener;
 
     object.on = object.addEventListener;
     object.off = object.removeEventListener;
     object.dispatchEvent = object.trigger;
-  },
+  }
 
-  _triggerOnce: function (event) {
+  static _triggerOnce(event) {
     this.trigger(event);
     if (this._listeners) {
       delete this._listeners[event.type];
     }
-  },
+  }
 
-  _trigger: function (event) {
+  static _trigger(event) {
     if (this._listeners === undefined) return;
 
     var type = event.type;
@@ -253,15 +244,15 @@ external_THREE_namespaceObject.Binder = {
         listeners[i].call(this, event, this);
       }
     }
-  },
+  }
 
-  _polyfill: function (object, methods, callback) {
+  static _polyfill(object, methods, callback) {
     methods.map(function (_method) {
       return object.method;
     });
     if (methods.length) callback(methods[0]);
-  },
-};
+  }
+}
 
 ;// CONCATENATED MODULE: ./src/bootstrap.js
 
@@ -273,87 +264,110 @@ function isString(str) {
   return str && typeof str.valueOf() === "string";
 }
 
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.Bootstrap = function (options) {
-  if (options) {
-    let args = [].slice.apply(arguments);
-    options = {};
+class Bootstrap {
+  static initClass() {
+    this.Plugins = {};
+    this.Aliases = {};
+  }
 
-    // (element, ...)
-    if (args[0] instanceof Node) {
-      const node = args[0];
-      args = args.slice(1);
-      options.element = node;
+  static registerPlugin(name, spec) {
+    var ctor = function (options) {
+      Bootstrap.Plugin.call(this, options);
+      this.__name = name;
+    };
+    ctor.prototype = Object.assign(new Bootstrap.Plugin(), spec);
+
+    this.Plugins[name] = ctor;
+  }
+
+  static unregisterPlugin(name) {
+    delete this.Plugins[name];
+  }
+
+  static registerAlias(name, plugins) {
+    this.Aliases[name] = plugins;
+  }
+
+  static unregisterAlias(name) {
+    delete this.Aliases[name];
+  }
+
+  constructor(options) {
+    if (options) {
+      let args = [].slice.apply(arguments);
+      options = {};
+
+      // (element, ...)
+      if (args[0] instanceof Node) {
+        const node = args[0];
+        args = args.slice(1);
+        options.element = node;
+      }
+
+      // (..., plugin, plugin, plugin)
+      if (isString(args[0])) {
+        options.plugins = args;
+      } else if (Array.isArray(args[0])) {
+        // (..., [plugin, plugin, plugin])
+        options.plugins = args[0];
+      } else if (args[0]) {
+        // (..., options)
+
+        // else, merge any arguments on the right that have NOT been set into the
+        // options dict on the left.
+        options = Object.assign({}, args[0], options);
+      }
     }
 
-    // (..., plugin, plugin, plugin)
-    if (isString(args[0])) {
-      options.plugins = args;
-    } else if (Array.isArray(args[0])) {
-      // (..., [plugin, plugin, plugin])
-      options.plugins = args[0];
-    } else if (args[0]) {
-      // (..., options)
+    // Apply defaults
+    const defaultOpts = {
+      init: true,
+      element: document.body,
+      plugins: ["core"],
+      aliases: {},
+      plugindb: Bootstrap.Plugins || {},
+      aliasdb: Bootstrap.Aliases || {},
+    };
 
-      // else, merge any arguments on the right that have NOT been set into the
-      // options dict on the left.
-      options = Object.assign({}, args[0], options);
+    this.__options = Object.assign({}, defaultOpts, options || {});
+
+    // Hidden state
+    this.__inited = false;
+    this.__destroyed = false;
+    this.__installed = [];
+
+    // Query element
+    var element = this.__options.element;
+    if (element === "" + element) {
+      element = document.querySelector(element);
+    }
+
+    // Global context
+    this.plugins = {};
+    this.element = element;
+
+    // Update cycle
+    this.trigger = this.trigger.bind(this);
+    this.frame = this.frame.bind(this);
+    this.events = ["pre", "update", "render", "post"].map(function (type) {
+      return { type: type };
+    });
+
+    // Auto-init
+    if (this.__options.init) {
+      this.init();
     }
   }
 
-  // 'new' is optional
-  if (!(this instanceof external_THREE_namespaceObject.Bootstrap)) return new external_THREE_namespaceObject.Bootstrap(options);
-
-  // Apply defaults
-  const defaultOpts = {
-    init: true,
-    element: document.body,
-    plugins: ["core"],
-    aliases: {},
-    plugindb: external_THREE_namespaceObject.Bootstrap.Plugins || {},
-    aliasdb: external_THREE_namespaceObject.Bootstrap.Aliases || {},
-  };
-
-  this.__options = Object.assign({}, defaultOpts, options || {});
-
-  // Hidden state
-  this.__inited = false;
-  this.__destroyed = false;
-  this.__installed = [];
-
-  // Query element
-  var element = this.__options.element;
-  if (element === "" + element) {
-    element = document.querySelector(element);
-  }
-
-  // Global context
-  this.plugins = {};
-  this.element = element;
-
-  // Update cycle
-  this.trigger = this.trigger.bind(this);
-  this.frame = this.frame.bind(this);
-  this.events = ["pre", "update", "render", "post"].map(function (type) {
-    return { type: type };
-  });
-
-  // Auto-init
-  if (this.__options.init) {
-    this.init();
-  }
-};
-
-external_THREE_namespaceObject.Bootstrap.prototype = {
-  init: function () {
+  init() {
     if (this.__inited) return;
     this.__inited = true;
 
     // Install plugins
     this.install(this.__options.plugins);
-  },
+  }
 
-  destroy: function () {
+  destroy() {
     if (!this.__inited) return;
     if (this.__destroyed) return;
     this.__destroyed = true;
@@ -363,13 +377,13 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Then uninstall plugins
     this.uninstall();
-  },
+  }
 
-  frame: function () {
+  frame() {
     this.events.map(this.trigger);
-  },
+  }
 
-  resolve: function (plugins) {
+  resolve(plugins) {
     plugins = Array.isArray(plugins) ? plugins : [plugins];
 
     // Resolve alias database
@@ -406,9 +420,9 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
     }
 
     return recurse(plugins, [], 0);
-  },
+  }
 
-  install: function (plugins) {
+  install(plugins) {
     plugins = Array.isArray(plugins) ? plugins : [plugins];
 
     // Resolve aliases
@@ -419,9 +433,9 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Fire off ready event
     this.__ready();
-  },
+  }
 
-  uninstall: function (plugins) {
+  uninstall(plugins) {
     if (plugins) {
       plugins = Array.isArray(plugins) ? plugins : [plugins];
 
@@ -433,9 +447,9 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
     (plugins || this.__installed)
       .reverse()
       .forEach((p) => this.__uninstall(p.__name));
-  },
+  }
 
-  __install: function (name) {
+  __install(name) {
     // Sanity check
     var ctor = this.__options.plugindb[name];
     if (!ctor)
@@ -458,13 +472,16 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Allow early abort
     return flag;
-  },
+  }
 
-  __uninstall: function (name) {
+  __uninstall(name) {
     // Sanity check
     const plugin = isString(name) ? this.plugins[name] : name;
-    if (!plugin)
-      return console.warn("[three.uninstall] " + name + "' is not installed.");
+    if (!plugin) {
+      console.warn("[three.uninstall] " + name + "' is not installed.");
+      return;
+    }
+
     name = plugin.__name;
 
     // Uninstall
@@ -474,62 +491,39 @@ external_THREE_namespaceObject.Bootstrap.prototype = {
 
     // Then notify
     this.trigger({ type: "uninstall", plugin: plugin });
-  },
+  }
 
-  __ready: function () {
+  __ready() {
     // Notify and remove event handlers
     this.triggerOnce({ type: "ready" });
-  },
-};
+  }
+}
+Bootstrap.initClass();
 
-external_THREE_namespaceObject.Binder.apply(external_THREE_namespaceObject.Bootstrap.prototype);
+// Plugin Creation
 
-// Former contents of plugin.js.
-
-external_THREE_namespaceObject.Bootstrap.Plugins = {};
-external_THREE_namespaceObject.Bootstrap.Aliases = {};
-
-external_THREE_namespaceObject.Bootstrap.Plugin = function (options) {
+Bootstrap.Plugin = function (options) {
   this.options = Object.assign({}, this.defaults, options || {});
 };
 
-external_THREE_namespaceObject.Bootstrap.Plugin.prototype = {
+Bootstrap.Plugin.prototype = {
   listen: [],
   defaults: {},
   install: function (_three) {},
   uninstall: function (_three) {},
 };
 
-external_THREE_namespaceObject.Binder.apply(external_THREE_namespaceObject.Bootstrap.Plugin.prototype);
-external_THREE_namespaceObject.Api.apply(external_THREE_namespaceObject.Bootstrap.Plugin.prototype);
+Binder.apply(Bootstrap.prototype);
+Binder.apply(Bootstrap.Plugin.prototype);
+Api.apply(Bootstrap.Plugin.prototype);
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin = function (name, spec) {
-  var ctor = function (options) {
-    external_THREE_namespaceObject.Bootstrap.Plugin.call(this, options);
-    this.__name = name;
-  };
-  ctor.prototype = Object.assign(new external_THREE_namespaceObject.Bootstrap.Plugin(), spec);
-
-  external_THREE_namespaceObject.Bootstrap.Plugins[name] = ctor;
-};
-
-external_THREE_namespaceObject.Bootstrap.unregisterPlugin = function (name) {
-  delete external_THREE_namespaceObject.Bootstrap.Plugins[name];
-};
-
-external_THREE_namespaceObject.Bootstrap.registerAlias = function (name, plugins) {
-  external_THREE_namespaceObject.Bootstrap.Aliases[name] = plugins;
-};
-
-external_THREE_namespaceObject.Bootstrap.unregisterAlias = function (name) {
-  delete external_THREE_namespaceObject.Bootstrap.Aliases[name];
-};
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.Bootstrap = Bootstrap;
 
 ;// CONCATENATED MODULE: ./src/aliases.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerAlias("empty", [
+Bootstrap.registerAlias("empty", [
   "fallback",
   "bind",
   "renderer",
@@ -538,33 +532,30 @@ external_THREE_namespaceObject.Bootstrap.registerAlias("empty", [
   "loop",
   "time",
 ]);
-external_THREE_namespaceObject.Bootstrap.registerAlias("core", [
+
+Bootstrap.registerAlias("core", [
   "empty",
   "scene",
   "camera",
   "render",
   "warmup",
 ]);
-external_THREE_namespaceObject.Bootstrap.registerAlias("VR", [
-  "core",
-  "cursor",
-  "fullscreen",
-  "render:vr",
-]);
+
+Bootstrap.registerAlias("VR", ["core", "cursor", "fullscreen", "render:vr"]);
 
 ;// CONCATENATED MODULE: ./src/core/bind.js
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("bind", {
+Bootstrap.registerPlugin("bind", {
   install: function (three) {
     var globals = {
       three: three,
       window: window,
     };
 
-    three.bind = external_THREE_namespaceObject.Binder.bind(three, globals);
-    three.unbind = external_THREE_namespaceObject.Binder.unbind(three);
+    three.bind = Binder.bind(three, globals);
+    three.unbind = Binder.unbind(three);
 
     three.bind("install:bind", this);
     three.bind("uninstall:unbind", this);
@@ -596,7 +587,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("bind", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("camera", {
+Bootstrap.registerPlugin("camera", {
   defaults: {
     near: 0.01,
     far: 10000,
@@ -677,8 +668,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("camera", {
 ;// CONCATENATED MODULE: ./src/core/fallback.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fallback", {
+Bootstrap.registerPlugin("fallback", {
   defaults: {
     force: false,
     fill: true,
@@ -742,8 +732,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("fallback", {
 ;// CONCATENATED MODULE: ./src/core/fill.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fill", {
+Bootstrap.registerPlugin("fill", {
   defaults: {
     block: true,
     body: true,
@@ -817,8 +806,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("fill", {
 ;// CONCATENATED MODULE: ./src/core/loop.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
+Bootstrap.registerPlugin("loop", {
   defaults: {
     start: true,
     each: 1,
@@ -884,8 +872,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("loop", {
 ;// CONCATENATED MODULE: ./src/core/render.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
+Bootstrap.registerPlugin("render", {
   listen: ["render"],
 
   render: function (event, three) {
@@ -899,7 +886,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("render", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
+Bootstrap.registerPlugin("renderer", {
   defaults: {
     klass: external_THREE_namespaceObject.WebGL1Renderer,
     parameters: {
@@ -953,7 +940,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("renderer", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("scene", {
+Bootstrap.registerPlugin("scene", {
   install: function (three) {
     three.scene = new external_THREE_namespaceObject.Scene();
   },
@@ -966,8 +953,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("scene", {
 ;// CONCATENATED MODULE: ./src/core/size.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
+Bootstrap.registerPlugin("size", {
   defaults: {
     width: null,
     height: null,
@@ -1059,8 +1045,12 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
     }
 
     // Apply scale and resolution max
-    rw = Math.round(Math.min(w * ratio * options.scale, options.maxRenderWidth));
-    rh = Math.round(Math.min(h * ratio * options.scale, options.maxRenderHeight));
+    rw = Math.round(
+      Math.min(w * ratio * options.scale, options.maxRenderWidth)
+    );
+    rh = Math.round(
+      Math.min(h * ratio * options.scale, options.maxRenderHeight)
+    );
 
     // Retain aspect ratio
     const raspect = rw / rh;
@@ -1105,8 +1095,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("size", {
 ;// CONCATENATED MODULE: ./src/core/time.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("time", {
+Bootstrap.registerPlugin("time", {
   defaults: {
     speed: 1, // Clock speed
     warmup: 0, // Wait N frames before starting clock
@@ -1198,8 +1187,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("time", {
 ;// CONCATENATED MODULE: ./src/core/warmup.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("warmup", {
+Bootstrap.registerPlugin("warmup", {
   defaults: {
     delay: 2,
   },
@@ -1238,7 +1226,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("warmup", {
 
 
 
-external_THREE_namespaceObject.Bootstrap.registerPlugin("controls", {
+Bootstrap.registerPlugin("controls", {
   listen: ["update", "resize", "camera", "this.change"],
 
   defaults: {
@@ -1294,8 +1282,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("controls", {
 ;// CONCATENATED MODULE: ./src/extra/cursor.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("cursor", {
+Bootstrap.registerPlugin("cursor", {
   listen: [
     "update",
     "this.change",
@@ -1361,8 +1348,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("cursor", {
 ;// CONCATENATED MODULE: ./src/extra/fullscreen.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("fullscreen", {
+Bootstrap.registerPlugin("fullscreen", {
   defaults: {
     key: "f",
   },
@@ -1449,8 +1435,7 @@ var stats_min_default = /*#__PURE__*/__webpack_require__.n(stats_min);
 
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("stats", {
+Bootstrap.registerPlugin("stats", {
   listen: ["pre", "post"],
 
   install: function (three) {
@@ -1482,8 +1467,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("stats", {
 ;// CONCATENATED MODULE: ./src/extra/ui.js
 
 
-
-external_THREE_namespaceObject.Bootstrap.registerPlugin("ui", {
+Bootstrap.registerPlugin("ui", {
   defaults: {
     theme: "white",
     style:
@@ -1581,7 +1565,7 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("ui", {
 /*
 VR sensor / HMD hookup.
 */
-external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
+Bootstrap.registerPlugin("vr", {
   defaults: {
     mode: "auto", // 'auto', '2d'
     device: null,
@@ -1820,111 +1804,113 @@ external_THREE_namespaceObject.Bootstrap.registerPlugin("vr", {
 
 
 
-external_THREE_namespaceObject.VRControls = function (object, onError) {
-  var scope = this;
+class VRControls {
+  constructor(object, onError) {
+    this.object = object;
+    this.standingMatrix = new external_THREE_namespaceObject.Matrix4();
+    this.frameData = null;
 
-  var vrDisplay, vrDisplays;
-
-  var standingMatrix = new external_THREE_namespaceObject.Matrix4();
-
-  var frameData = null;
-
-  if ("VRFrameData" in window) {
-    frameData = new VRFrameData();
-  }
-
-  function gotVRDisplays(displays) {
-    vrDisplays = displays;
-
-    if (displays.length > 0) {
-      vrDisplay = displays[0];
-    } else {
-      if (onError) onError("VR input not available.");
+    if ("VRFrameData" in window) {
+      // eslint-disable-next-line no-undef
+      this.frameData = new VRFrameData();
     }
+
+    function gotVRDisplays(displays) {
+      this.vrDisplays = displays;
+
+      if (displays.length > 0) {
+        this.vrDisplay = displays[0];
+      } else {
+        if (onError) onError("VR input not available.");
+      }
+    }
+
+    if (navigator.getVRDisplays) {
+      navigator
+        .getVRDisplays()
+        .then(gotVRDisplays)
+        .catch(function () {
+          console.warn("THREE.VRControls: Unable to get VR Displays");
+        });
+    }
+
+    // the Rift SDK returns the position in meters
+    // this scale factor allows the user to define how meters
+    // are converted to scene units.
+
+    this.scale = 1;
+
+    // If true will use "standing space" coordinate system where y=0 is the
+    // floor and x=0, z=0 is the center of the room.
+    this.standing = false;
+
+    // Distance from the users eyes to the floor in meters. Used when
+    // standing=true but the VRDisplay doesn't provide stageParameters.
+    this.userHeight = 1.6;
   }
 
-  if (navigator.getVRDisplays) {
-    navigator
-      .getVRDisplays()
-      .then(gotVRDisplays)
-      .catch(function () {
-        console.warn("THREE.VRControls: Unable to get VR Displays");
-      });
+  getVRDisplay() {
+    return this.vrDisplay;
   }
 
-  // the Rift SDK returns the position in meters
-  // this scale factor allows the user to define how meters
-  // are converted to scene units.
+  setVRDisplay(value) {
+    this.vrDisplay = value;
+  }
 
-  this.scale = 1;
-
-  // If true will use "standing space" coordinate system where y=0 is the
-  // floor and x=0, z=0 is the center of the room.
-  this.standing = false;
-
-  // Distance from the users eyes to the floor in meters. Used when
-  // standing=true but the VRDisplay doesn't provide stageParameters.
-  this.userHeight = 1.6;
-
-  this.getVRDisplay = function () {
-    return vrDisplay;
-  };
-
-  this.setVRDisplay = function (value) {
-    vrDisplay = value;
-  };
-
-  this.getVRDisplays = function () {
+  getVRDisplays() {
     console.warn("THREE.VRControls: getVRDisplays() is being deprecated.");
-    return vrDisplays;
-  };
+    return this.vrDisplays;
+  }
 
-  this.getStandingMatrix = function () {
-    return standingMatrix;
-  };
+  getStandingMatrix() {
+    return this.standingMatrix;
+  }
 
-  this.update = function () {
-    if (vrDisplay) {
+  update() {
+    if (this.vrDisplay) {
       var pose;
 
-      if (vrDisplay.getFrameData) {
-        vrDisplay.getFrameData(frameData);
-        pose = frameData.pose;
-      } else if (vrDisplay.getPose) {
-        pose = vrDisplay.getPose();
+      if (this.vrDisplay.getFrameData) {
+        this.vrDisplay.getFrameData(this.frameData);
+        pose = this.frameData.pose;
+      } else if (this.vrDisplay.getPose) {
+        pose = this.vrDisplay.getPose();
       }
 
       if (pose.orientation !== null) {
-        object.quaternion.fromArray(pose.orientation);
+        this.object.quaternion.fromArray(pose.orientation);
       }
 
       if (pose.position !== null) {
-        object.position.fromArray(pose.position);
+        this.object.position.fromArray(pose.position);
       } else {
-        object.position.set(0, 0, 0);
+        this.object.position.set(0, 0, 0);
       }
 
       if (this.standing) {
-        if (vrDisplay.stageParameters) {
-          object.updateMatrix();
+        if (this.vrDisplay.stageParameters) {
+          this.object.updateMatrix();
 
-          standingMatrix.fromArray(
-            vrDisplay.stageParameters.sittingToStandingTransform
+          this.standingMatrix.fromArray(
+            this.vrDisplay.stageParameters.sittingToStandingTransform
           );
-          object.applyMatrix(standingMatrix);
+          this.object.applyMatrix(this.standingMatrix);
         } else {
-          object.position.setY(object.position.y + this.userHeight);
+          this.object.position.setY(this.object.position.y + this.userHeight);
         }
       }
 
-      object.position.multiplyScalar(scope.scale);
+      this.object.position.multiplyScalar(this.scale);
     }
-  };
+  }
 
-  this.dispose = function () {
-    vrDisplay = null;
-  };
-};
+  dispose() {
+    this.vrDisplay = null;
+  }
+}
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.VRControls = VRControls;
 
 ;// CONCATENATED MODULE: ./src/controls/index.js
 
@@ -1938,64 +1924,69 @@ external_THREE_namespaceObject.VRControls = function (object, onError) {
 
 
 // eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.MultiRenderer = function (parameters) {
-  console.log("THREE.MultiRenderer", external_THREE_namespaceObject.REVISION);
+class MultiRenderer {
+  constructor(parameters) {
+    console.log("THREE.MultiRenderer", external_THREE_namespaceObject.REVISION);
 
-  this.domElement = document.createElement("div");
-  this.domElement.style.position = "relative";
+    this.domElement = document.createElement("div");
+    this.domElement.style.position = "relative";
 
-  this.renderers = [];
-  this._renderSizeSet = false;
+    this.renderers = [];
+    this._renderSizeSet = false;
 
-  var rendererClasses = parameters.renderers || [];
-  var rendererParameters = parameters.parameters || [];
+    var rendererClasses = parameters.renderers || [];
+    var rendererParameters = parameters.parameters || [];
 
-  // elements are stacked back-to-front
-  for (var i = 0; i < rendererClasses.length; i++) {
-    var renderer = new rendererClasses[i](rendererParameters[i]);
-    renderer.domElement.style.position = "absolute";
-    renderer.domElement.style.top = "0px";
-    renderer.domElement.style.left = "0px";
-    this.domElement.appendChild(renderer.domElement);
-    this.renderers.push(renderer);
-  }
-};
-
-external_THREE_namespaceObject.MultiRenderer.prototype.setSize = function (w, h) {
-  this.domElement.style.width = w + "px";
-  this.domElement.style.height = h + "px";
-
-  for (var i = 0; i < this.renderers.length; i++) {
-    var renderer = this.renderers[i];
-    var el = renderer.domElement;
-
-    if (!this._renderSizeSet || (el && el.tagName !== "CANVAS")) {
-      renderer.setSize(w, h);
-    }
-
-    el.style.width = w + "px";
-    el.style.height = h + "px";
-  }
-};
-
-external_THREE_namespaceObject.MultiRenderer.prototype.setRenderSize = function (rw, rh) {
-  this._renderSizeSet = true;
-
-  for (var i = 0; i < this.renderers.length; i++) {
-    var renderer = this.renderers[i];
-    var el = renderer.domElement;
-
-    if (el && el.tagName === "CANVAS") {
-      renderer.setSize(rw, rh, false);
+    // elements are stacked back-to-front
+    for (var i = 0; i < rendererClasses.length; i++) {
+      var renderer = new rendererClasses[i](rendererParameters[i]);
+      renderer.domElement.style.position = "absolute";
+      renderer.domElement.style.top = "0px";
+      renderer.domElement.style.left = "0px";
+      this.domElement.appendChild(renderer.domElement);
+      this.renderers.push(renderer);
     }
   }
-};
 
-external_THREE_namespaceObject.MultiRenderer.prototype.render = function (scene, camera) {
-  for (var i = 0; i < this.renderers.length; i++) {
-    this.renderers[i].render(scene, camera);
+  setSize(w, h) {
+    this.domElement.style.width = w + "px";
+    this.domElement.style.height = h + "px";
+
+    for (var i = 0; i < this.renderers.length; i++) {
+      var renderer = this.renderers[i];
+      var el = renderer.domElement;
+
+      if (!this._renderSizeSet || (el && el.tagName !== "CANVAS")) {
+        renderer.setSize(w, h);
+      }
+
+      el.style.width = w + "px";
+      el.style.height = h + "px";
+    }
   }
-};
+
+  setRenderSize(rw, rh) {
+    this._renderSizeSet = true;
+
+    for (var i = 0; i < this.renderers.length; i++) {
+      var renderer = this.renderers[i];
+      var el = renderer.domElement;
+
+      if (el && el.tagName === "CANVAS") {
+        renderer.setSize(rw, rh, false);
+      }
+    }
+  }
+
+  render(scene, camera) {
+    for (var i = 0; i < this.renderers.length; i++) {
+      this.renderers[i].render(scene, camera);
+    }
+  }
+}
+
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.MultiRenderer = MultiRenderer;
 
 ;// CONCATENATED MODULE: ./src/renderers/VRRenderer.js
 /**
@@ -2006,18 +1997,21 @@ external_THREE_namespaceObject.MultiRenderer.prototype.render = function (scene,
  */
 
 
-// eslint-disable-next-line no-import-assign
-external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
-  var self = this;
+class VRRenderer {
+  constructor(renderer, hmd) {
+    this.renderer = renderer;
 
-  self.initialize = function () {
+    this.right = new external_THREE_namespaceObject.Vector3();
+    this.cameraLeft = new external_THREE_namespaceObject.PerspectiveCamera();
+    this.cameraRight = new external_THREE_namespaceObject.PerspectiveCamera();
+
     var et = hmd.getEyeTranslation("left");
-    self.halfIPD = new external_THREE_namespaceObject.Vector3(et.x, et.y, et.z).length();
-    self.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
-    self.fovRight = hmd.getRecommendedEyeFieldOfView("right");
-  };
+    this.halfIPD = new external_THREE_namespaceObject.Vector3(et.x, et.y, et.z).length();
+    this.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
+    this.fovRight = hmd.getRecommendedEyeFieldOfView("right");
+  }
 
-  self.FovToNDCScaleOffset = function (fov) {
+  FovToNDCScaleOffset(fov) {
     var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
     var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
     var pyscale = 2.0 / (fov.upTan + fov.downTan);
@@ -2026,9 +2020,9 @@ external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
       scale: [pxscale, pyscale],
       offset: [pxoffset, pyoffset],
     };
-  };
+  }
 
-  self.FovPortToProjection = function (
+  FovPortToProjection(
     matrix,
     fov,
     rightHanded /* = true */,
@@ -2040,7 +2034,7 @@ external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
     zFar = zFar === undefined ? 10000.0 : zFar;
     var handednessScale = rightHanded ? -1.0 : 1.0;
     var m = matrix.elements;
-    var scaleAndOffset = self.FovToNDCScaleOffset(fov);
+    var scaleAndOffset = this.FovToNDCScaleOffset(fov);
     m[0 * 4 + 0] = scaleAndOffset.scale[0];
     m[0 * 4 + 1] = 0.0;
     m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
@@ -2058,9 +2052,9 @@ external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
     m[3 * 4 + 2] = handednessScale;
     m[3 * 4 + 3] = 0.0;
     matrix.transpose();
-  };
+  }
 
-  self.FovToProjection = function (
+  FovToProjection(
     matrix,
     fov,
     rightHanded /* = true */,
@@ -2073,56 +2067,52 @@ external_THREE_namespaceObject.VRRenderer = function (renderer, hmd) {
       leftTan: Math.tan((fov.leftDegrees * Math.PI) / 180.0),
       rightTan: Math.tan((fov.rightDegrees * Math.PI) / 180.0),
     };
-    return self.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
-  };
+    return this.FovPortToProjection(matrix, fovPort, rightHanded, zNear, zFar);
+  }
 
-  var right = new external_THREE_namespaceObject.Vector3();
-
-  var cameraLeft = new external_THREE_namespaceObject.PerspectiveCamera();
-  var cameraRight = new external_THREE_namespaceObject.PerspectiveCamera();
-
-  self.render = function (scene, camera) {
-    self.FovToProjection(
-      cameraLeft.projectionMatrix,
-      self.fovLeft,
+  render(scene, camera) {
+    this.FovToProjection(
+      this.cameraLeft.projectionMatrix,
+      this.fovLeft,
       true,
       camera.near,
       camera.far
     );
-    self.FovToProjection(
-      cameraRight.projectionMatrix,
-      self.fovRight,
+    this.FovToProjection(
+      this.cameraRight.projectionMatrix,
+      this.fovRight,
       true,
       camera.near,
       camera.far
     );
 
-    right.set(self.halfIPD, 0, 0);
-    right.applyQuaternion(camera.quaternion);
+    this.right.set(this.halfIPD, 0, 0);
+    this.right.applyQuaternion(camera.quaternion);
 
-    cameraLeft.position.copy(camera.position).sub(right);
-    cameraRight.position.copy(camera.position).add(right);
+    this.cameraLeft.position.copy(camera.position).sub(this.right);
+    this.cameraRight.position.copy(camera.position).add(this.right);
 
-    cameraLeft.quaternion.copy(camera.quaternion);
-    cameraRight.quaternion.copy(camera.quaternion);
+    this.cameraLeft.quaternion.copy(camera.quaternion);
+    this.cameraRight.quaternion.copy(camera.quaternion);
 
-    var dpr = renderer.devicePixelRatio || 1;
-    var width = renderer.domElement.width / 2 / dpr;
-    var height = renderer.domElement.height / dpr;
+    var dpr = this.renderer.devicePixelRatio || 1;
+    var width = this.renderer.domElement.width / 2 / dpr;
+    var height = this.renderer.domElement.height / dpr;
 
-    renderer.enableScissorTest(true);
+    this.renderer.enableScissorTest(true);
 
-    renderer.setViewport(0, 0, width, height);
-    renderer.setScissor(0, 0, width, height);
-    renderer.render(scene, cameraLeft);
+    this.renderer.setViewport(0, 0, width, height);
+    this.renderer.setScissor(0, 0, width, height);
+    this.renderer.render(scene, this.cameraLeft);
 
-    renderer.setViewport(width, 0, width, height);
-    renderer.setScissor(width, 0, width, height);
-    renderer.render(scene, cameraRight);
-  };
+    this.renderer.setViewport(width, 0, width, height);
+    this.renderer.setScissor(width, 0, width, height);
+    this.renderer.render(scene, this.cameraRight);
+  }
+}
 
-  self.initialize();
-};
+// eslint-disable-next-line no-import-assign
+external_THREE_namespaceObject.VRRenderer = VRRenderer;
 
 ;// CONCATENATED MODULE: ./src/renderers/index.js
 
