@@ -10,6 +10,9 @@
   "dependencies": {
     "stats.js": "^0.17.0"
   },
+  "files": [
+    "/src", "build", "*.md", "FUNDING.yml"
+  ],
   "peerDependencies": {
     "three": ">=0.118.0"
   },
