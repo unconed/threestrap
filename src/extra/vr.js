@@ -35,22 +35,22 @@ Bootstrap.registerPlugin("vr", {
     // Fake VR device for cardboard / desktop
 
     // Interpuppilary distance
-    var ipd = 0.03;
+    const ipd = 0.03;
 
     // Symmetric eye FOVs (Cardboard style)
-    var getEyeTranslation = function (key) {
+    const getEyeTranslation = function (key) {
       return { left: { x: -ipd, y: 0, z: 0 }, right: { x: ipd, y: 0, z: 0 } }[
         key
       ];
     };
-    var getRecommendedEyeFieldOfView = function (key) {
-      var camera = three.camera;
-      var aspect = (camera && camera.aspect) || 16 / 9;
-      var fov2 = (fov || (camera && camera.fov) || def) / 2;
-      var fovX =
+    const getRecommendedEyeFieldOfView = function (key) {
+      const camera = three.camera;
+      const aspect = (camera && camera.aspect) || 16 / 9;
+      const fov2 = (fov || (camera && camera.fov) || def) / 2;
+      const fovX =
         (Math.atan((Math.tan((fov2 * Math.PI) / 180) * aspect) / 2) * 180) /
         Math.PI;
-      var fovY = fov2;
+      const fovY = fov2;
 
       return {
         left: {
@@ -68,7 +68,7 @@ Bootstrap.registerPlugin("vr", {
       }[key];
     };
     // Will be replaced with orbit controls or device orientation controls by VRControls
-    var getState = function () {
+    const getState = function () {
       return {};
     };
 
@@ -89,7 +89,7 @@ Bootstrap.registerPlugin("vr", {
   },
 
   load: function (event, three) {
-    var callback = function (devs) {
+    const callback = function (devs) {
       this.callback(devs, three);
     }.bind(this);
 
@@ -104,16 +104,16 @@ Bootstrap.registerPlugin("vr", {
   },
 
   callback: function (vrdevs, three) {
-    var hmd, sensor;
+    let hmd, sensor;
 
-    var HMD = window.HMDVRDevice || function () {};
-    var SENSOR = window.PositionSensorVRDevice || function () {};
+    const HMD = window.HMDVRDevice || function () {};
+    const SENSOR = window.PositionSensorVRDevice || function () {};
 
     // Export list of devices
     vrdevs = three.VR.devices = vrdevs || three.VR.devices;
 
     // Get HMD device
-    var deviceId = this.options.device;
+    const deviceId = this.options.device;
     let dev;
 
     for (let i = 0; i < vrdevs.length; ++i) {
@@ -145,7 +145,7 @@ Bootstrap.registerPlugin("vr", {
 
   hookup: function (hmd, sensor, three) {
     if (!VRRenderer) console.log("VRRenderer not found");
-    var klass = VRRenderer || function () {};
+    const klass = VRRenderer || function () {};
 
     this.renderer = new klass(three.renderer, hmd);
     this.hmd = hmd;
@@ -166,15 +166,15 @@ Bootstrap.registerPlugin("vr", {
   },
 
   pre: function (event, three) {
-    var last = this.active;
+    const last = this.active;
 
     // Global active flag
-    var active = (this.active = this.renderer && this.options.mode != "2d");
+    const active = (this.active = this.renderer && this.options.mode != "2d");
     three.VR.active = active;
 
     // Load sensor state
     if (active && this.sensor) {
-      var state = this.sensor.getState();
+      const state = this.sensor.getState();
       three.VR.state = state;
     } else {
       three.VR.state = null;
@@ -200,14 +200,14 @@ Bootstrap.registerPlugin("vr", {
 
   render: function (event, three) {
     if (three.scene && three.camera) {
-      var renderer = this.active ? this.renderer : three.renderer;
+      const renderer = this.active ? this.renderer : three.renderer;
 
       if (this.last != renderer) {
         if (renderer == three.renderer) {
           // Cleanup leftover renderer state when swapping back to normal
-          var dpr = renderer.getPixelRatio();
-          var width = renderer.domElement.width / dpr;
-          var height = renderer.domElement.height / dpr;
+          const dpr = renderer.getPixelRatio();
+          const width = renderer.domElement.width / dpr;
+          const height = renderer.domElement.height / dpr;
           renderer.setScissorTest(false);
           renderer.setViewport(0, 0, width, height);
         }

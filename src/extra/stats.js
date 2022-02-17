@@ -5,8 +5,8 @@ Bootstrap.registerPlugin("stats", {
   listen: ["pre", "post"],
 
   install: function (three) {
-    var stats = (this.stats = new Stats());
-    var style = stats.domElement.style;
+    const stats = (this.stats = new Stats());
+    const style = stats.domElement.style;
 
     style.position = "absolute";
     style.top = style.left = 0;

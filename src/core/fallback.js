@@ -15,7 +15,7 @@ Bootstrap.registerPlugin("fallback", {
   },
 
   install: function (three) {
-    var cnv, gl;
+    let cnv, gl;
     try {
       cnv = document.createElement("canvas");
       gl = cnv.getContext("webgl") || cnv.getContext("experimental-webgl");
@@ -24,12 +24,12 @@ Bootstrap.registerPlugin("fallback", {
       }
       three.fallback = false;
     } catch (e) {
-      var message = this.options.message;
-      var begin = this.options.begin;
-      var end = this.options.end;
-      var fill = this.options.fill;
+      const message = this.options.message;
+      const begin = this.options.begin;
+      const end = this.options.end;
+      const fill = this.options.fill;
 
-      var div = document.createElement("div");
+      const div = document.createElement("div");
       div.innerHTML = begin + message + end;
 
       this.children = [];

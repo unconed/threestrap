@@ -3,7 +3,7 @@ import { Binder } from "../binder";
 
 Bootstrap.registerPlugin("bind", {
   install: function (three) {
-    var globals = {
+    const globals = {
       three: three,
       window: window,
     };
@@ -23,8 +23,8 @@ Bootstrap.registerPlugin("bind", {
   },
 
   bind: function (event, three) {
-    var plugin = event.plugin;
-    var listen = plugin.listen;
+    const plugin = event.plugin;
+    const listen = plugin.listen;
 
     listen &&
       listen.forEach(function (key) {

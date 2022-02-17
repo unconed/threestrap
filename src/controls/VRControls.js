@@ -76,7 +76,7 @@ export class VRControls {
 
   update() {
     if (this.vrDisplay) {
-      var pose;
+      let pose;
 
       if (this.vrDisplay.getFrameData) {
         this.vrDisplay.getFrameData(this.frameData);

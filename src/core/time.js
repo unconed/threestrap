@@ -38,24 +38,24 @@ Bootstrap.registerPlugin("time", {
   },
 
   tick: function (event, three) {
-    var speed = this.options.speed;
-    var timeout = this.options.timeout;
+    const speed = this.options.speed;
+    const timeout = this.options.timeout;
 
-    var api = three.Time;
-    var now = (api.now = this.now());
-    var last = this.last;
-    var time = this.time;
-    var clock = this.clock;
+    const api = three.Time;
+    const now = (api.now = this.now());
+    const last = this.last;
+    let time = this.time;
+    let clock = this.clock;
 
     if (last) {
-      var delta = (api.delta = now - last);
-      var average = api.average || delta;
+      let delta = (api.delta = now - last);
+      const average = api.average || delta;
 
       if (delta > timeout) {
         delta = 0;
       }
 
-      var step = delta * speed;
+      const step = delta * speed;
 
       time += delta;
       clock += step;
