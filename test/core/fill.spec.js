@@ -15,7 +15,7 @@ describe("fill", function () {
 
     expect(test()).toBe(false);
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 
@@ -36,7 +36,7 @@ describe("fill", function () {
 
     expect(test()).toBeFalsy();
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 
@@ -61,7 +61,7 @@ describe("fill", function () {
 
     expect(test()).toBeFalsy();
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 

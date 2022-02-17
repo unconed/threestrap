@@ -2,13 +2,11 @@
  * Allows a stack of renderers to be treated as a single renderer.
  * @author Gheric Speiginer
  */
+import { REVISION } from "three";
 
-import * as THREE from "three";
-
-// eslint-disable-next-line no-import-assign
-class MultiRenderer {
+export class MultiRenderer {
   constructor(parameters) {
-    console.log("THREE.MultiRenderer", THREE.REVISION);
+    console.log("MultiRenderer", REVISION);
 
     this.domElement = document.createElement("div");
     this.domElement.style.position = "relative";
@@ -66,6 +64,3 @@ class MultiRenderer {
     }
   }
 }
-
-// eslint-disable-next-line no-import-assign
-THREE.MultiRenderer = MultiRenderer;

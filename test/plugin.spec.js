@@ -1,20 +1,20 @@
-/* global THREE */
+/* global Threestrap */
 
 describe("plugin", function () {
   it("registers a plugin", function () {
     var spec = {};
 
-    expect(THREE.Bootstrap.Plugins.mockp1).toBeFalsy();
+    expect(Threestrap.Bootstrap.Plugins.mockp1).toBeFalsy();
 
-    THREE.Bootstrap.registerPlugin("mockp1", spec);
+    Threestrap.Bootstrap.registerPlugin("mockp1", spec);
 
-    expect(new THREE.Bootstrap.Plugins.mockp1()).toEqual(
-      jasmine.any(THREE.Bootstrap.Plugin)
+    expect(new Threestrap.Bootstrap.Plugins.mockp1()).toEqual(
+      jasmine.any(Threestrap.Bootstrap.Plugin)
     );
 
-    THREE.Bootstrap.unregisterPlugin("mockp1", spec);
+    Threestrap.Bootstrap.unregisterPlugin("mockp1", spec);
 
-    expect(THREE.Bootstrap.Plugins.mockp1).toBeFalsy();
+    expect(Threestrap.Bootstrap.Plugins.mockp1).toBeFalsy();
   });
 
   it("sets defaults", function () {
@@ -30,7 +30,7 @@ describe("plugin", function () {
       },
     };
 
-    THREE.Bootstrap.registerPlugin("mockp2", spec);
+    Threestrap.Bootstrap.registerPlugin("mockp2", spec);
 
     var options = {
       init: false,
@@ -40,7 +40,7 @@ describe("plugin", function () {
       plugins: ["mockp2"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.init();
 
@@ -49,6 +49,6 @@ describe("plugin", function () {
 
     three.destroy();
 
-    THREE.Bootstrap.unregisterPlugin("mockp2", spec);
+    Threestrap.Bootstrap.unregisterPlugin("mockp2", spec);
   });
 });

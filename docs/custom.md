@@ -1,7 +1,8 @@
 Threestrap - Custom Plugins
 ===
 
-See below for scaffold. Use `THREE.Bootstrap.registerPlugin` to make a new plug-in available, passing in a prototype for the class.
+See below for scaffold. Use `Bootstrap.registerPlugin` to make a new plug-in
+available, passing in a prototype for the class.
 
 Init
 ---
@@ -35,7 +36,7 @@ Scaffold
 ---
 
 ```javascript
-THREE.Bootstrap.registerPlugin('magic', {
+Threestrap.Bootstrap.registerPlugin('magic', {
 
   // Configuration defaults
   defaults: {
@@ -107,7 +108,7 @@ THREE.Bootstrap.registerPlugin('magic', {
 });
 ```
 
-Call `THREE.Bootstrap.unregisterPlugin('plugin')` to remove.
+Call `Threestrap.Bootstrap.unregisterPlugin('plugin')` to remove.
 
 
 Aliases
@@ -116,7 +117,7 @@ Aliases
 Make an alias for a set of plugins, like so:
 
 ```
-THREE.Bootstrap.registerAlias('empty', ['size', 'fill', 'loop', 'time']);
+Threestrap.Bootstrap.registerAlias('empty', ['size', 'fill', 'loop', 'time']);
 ```
 
-Call `THREE.Bootstrap.unregisterAlias('alias')` to remove.
+Call `Threestrap.Bootstrap.unregisterAlias('alias')` to remove.

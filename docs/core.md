@@ -4,16 +4,16 @@ Threestrap - Core Reference
 * API
 
 ```javascript
-THREE.Bootstrap()                            // Create bootstrap context
+Threestrap.Bootstrap()                            // Create bootstrap context
 
-THREE.Bootstrap('plugin', ...)               // With given plugins
-THREE.Bootstrap(['plugin', ...])
-THREE.Bootstrap(['plugin', "plugin:plugin"]) // and ad-hoc overrides
+Threestrap.Bootstrap('plugin', ...)               // With given plugins
+Threestrap.Bootstrap(['plugin', ...])
+Threestrap.Bootstrap(['plugin', "plugin:plugin"]) // and ad-hoc overrides
 
-THREE.Bootstrap(element, "plugin", ...)      // Inside given DOM element
-THREE.Bootstrap(element, ["plugin", ...])    // 
+Threestrap.Bootstrap(element, "plugin", ...)      // Inside given DOM element
+Threestrap.Bootstrap(element, ["plugin", ...])    //
 
-THREE.Bootstrap({                            // With given options
+Threestrap.Bootstrap({                            // With given options
   init: true,                                // Initialize on creation
 
   element: document.body,                    // Containing element
@@ -369,7 +369,7 @@ Displays a standard message with a link if WebGL is unavailable.
            'box-sizing: border-box; border: 1px dashed rgba(0, 0, 0, .25);">'+
            '<div style="display: table-cell; padding: 10px; vertical-align: middle; text-align: center;">',
   end:     '</div></div>',
-  
+
   // Message
   message: '<big><strong>This example requires WebGL</strong></big><br>'+
            'Visit <a target="_blank" href="http://get.webgl.org/">get.webgl.org</a> for more info</a>',
@@ -392,4 +392,3 @@ Hide canvas for first few frames to avoid stuttering while JS/GL warms up.
 {
   delay: 2,  // Number of frames to wait before showing canvas
 }
-

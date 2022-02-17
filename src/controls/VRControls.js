@@ -10,12 +10,12 @@
  * for more info.
  */
 
-import * as THREE from "three";
+import { Matrix4 } from "three/src/math/Matrix4.js";
 
-class VRControls {
+export class VRControls {
   constructor(object, onError) {
     this.object = object;
-    this.standingMatrix = new THREE.Matrix4();
+    this.standingMatrix = new Matrix4();
     this.frameData = null;
 
     if ("VRFrameData" in window) {
@@ -38,7 +38,7 @@ class VRControls {
         .getVRDisplays()
         .then(gotVRDisplays)
         .catch(function () {
-          console.warn("THREE.VRControls: Unable to get VR Displays");
+          console.warn("VRControls: Unable to get VR Displays");
         });
     }
 
@@ -66,7 +66,7 @@ class VRControls {
   }
 
   getVRDisplays() {
-    console.warn("THREE.VRControls: getVRDisplays() is being deprecated.");
+    console.warn("VRControls: getVRDisplays() is being deprecated.");
     return this.vrDisplays;
   }
 
@@ -116,6 +116,3 @@ class VRControls {
     this.vrDisplay = null;
   }
 }
-
-// eslint-disable-next-line no-import-assign
-THREE.VRControls = VRControls;

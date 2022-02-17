@@ -4,18 +4,19 @@
  * @author wwwtyro https://github.com/wwwtyro
  * @author unconed https://github.com/unconed
  */
-import * as THREE from "three";
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { Vector3 } from "three/src/math/Vector3.js";
 
-class VRRenderer {
+export class VRRenderer {
   constructor(renderer, hmd) {
     this.renderer = renderer;
 
-    this.right = new THREE.Vector3();
-    this.cameraLeft = new THREE.PerspectiveCamera();
-    this.cameraRight = new THREE.PerspectiveCamera();
+    this.right = new Vector3();
+    this.cameraLeft = new PerspectiveCamera();
+    this.cameraRight = new PerspectiveCamera();
 
     var et = hmd.getEyeTranslation("left");
-    this.halfIPD = new THREE.Vector3(et.x, et.y, et.z).length();
+    this.halfIPD = new Vector3(et.x, et.y, et.z).length();
     this.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
     this.fovRight = hmd.getRecommendedEyeFieldOfView("right");
   }
@@ -119,6 +120,3 @@ class VRRenderer {
     this.renderer.render(scene, this.cameraRight);
   }
 }
-
-// eslint-disable-next-line no-import-assign
-THREE.VRRenderer = VRRenderer;

@@ -15,7 +15,7 @@ describe("size", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var canvas = three.renderer.domElement;
 
@@ -39,7 +39,7 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var h;
     three.on(
@@ -76,7 +76,7 @@ describe("size", function () {
     dpr = window.devicePixelRatio;
     window.devicePixelRatio = 2;
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.renderWidth).toBe(600);
@@ -105,7 +105,7 @@ describe("size", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.renderWidth).toBe(200);
@@ -130,7 +130,7 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.viewWidth).toBe(500);
@@ -158,7 +158,7 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.viewWidth).toBe(400);
@@ -188,7 +188,7 @@ describe("size", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var called = false;
     three.on("resize", function (event) {

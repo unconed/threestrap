@@ -6,7 +6,7 @@ describe("fullscreen", function () {
       plugins: ["bind", "renderer", "fullscreen"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.Fullscreen).toBeTruthy();
     expect(three.Fullscreen.toggle).toBeTruthy();

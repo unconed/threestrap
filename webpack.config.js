@@ -1,15 +1,16 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 
+const libraryName = "Threestrap";
 const PATHS = {
-  core: path.resolve(__dirname, "src/index.js"),
+  entryPoint: path.resolve(__dirname, "src/index.js"),
   bundles: path.resolve(__dirname, "dist"),
 };
 
 const config = {
   entry: {
-    threestrap: [PATHS.core],
-    "threestrap.min": [PATHS.core],
+    threestrap: [PATHS.entryPoint],
+    "threestrap.min": [PATHS.entryPoint],
   },
   externals: {
     three: "THREE",
@@ -26,6 +27,9 @@ const config = {
   output: {
     path: PATHS.bundles,
     filename: "[name].js",
+    libraryTarget: "umd",
+    library: libraryName,
+    umdNamedDefine: true,
   },
   resolve: {
     extensions: [".js"],

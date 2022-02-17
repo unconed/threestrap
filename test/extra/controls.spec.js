@@ -23,7 +23,7 @@ describe("controls", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.controls instanceof klass).toBe(true);
 
@@ -44,7 +44,7 @@ describe("controls", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.controls.object).toBe(three.camera);
 

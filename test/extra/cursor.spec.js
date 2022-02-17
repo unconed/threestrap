@@ -11,7 +11,7 @@ describe("cursor", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.element.style.cursor).toBe("pointer");
 
@@ -46,7 +46,7 @@ describe("cursor", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.element.style.cursor).toBe("move");
 

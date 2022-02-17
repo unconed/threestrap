@@ -15,7 +15,7 @@ describe("time", function () {
       plugins: ["bind", "time"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.Time.now !== undefined).toBeTruthy();
     expect(three.Time.clock !== undefined).toBeTruthy();
@@ -36,7 +36,7 @@ describe("time", function () {
       plugins: ["bind", "time"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     var fps = 60;
     var delta = 1 / fps;
     var frames = 5;
@@ -81,7 +81,7 @@ describe("time", function () {
       time: { speed: RATIO },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     var frames = 5;
     var fps = 60;
     var delta = 1 / fps;
@@ -122,7 +122,7 @@ describe("time", function () {
       time: { warmup: delay },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     var frames = delay;
     var fps = 60;
     var delta = 1 / fps;
@@ -161,7 +161,7 @@ describe("time", function () {
       time: { timeout: delay },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     var frames = 3;
     var fps = 60;
     var delta = 1 / fps;
