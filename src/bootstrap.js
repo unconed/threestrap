@@ -1,5 +1,3 @@
-import * as THREE from "three";
-
 import { Api } from "./api";
 import { Binder } from "./binder";
 
@@ -259,6 +257,3 @@ Bootstrap.Plugin.prototype = {
 Binder.apply(Bootstrap.prototype);
 Binder.apply(Bootstrap.Plugin.prototype);
 Api.apply(Bootstrap.Plugin.prototype);
-
-// eslint-disable-next-line no-import-assign
-THREE.Bootstrap = Bootstrap;

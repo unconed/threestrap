@@ -11,7 +11,7 @@ describe("warmup", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.renderer.domElement.style.visibility).toBe("hidden");
 

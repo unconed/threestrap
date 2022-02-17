@@ -8,7 +8,7 @@ describe("stats", function () {
 
     expect(document.querySelector("#stats")).toBeFalsy();
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelector("#stats")).toBeTruthy();
 

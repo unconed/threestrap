@@ -1,4 +1,6 @@
-import * as THREE from "three";
+import { Camera } from "three/src/cameras/Camera.js";
+import { OrthographicCamera } from "three/src/cameras/OrthographicCamera.js";
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
 import { Bootstrap } from "../bootstrap";
 
 Bootstrap.registerPlugin("camera", {
@@ -43,10 +45,10 @@ Bootstrap.registerPlugin("camera", {
       var klass =
         o.klass ||
         {
-          perspective: THREE.PerspectiveCamera,
-          orthographic: THREE.OrthographicCamera,
+          perspective: PerspectiveCamera,
+          orthographic: OrthographicCamera,
         }[o.type] ||
-        THREE.Camera;
+        Camera;
 
       three.camera = o.parameters ? new klass(o.parameters) : new klass();
     }

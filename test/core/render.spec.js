@@ -6,7 +6,7 @@ describe("render", function () {
       plugins: ["bind", "renderer", "render"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.scene = new THREE.Scene();
     three.camera = new THREE.PerspectiveCamera();

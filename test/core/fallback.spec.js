@@ -22,7 +22,7 @@ describe("fallback", function () {
     expect(getNode()).toBe(null);
     expect(getSpan()).toBe(null);
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     node = getNode();
     expect(node).toBeTruthy();
@@ -43,7 +43,7 @@ describe("fallback", function () {
       fallback: { force: true },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.plugins.fill).toBeTruthy();
     expect(three.renderer).toBeFalsy();
@@ -56,7 +56,7 @@ describe("fallback", function () {
       plugins: ["fallback", "renderer"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.fallback).toBe(false);
 

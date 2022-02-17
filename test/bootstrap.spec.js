@@ -7,7 +7,7 @@ describe("three", function () {
       plugins: [],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(false);
 
@@ -34,7 +34,7 @@ describe("three", function () {
       plugins: [],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
 
@@ -51,7 +51,7 @@ describe("three", function () {
       element: element,
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -70,7 +70,7 @@ describe("three", function () {
       plugins: [],
     };
 
-    var three = new THREE.Bootstrap(element, options);
+    var three = new Threestrap.Bootstrap(element, options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -91,7 +91,7 @@ describe("three", function () {
       element: "#watwatwatselector",
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -109,7 +109,7 @@ describe("three", function () {
       plugins: [],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     three.on("ready", function () {
       ready++;
     });
@@ -133,7 +133,7 @@ describe("three", function () {
       plugins: [],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
     var cb;
     three.on(
       "update",
@@ -183,7 +183,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
 
@@ -219,7 +219,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
 
@@ -258,7 +258,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
     expect(ready).toBe(false);
@@ -309,7 +309,7 @@ describe("three", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(installed[0]).toEqual(1);
     expect(installed[1]).toEqual(1);
@@ -331,7 +331,7 @@ describe("three", function () {
 
     var caught = false;
     try {
-      var three = new THREE.Bootstrap(options);
+      var three = new Threestrap.Bootstrap(options);
     } catch (e) {
       caught = true;
     }
@@ -374,7 +374,7 @@ describe("three", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(installed[0]).toEqual(1);
     expect(installed[1]).toEqual(1);
@@ -409,7 +409,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     three.init();
 
@@ -419,7 +419,7 @@ describe("three", function () {
   });
 
   it("autoinits core", function () {
-    var three = new THREE.Bootstrap();
+    var three = new Threestrap.Bootstrap();
 
     expect(three.__inited).toEqual(true);
 

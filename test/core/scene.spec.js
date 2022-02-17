@@ -6,7 +6,7 @@ describe("scene", function () {
       plugins: ["scene"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.scene instanceof THREE.Scene).toBe(true);
 

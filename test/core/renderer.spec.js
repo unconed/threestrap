@@ -7,7 +7,7 @@ describe("renderer", function () {
       plugins: ["renderer"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelectorAll("canvas").length).toBe(0);
 
@@ -33,7 +33,7 @@ describe("renderer", function () {
       plugins: ["renderer"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelectorAll("canvas").length).toBe(0);
 
@@ -61,7 +61,7 @@ describe("renderer", function () {
       plugins: ["renderer"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var called = 0;
     var callback = function () {
@@ -95,7 +95,7 @@ describe("renderer", function () {
       plugins: ["renderer"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var called = 0;
     var callback = function () {

@@ -13,5 +13,6 @@ module.exports = {
   },
   rules: {
     "no-unused-vars": [1, { argsIgnorePattern: "^_" }],
+    "no-multi-str": 1
   },
 };

@@ -11,7 +11,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.camera instanceof THREE.PerspectiveCamera).toBeTruthy();
     expect(three.camera.fov).toEqual(42);
@@ -35,7 +35,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.camera instanceof THREE.OrthographicCamera).toBeTruthy();
     expect(three.camera.left).toEqual(0);
@@ -76,7 +76,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(captured).toBe("bar");
 
@@ -102,7 +102,7 @@ describe("camera", function () {
       plugins: ["bind", "renderer", "size", "camera"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.camera.aspect).toBe(1.5);
 
@@ -125,7 +125,7 @@ describe("camera", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.camera instanceof THREE.OrthographicCamera).toBeTruthy();
     expect(three.camera.left).toEqual(0);

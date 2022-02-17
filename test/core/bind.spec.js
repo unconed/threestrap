@@ -14,31 +14,31 @@ describe("bind", function () {
       listen: ["ready", "this.foo:baz", [object, "wtf"]],
       ready: function (event, three) {
         expect(event.type).toBe("ready");
-        expect(three instanceof THREE.Bootstrap).toBe(true);
-        expect(this instanceof THREE.Bootstrap.Plugins.mockb).toBe(true);
+        expect(three instanceof Threestrap.Bootstrap).toBe(true);
+        expect(this instanceof Threestrap.Bootstrap.Plugins.mockb).toBe(true);
         ready = true;
       },
       baz: function (event, three) {
         expect(event.type).toBe("foo");
-        expect(three instanceof THREE.Bootstrap).toBe(true);
-        expect(this instanceof THREE.Bootstrap.Plugins.mockb).toBe(true);
+        expect(three instanceof Threestrap.Bootstrap).toBe(true);
+        expect(this instanceof Threestrap.Bootstrap.Plugins.mockb).toBe(true);
         foo = true;
       },
       wtf: function (event, three) {
         expect(event.type).toBe("wtf");
-        expect(three instanceof THREE.Bootstrap).toBe(true);
-        expect(this instanceof THREE.Bootstrap.Plugins.mockb).toBe(true);
+        expect(three instanceof Threestrap.Bootstrap).toBe(true);
+        expect(this instanceof Threestrap.Bootstrap.Plugins.mockb).toBe(true);
         wtf = true;
       },
     };
 
-    THREE.Bootstrap.registerPlugin("mockb", spec);
+    Threestrap.Bootstrap.registerPlugin("mockb", spec);
 
     var options = {
       plugins: ["bind", "mockb"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.bind).toBeTruthy();
     expect(three.unbind).toBeTruthy();
@@ -55,7 +55,7 @@ describe("bind", function () {
     expect(three.bind).toBeFalsy();
     expect(three.unbind).toBeFalsy();
 
-    THREE.Bootstrap.unregisterPlugin("mockb", spec);
+    Threestrap.Bootstrap.unregisterPlugin("mockb", spec);
   });
 
   it("fires ready events for hot install", function () {
@@ -69,19 +69,19 @@ describe("bind", function () {
       listen: ["ready"],
       ready: function (event, three) {
         expect(event.type).toBe("ready");
-        expect(three instanceof THREE.Bootstrap).toBe(true);
-        expect(this instanceof THREE.Bootstrap.Plugins.mockc).toBe(true);
+        expect(three instanceof Threestrap.Bootstrap).toBe(true);
+        expect(this instanceof Threestrap.Bootstrap.Plugins.mockc).toBe(true);
         ready = true;
       },
     };
 
-    THREE.Bootstrap.registerPlugin("mockc", spec);
+    Threestrap.Bootstrap.registerPlugin("mockc", spec);
 
     var options = {
       plugins: ["bind"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.plugins.mockc).toBeFalsy();
 
@@ -91,6 +91,6 @@ describe("bind", function () {
 
     three.destroy();
 
-    THREE.Bootstrap.unregisterPlugin("mockc", spec);
+    Threestrap.Bootstrap.unregisterPlugin("mockc", spec);
   });
 });

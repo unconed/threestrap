@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { Bootstrap } from "../bootstrap";
+import { Bootstrap } from "../bootstrap.js";
+import { VRRenderer } from "../renderers/VRRenderer.js";
 
 /*
 VR sensor / HMD hookup.
@@ -67,7 +67,7 @@ Bootstrap.registerPlugin("vr", {
         },
       }[key];
     };
-    // Will be replaced with orbit controls or device orientation controls by THREE.VRControls
+    // Will be replaced with orbit controls or device orientation controls by VRControls
     var getState = function () {
       return {};
     };
@@ -144,8 +144,8 @@ Bootstrap.registerPlugin("vr", {
   },
 
   hookup: function (hmd, sensor, three) {
-    if (!THREE.VRRenderer) console.log("THREE.VRRenderer not found");
-    var klass = THREE.VRRenderer || function () {};
+    if (!VRRenderer) console.log("VRRenderer not found");
+    var klass = VRRenderer || function () {};
 
     this.renderer = new klass(three.renderer, hmd);
     this.hmd = hmd;
@@ -155,7 +155,7 @@ Bootstrap.registerPlugin("vr", {
     three.VR.hmd = hmd;
     three.VR.sensor = sensor;
 
-    console.log("THREE.VRRenderer", hmd.deviceName);
+    console.log("VRRenderer", hmd.deviceName);
   },
 
   change: function (event, three) {

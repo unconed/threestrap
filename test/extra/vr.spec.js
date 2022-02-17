@@ -6,7 +6,7 @@ describe("vr", function () {
       plugins: ["bind", "renderer", "scene", "camera", "vr"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     // Fire window.onload
     three.plugins.vr.load({}, three);
@@ -25,7 +25,7 @@ describe("vr", function () {
       plugins: ["bind", "renderer", "scene", "camera", "vr"],
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     // Fire window.onload
     three.plugins.vr.load({}, three);

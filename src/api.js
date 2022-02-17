@@ -24,7 +24,9 @@ export class Api {
     };
 
     object.api = function (object, context) {
-      object ||= {};
+      if (!object) {
+        object = {};
+      }
 
       // Append context argument to API methods
       context &&

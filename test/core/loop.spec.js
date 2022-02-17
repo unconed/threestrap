@@ -9,7 +9,7 @@ describe("loop", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     expect(three.Loop.start.call).toBeTruthy();
     expect(three.Loop.stop.call).toBeTruthy();
@@ -25,7 +25,7 @@ describe("loop", function () {
       },
     };
 
-    var three = new THREE.Bootstrap(options);
+    var three = new Threestrap.Bootstrap(options);
 
     var started = false;
     var stopped = false;
@@ -80,7 +80,7 @@ describe("loop", function () {
         plugins: ["bind", "loop"],
       };
 
-      three = new THREE.Bootstrap(options);
+      three = new Threestrap.Bootstrap(options);
 
       three.on("pre", function () {
         pre = +new Date();
