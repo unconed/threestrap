@@ -1,5 +1,5 @@
 {
-  "name": "threestrap",
+  "name": "@sicmutils/threestrap",
   "version": "0.3.0",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
@@ -11,7 +11,10 @@
     "stats.js": "^0.17.0"
   },
   "files": [
-    "/src", "build", "*.md", "FUNDING.yml"
+    "/src",
+    "build",
+    "*.md",
+    "FUNDING.yml"
   ],
   "peerDependencies": {
     "three": ">=0.118.0"

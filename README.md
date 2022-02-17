@@ -21,10 +21,10 @@ Examples:
 
 # Usage
 
-Install via bower:
+Install via npm:
 
 ```
-bower install threestrap
+npm install @sicmutils/threestrap
 ```
 
 Add `build/threestrap.js` to your Three.js:
