@@ -24,7 +24,7 @@ Examples:
 Install via npm:
 
 ```
-npm install @sicmutils/threestrap
+npm install threestrap
 ```
 
 Add `build/threestrap.js` to your Three.js:
