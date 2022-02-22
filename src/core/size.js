@@ -45,18 +45,17 @@ Bootstrap.registerPlugin("size", {
   },
 
   resize: function (event, three) {
-    var options = this.options;
-    var element = three.element;
-    var renderer = three.renderer;
+    const options = this.options;
+    const element = three.element;
+    const renderer = three.renderer;
 
-    var w,
+    let w,
       h,
       ew,
       eh,
       rw,
       rh,
       aspect,
-      style,
       ratio,
       ml = 0,
       mt = 0;
@@ -111,7 +110,7 @@ Bootstrap.registerPlugin("size", {
     ratio = rh / h;
 
     // Resize and position renderer element
-    style = renderer.domElement.style;
+    const style = renderer.domElement.style;
     style.width = w + "px";
     style.height = h + "px";
     style.marginLeft = ml + "px";

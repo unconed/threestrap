@@ -1,6 +1,6 @@
 {
-  "name": "@sicmutils/threestrap",
-  "version": "0.4.0",
+  "name": "threestrap",
+  "version": "0.4.1",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",

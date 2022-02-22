@@ -40,8 +40,8 @@ Bootstrap.registerPlugin("loop", {
 
     three.Loop.running = this.running = true;
 
-    var trigger = three.trigger.bind(three);
-    var loop = function () {
+    const trigger = three.trigger.bind(three);
+    const loop = function () {
       if (!this.running) return;
       this.lastRequestId = three.Loop.window.requestAnimationFrame(loop);
       this.events.map(trigger);

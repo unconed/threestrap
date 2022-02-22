@@ -16,7 +16,7 @@ Bootstrap.registerPlugin("renderer", {
 
   install: function (three) {
     // Instantiate Three renderer
-    var renderer = (three.renderer = new this.options.klass(
+    const renderer = (three.renderer = new this.options.klass(
       this.options.parameters
     ));
     three.canvas = renderer.domElement;
@@ -34,8 +34,8 @@ Bootstrap.registerPlugin("renderer", {
   },
 
   resize: function (event, three) {
-    var renderer = three.renderer;
-    var el = renderer.domElement;
+    const renderer = three.renderer;
+    const el = renderer.domElement;
 
     // Resize renderer to render size if it's a canvas
     if (el && el.tagName == "CANVAS") {

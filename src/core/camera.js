@@ -38,11 +38,11 @@ Bootstrap.registerPlugin("camera", {
   },
 
   change: function (event, three) {
-    var o = this.options;
-    var old = three.camera;
+    const o = this.options;
+    const old = three.camera;
 
     if (!three.camera || event.changes.type || event.changes.klass) {
-      var klass =
+      const klass =
         o.klass ||
         {
           perspective: PerspectiveCamera,

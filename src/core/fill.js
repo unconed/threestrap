@@ -9,7 +9,7 @@ Bootstrap.registerPlugin("fill", {
 
   install: function (three) {
     function is(element) {
-      var h = element.style.height;
+      const h = element.style.height;
       return h == "auto" || h == "";
     }
 
@@ -33,7 +33,7 @@ Bootstrap.registerPlugin("fill", {
     }
 
     if (this.options.layout && three.element) {
-      var style = window.getComputedStyle(three.element);
+      const style = window.getComputedStyle(three.element);
       if (style.position == "static") {
         three.element.style.position = "relative";
         this.layout = true;

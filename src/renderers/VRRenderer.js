@@ -15,17 +15,17 @@ export class VRRenderer {
     this.cameraLeft = new PerspectiveCamera();
     this.cameraRight = new PerspectiveCamera();
 
-    var et = hmd.getEyeTranslation("left");
+    const et = hmd.getEyeTranslation("left");
     this.halfIPD = new Vector3(et.x, et.y, et.z).length();
     this.fovLeft = hmd.getRecommendedEyeFieldOfView("left");
     this.fovRight = hmd.getRecommendedEyeFieldOfView("right");
   }
 
   FovToNDCScaleOffset(fov) {
-    var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
-    var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
-    var pyscale = 2.0 / (fov.upTan + fov.downTan);
-    var pyoffset = (fov.upTan - fov.downTan) * pyscale * 0.5;
+    const pxscale = 2.0 / (fov.leftTan + fov.rightTan);
+    const pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
+    const pyscale = 2.0 / (fov.upTan + fov.downTan);
+    const pyoffset = (fov.upTan - fov.downTan) * pyscale * 0.5;
     return {
       scale: [pxscale, pyscale],
       offset: [pxoffset, pyoffset],
@@ -42,9 +42,9 @@ export class VRRenderer {
     rightHanded = rightHanded === undefined ? true : rightHanded;
     zNear = zNear === undefined ? 0.01 : zNear;
     zFar = zFar === undefined ? 10000.0 : zFar;
-    var handednessScale = rightHanded ? -1.0 : 1.0;
-    var m = matrix.elements;
-    var scaleAndOffset = this.FovToNDCScaleOffset(fov);
+    const handednessScale = rightHanded ? -1.0 : 1.0;
+    const m = matrix.elements;
+    const scaleAndOffset = this.FovToNDCScaleOffset(fov);
     m[0 * 4 + 0] = scaleAndOffset.scale[0];
     m[0 * 4 + 1] = 0.0;
     m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
@@ -71,7 +71,7 @@ export class VRRenderer {
     zNear /* = 0.01 */,
     zFar /* = 10000.0 */
   ) {
-    var fovPort = {
+    const fovPort = {
       upTan: Math.tan((fov.upDegrees * Math.PI) / 180.0),
       downTan: Math.tan((fov.downDegrees * Math.PI) / 180.0),
       leftTan: Math.tan((fov.leftDegrees * Math.PI) / 180.0),
@@ -105,9 +105,9 @@ export class VRRenderer {
     this.cameraLeft.quaternion.copy(camera.quaternion);
     this.cameraRight.quaternion.copy(camera.quaternion);
 
-    var dpr = this.renderer.devicePixelRatio || 1;
-    var width = this.renderer.domElement.width / 2 / dpr;
-    var height = this.renderer.domElement.height / dpr;
+    const dpr = this.renderer.devicePixelRatio || 1;
+    const width = this.renderer.domElement.width / 2 / dpr;
+    const height = this.renderer.domElement.height / dpr;
 
     this.renderer.enableScissorTest(true);
 

@@ -34,8 +34,8 @@ Bootstrap.registerPlugin("fullscreen", {
       }.bind(this)
     );
 
-    var changeHandler = function () {
-      var active =
+    const changeHandler = function () {
+      const active =
         !!document.fullscreenElement ||
         !!document.mozFullScreenElement ||
         !!document.webkitFullscreenElement ||
@@ -52,8 +52,8 @@ Bootstrap.registerPlugin("fullscreen", {
   },
 
   toggle: function (three) {
-    var canvas = three.canvas;
-    var options =
+    const canvas = three.canvas;
+    const options =
       three.VR && three.VR.active ? { vrDisplay: three.VR.hmd } : {};
 
     if (!this.active) {

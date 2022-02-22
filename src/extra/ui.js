@@ -19,11 +19,11 @@ Bootstrap.registerPlugin("ui", {
   listen: ["fullscreen"],
 
   markup: function (three, theme, style) {
-    var url =
+    let url =
       "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css";
     if (location.href.match(/^file:\/\//)) url = "http://" + url;
 
-    var buttons = [];
+    const buttons = [];
 
     if (three.Fullscreen) {
       buttons.push(
@@ -51,17 +51,17 @@ Bootstrap.registerPlugin("ui", {
   },
 
   install: function (three) {
-    var ui = (this.ui = document.createElement("div"));
+    const ui = (this.ui = document.createElement("div"));
     ui.innerHTML = this.markup(three, this.options.theme, this.options.style);
     document.body.appendChild(ui);
 
-    var fullscreen = (this.ui.fullscreen =
+    const fullscreen = (this.ui.fullscreen =
       ui.querySelector("button.fullscreen"));
     if (fullscreen) {
       three.bind([fullscreen, "click:goFullscreen"], this);
     }
 
-    var vr = (this.ui.vr = ui.querySelector("button.vr"));
+    const vr = (this.ui.vr = ui.querySelector("button.vr"));
     if (vr && three.VR) {
       three.VR.set({ mode: "2d" });
       three.bind([vr, "click:goVR"], this);

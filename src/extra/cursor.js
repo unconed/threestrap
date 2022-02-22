@@ -38,7 +38,7 @@ Bootstrap.registerPlugin("cursor", {
   },
 
   update: function (event, three) {
-    var delta = (three.Time && three.Time.delta) || 1 / 60;
+    const delta = (three.Time && three.Time.delta) || 1 / 60;
 
     if (this.options.hide) {
       this.timeout -= delta;
@@ -54,7 +54,7 @@ Bootstrap.registerPlugin("cursor", {
   },
 
   applyCursor: function (three, cursor) {
-    var auto = three.controls ? "move" : "";
+    const auto = three.controls ? "move" : "";
     cursor = cursor || this.options.cursor || auto;
     if (this.hide) cursor = "none";
     if (this.cursor != cursor) {
