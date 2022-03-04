@@ -2,11 +2,11 @@
 
 describe("vr", function () {
   it("adds vr api", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "scene", "camera", "vr"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     // Fire window.onload
     three.plugins.vr.load({}, three);
@@ -21,17 +21,17 @@ describe("vr", function () {
   });
 
   it("fires vr event", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "scene", "camera", "vr"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     // Fire window.onload
     three.plugins.vr.load({}, three);
 
-    var called = 0;
-    var handler = function () {
+    let called = 0;
+    const handler = function () {
       called++;
     };
     three.on("vr", handler);

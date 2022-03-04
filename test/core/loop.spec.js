@@ -2,14 +2,14 @@
 
 describe("loop", function () {
   it("installs start/stop methods", function () {
-    var options = {
+    const options = {
       plugins: ["loop"],
       loop: {
         start: false,
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.Loop.start.call).toBeTruthy();
     expect(three.Loop.stop.call).toBeTruthy();
@@ -18,17 +18,17 @@ describe("loop", function () {
   });
 
   it("starts and stops", function (cb) {
-    var options = {
+    const options = {
       plugins: ["loop"],
       loop: {
         start: false,
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var started = false;
-    var stopped = false;
+    let started = false;
+    let stopped = false;
 
     three.on("start", function () {
       started = true;
@@ -63,19 +63,19 @@ describe("loop", function () {
   });
 
   it("loops correctly", function (cb) {
-    var pre, update, render, post, three;
+    let pre, update, render, post, three;
 
     function stall(val) {
-      var k,
+      let k,
         i = 0;
-      var delay = 10;
+      const delay = 10;
       while (+new Date() <= val + delay) {
         k = ++i * ++i * ++i * ++i * ++i;
       }
     }
 
     runs(function () {
-      var options = {
+      const options = {
         init: false,
         plugins: ["bind", "loop"],
       };

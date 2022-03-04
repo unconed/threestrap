@@ -2,12 +2,12 @@
 
 describe("three", function () {
   it("initializes and destroys once", function () {
-    var options = {
+    const options = {
       init: false,
       plugins: [],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(false);
 
@@ -20,7 +20,7 @@ describe("three", function () {
 
     expect(three.__destroyed).toEqual(true);
 
-    var called = false;
+    let called = false;
     three.on("ready", function () {
       called = true;
     });
@@ -29,12 +29,12 @@ describe("three", function () {
   });
 
   it("autoinits", function () {
-    var options = {
+    const options = {
       init: true,
       plugins: [],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
 
@@ -42,16 +42,16 @@ describe("three", function () {
   });
 
   it("installs in an element", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: true,
       plugins: [],
       element: element,
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -62,15 +62,15 @@ describe("three", function () {
   });
 
   it("installs in an element (shorthand)", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: true,
       plugins: [],
     };
 
-    var three = new Threestrap.Bootstrap(element, options);
+    const three = new Threestrap.Bootstrap(element, options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -81,17 +81,17 @@ describe("three", function () {
   });
 
   it("installs in an element (selector)", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     element.setAttribute("id", "watwatwatselector");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: true,
       plugins: [],
       element: "#watwatwatselector",
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.__inited).toEqual(true);
     expect(three.element).toEqual(element);
@@ -102,14 +102,14 @@ describe("three", function () {
   });
 
   it("fires a ready event", function () {
-    var ready = 0;
+    let ready = 0;
 
-    var options = {
+    const options = {
       init: false,
       plugins: [],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
     three.on("ready", function () {
       ready++;
     });
@@ -126,15 +126,15 @@ describe("three", function () {
   });
 
   it("adds/removes handlers", function () {
-    var update = 0;
+    let update = 0;
 
-    var options = {
+    const options = {
       init: false,
       plugins: [],
     };
 
-    var three = new Threestrap.Bootstrap(options);
-    var cb;
+    const three = new Threestrap.Bootstrap(options);
+    let cb;
     three.on(
       "update",
       (cb = function () {
@@ -163,7 +163,7 @@ describe("three", function () {
   });
 
   it("installs/uninstall a plugin", function () {
-    var spec = {
+    const spec = {
       install: function () {},
       uninstall: function () {},
       bind: function () {},
@@ -173,17 +173,17 @@ describe("three", function () {
     spyOn(spec, "install");
     spyOn(spec, "uninstall");
 
-    var mock = function () {};
+    const mock = function () {};
     mock.prototype = spec;
 
-    var options = {
+    const options = {
       init: false,
       plugins: ["mock"],
       plugindb: { mock: mock },
       aliasdb: {},
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
 
@@ -198,7 +198,7 @@ describe("three", function () {
   });
 
   it("installs/uninstall an aliased plugin", function () {
-    var spec = {
+    const spec = {
       install: function () {},
       uninstall: function () {},
       bind: function () {},
@@ -208,10 +208,10 @@ describe("three", function () {
     spyOn(spec, "install");
     spyOn(spec, "uninstall");
 
-    var mock = function () {};
+    const mock = function () {};
     mock.prototype = spec;
 
-    var options = {
+    const options = {
       init: false,
       aliases: { core: ["mock"] },
       plugins: ["core", "mock:mock2"],
@@ -219,7 +219,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
 
@@ -234,8 +234,8 @@ describe("three", function () {
   });
 
   it("hot swaps a plugin", function () {
-    var ready = false;
-    var spec = {
+    let ready = false;
+    const spec = {
       install: function (three) {
         three.on("ready", function () {
           ready = true;
@@ -249,16 +249,16 @@ describe("three", function () {
     spyOn(spec, "install").andCallThrough();
     spyOn(spec, "uninstall");
 
-    var mock = function () {};
+    const mock = function () {};
     mock.prototype = spec;
 
-    var options = {
+    const options = {
       plugins: [],
       plugindb: { mock: mock },
       aliasdb: {},
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(spec.install.calls.length).toEqual(0);
     expect(ready).toBe(false);
@@ -277,8 +277,8 @@ describe("three", function () {
   });
 
   it("expands aliases recursively", function () {
-    var installed = [0, 0, 0, 0];
-    var spec = function (key) {
+    const installed = [0, 0, 0, 0];
+    const spec = function (key) {
       return {
         install: function () {
           installed[key]++;
@@ -289,17 +289,17 @@ describe("three", function () {
       };
     };
 
-    var mock1 = function () {};
-    var mock2 = function () {};
-    var mock3 = function () {};
-    var mock4 = function () {};
+    const mock1 = function () {};
+    const mock2 = function () {};
+    const mock3 = function () {};
+    const mock4 = function () {};
 
     mock1.prototype = spec(0);
     mock2.prototype = spec(1);
     mock3.prototype = spec(2);
     mock4.prototype = spec(3);
 
-    var options = {
+    const options = {
       plugins: ["foo", "bar"],
       plugindb: { mock1: mock1, mock2: mock2, mock3: mock3, mock4: mock4 },
       aliasdb: {
@@ -309,7 +309,7 @@ describe("three", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(installed[0]).toEqual(1);
     expect(installed[1]).toEqual(1);
@@ -320,7 +320,7 @@ describe("three", function () {
   });
 
   it("doesn't allow circular aliases", function () {
-    var options = {
+    const options = {
       plugins: ["foo"],
       plugindb: {},
       aliasdb: {
@@ -329,9 +329,9 @@ describe("three", function () {
       },
     };
 
-    var caught = false;
+    let caught = false;
     try {
-      var three = new Threestrap.Bootstrap(options);
+      const three = new Threestrap.Bootstrap(options);
     } catch (e) {
       caught = true;
     }
@@ -340,8 +340,8 @@ describe("three", function () {
   });
 
   it("expands custom aliases", function () {
-    var installed = [0, 0, 0, 0];
-    var spec = function (key) {
+    const installed = [0, 0, 0, 0];
+    const spec = function (key) {
       return {
         install: function () {
           installed[key]++;
@@ -352,17 +352,17 @@ describe("three", function () {
       };
     };
 
-    var mock1 = function () {};
-    var mock2 = function () {};
-    var mock3 = function () {};
-    var mock4 = function () {};
+    const mock1 = function () {};
+    const mock2 = function () {};
+    const mock3 = function () {};
+    const mock4 = function () {};
 
     mock1.prototype = spec(0);
     mock2.prototype = spec(1);
     mock3.prototype = spec(2);
     mock4.prototype = spec(3);
 
-    var options = {
+    const options = {
       plugins: ["foo", "bar"],
       plugindb: { mock1: mock1, mock2: mock2, mock3: mock3, mock4: mock4 },
       aliases: {
@@ -374,7 +374,7 @@ describe("three", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(installed[0]).toEqual(1);
     expect(installed[1]).toEqual(1);
@@ -385,21 +385,21 @@ describe("three", function () {
   });
 
   it("passed on plugin options", function () {
-    var captured = false;
+    let captured = false;
 
-    var spec = {
+    const spec = {
       install: function () {},
       uninstall: function () {},
       bind: function () {},
       unbind: function () {},
     };
 
-    var mock = function (options) {
+    const mock = function (options) {
       captured = options;
     };
     mock.prototype = spec;
 
-    var options = {
+    const options = {
       init: false,
       mock: {
         foo: "bar",
@@ -409,7 +409,7 @@ describe("three", function () {
       aliasdb: {},
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.init();
 
@@ -419,7 +419,7 @@ describe("three", function () {
   });
 
   it("autoinits core", function () {
-    var three = new Threestrap.Bootstrap();
+    const three = new Threestrap.Bootstrap();
 
     expect(three.__inited).toEqual(true);
 

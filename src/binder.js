@@ -9,7 +9,7 @@ export class Binder {
       }
 
       // Set base target
-      var fallback = context;
+      let fallback = context;
 
       if (Array.isArray(key)) {
         fallback = key[0];
@@ -17,16 +17,16 @@ export class Binder {
       }
 
       // Match key
-      var match = /^([^.:]*(?:\.[^.:]+)*)?(?::(.*))?$/.exec(key);
-      var path = match[1].split(/\./g);
+      const match = /^([^.:]*(?:\.[^.:]+)*)?(?::(.*))?$/.exec(key);
+      const path = match[1].split(/\./g);
 
-      var name = path.pop();
-      var dest = match[2] || name;
+      const name = path.pop();
+      const dest = match[2] || name;
 
       // Whitelisted objects
-      var selector = path.shift();
+      const selector = path.shift();
 
-      var target =
+      let target =
         {
           this: object,
         }[selector] ||
@@ -41,7 +41,7 @@ export class Binder {
 
       // Attach event handler at last level
       if (target && (target.on || target.addEventListener)) {
-        var callback = function (event) {
+        const callback = function (event) {
           object[dest] && object[dest](event, context);
         };
 
@@ -51,7 +51,7 @@ export class Binder {
         });
 
         // Store bind for removal later
-        var bind = { target: target, name: name, callback: callback };
+        const bind = { target: target, name: name, callback: callback };
         object.__binds.push(bind);
 
         // Return callback
@@ -107,14 +107,14 @@ export class Binder {
   static _trigger(event) {
     if (this._listeners === undefined) return;
 
-    var type = event.type;
-    var listeners = this._listeners[type];
+    const type = event.type;
+    let listeners = this._listeners[type];
     if (listeners !== undefined) {
       listeners = listeners.slice();
-      var length = listeners.length;
+      const length = listeners.length;
 
       event.target = this;
-      for (var i = 0; i < length; i++) {
+      for (let i = 0; i < length; i++) {
         // add original target as parameter for convenience
         listeners[i].call(this, event, this);
       }

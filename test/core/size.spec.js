@@ -2,12 +2,12 @@
 
 describe("size", function () {
   it("fits the canvas in an element", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     element.style.width = "451px";
     element.style.height = "251px";
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       element: element,
       plugins: ["bind", "renderer", "size"],
       size: {
@@ -15,9 +15,9 @@ describe("size", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var canvas = three.renderer.domElement;
+    const canvas = three.renderer.domElement;
 
     expect(canvas.width).toBe(451);
     expect(canvas.height).toBe(251);
@@ -28,7 +28,7 @@ describe("size", function () {
   });
 
   it("applies width, height, scale", function () {
-    var options = {
+    const options = {
       init: false,
       size: {
         width: 230,
@@ -39,9 +39,9 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var h;
+    let h;
     three.on(
       "resize",
       (h = function (event) {
@@ -63,7 +63,7 @@ describe("size", function () {
   });
 
   it("applies devicepixelratio", function () {
-    var options = {
+    const options = {
       init: false,
       plugins: ["bind", "renderer", "size"],
       size: {
@@ -76,7 +76,7 @@ describe("size", function () {
     dpr = window.devicePixelRatio;
     window.devicePixelRatio = 2;
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.renderWidth).toBe(600);
@@ -93,7 +93,7 @@ describe("size", function () {
   });
 
   it("caps resolution while retaining aspect tall", function () {
-    var options = {
+    const options = {
       init: false,
       plugins: ["bind", "renderer", "size"],
       size: {
@@ -105,7 +105,7 @@ describe("size", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.renderWidth).toBe(200);
@@ -118,7 +118,7 @@ describe("size", function () {
   });
 
   it("applies width, height, scale, aspect wide", function () {
-    var options = {
+    const options = {
       init: false,
       size: {
         width: 500,
@@ -130,7 +130,7 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.viewWidth).toBe(500);
@@ -146,7 +146,7 @@ describe("size", function () {
   });
 
   it("applies width, height, scale, aspect tall", function () {
-    var options = {
+    const options = {
       init: false,
       size: {
         width: 500,
@@ -158,7 +158,7 @@ describe("size", function () {
       plugins: ["bind", "renderer", "size"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.on("resize", function (event) {
       expect(event.viewWidth).toBe(400);
@@ -174,12 +174,12 @@ describe("size", function () {
   });
 
   it("changes on set", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     element.style.width = "451px";
     element.style.height = "251px";
     document.body.appendChild(element);
 
-    var options = {
+    let options = {
       element: element,
       plugins: ["bind", "renderer", "size"],
       size: {
@@ -188,9 +188,9 @@ describe("size", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var called = false;
+    let called = false;
     three.on("resize", function (event) {
       expect(event.viewWidth).toBe(500);
       expect(event.viewHeight).toBe(400);

@@ -2,12 +2,12 @@
 
 describe("renderer", function () {
   it("installs the canvas into the body", function () {
-    var options = {
+    const options = {
       init: false,
       plugins: ["renderer"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelectorAll("canvas").length).toBe(0);
 
@@ -24,16 +24,16 @@ describe("renderer", function () {
   });
 
   it("installs the canvas into an element", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: false,
       element: element,
       plugins: ["renderer"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelectorAll("canvas").length).toBe(0);
 
@@ -52,19 +52,19 @@ describe("renderer", function () {
   });
 
   it("calls renderer setSize", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: false,
       element: element,
       plugins: ["renderer"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var called = 0;
-    var callback = function () {
+    let called = 0;
+    const callback = function () {
       called++;
     };
 
@@ -86,19 +86,19 @@ describe("renderer", function () {
   });
 
   it("calls renderer setSize and setRenderSize", function () {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       init: false,
       element: element,
       plugins: ["renderer"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
-    var called = 0;
-    var callback = function () {
+    let called = 0;
+    const callback = function () {
       called++;
     };
 

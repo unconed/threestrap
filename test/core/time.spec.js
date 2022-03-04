@@ -3,7 +3,7 @@
 describe("time", function () {
   function stall(val, delay) {
     delay = delay || 0;
-    var k,
+    let k,
       i = 0;
     while (+new Date() / 1000 <= val + delay) {
       k = ++i * ++i * ++i * ++i * ++i;
@@ -11,11 +11,11 @@ describe("time", function () {
   }
 
   it("installs time values", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "time"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.Time.now !== undefined).toBeTruthy();
     expect(three.Time.clock !== undefined).toBeTruthy();
@@ -32,14 +32,14 @@ describe("time", function () {
   it("measures delta / fps correctly", function (cb) {
     var pre, update, render, post, three;
 
-    var options = {
+    const options = {
       plugins: ["bind", "time"],
     };
 
     var three = new Threestrap.Bootstrap(options);
-    var fps = 60;
-    var delta = 1 / fps;
-    var frames = 5;
+    const fps = 60;
+    const delta = 1 / fps;
+    const frames = 5;
 
     three.trigger({ type: "pre" });
 
@@ -47,7 +47,7 @@ describe("time", function () {
 
     three.trigger({ type: "pre" });
 
-    for (var i = 0; i < frames - 1; ++i) {
+    for (let i = 0; i < frames - 1; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: "pre" });
     }
@@ -74,37 +74,37 @@ describe("time", function () {
   it("clock runs at half speed", function (cb) {
     var pre, update, render, post, three;
 
-    var RATIO = 1 / 2;
+    const RATIO = 1 / 2;
 
-    var options = {
+    const options = {
       plugins: ["bind", "time"],
       time: { speed: RATIO },
     };
 
     var three = new Threestrap.Bootstrap(options);
-    var frames = 5;
-    var fps = 60;
-    var delta = 1 / fps;
+    const frames = 5;
+    const fps = 60;
+    const delta = 1 / fps;
 
     three.trigger({ type: "pre" });
 
-    var start = three.Time.now;
+    const start = three.Time.now;
 
-    for (var i = 0; i < frames; ++i) {
+    for (let i = 0; i < frames; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: "pre" });
     }
 
-    var nowTime = three.Time.now - start;
-    var realTime = three.Time.time;
-    var clockTime = three.Time.clock;
+    const nowTime = three.Time.now - start;
+    const realTime = three.Time.time;
+    const clockTime = three.Time.clock;
 
     expect(nowTime).toBeGreaterThan(0);
     expect(realTime).toBeGreaterThan(0);
     expect(clockTime).toBeGreaterThan(0);
 
-    var ratio = clockTime / realTime / RATIO;
-    var diff = 1.0 - Math.min(ratio, 1 / ratio);
+    const ratio = clockTime / realTime / RATIO;
+    const diff = 1.0 - Math.min(ratio, 1 / ratio);
     expect(diff).toBeLessThan(0.05);
 
     expect(Math.abs(1.0 / three.Time.step - fps / RATIO)).toBeLessThan(5);
@@ -115,28 +115,28 @@ describe("time", function () {
   it("clock waits N frames then starts from 0", function (cb) {
     var pre, update, render, post, three;
 
-    var delay = 5;
+    const delay = 5;
 
-    var options = {
+    const options = {
       plugins: ["bind", "time"],
       time: { warmup: delay },
     };
 
     var three = new Threestrap.Bootstrap(options);
-    var frames = delay;
-    var fps = 60;
-    var delta = 1 / fps;
+    const frames = delay;
+    const fps = 60;
+    const delta = 1 / fps;
 
     three.trigger({ type: "pre" });
 
-    var start = three.Time.clock;
+    const start = three.Time.clock;
 
-    for (var i = 0; i < frames; ++i) {
+    for (let i = 0; i < frames; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: "pre" });
     }
 
-    var clockTime = three.Time.clock;
+    let clockTime = three.Time.clock;
 
     expect(clockTime).toBe(0);
 
@@ -154,29 +154,29 @@ describe("time", function () {
   it("clock ignores frames longer than timeout", function (cb) {
     var pre, update, render, post, three;
 
-    var delay = 5 / 60;
+    const delay = 5 / 60;
 
-    var options = {
+    const options = {
       plugins: ["bind", "time"],
       time: { timeout: delay },
     };
 
     var three = new Threestrap.Bootstrap(options);
-    var frames = 3;
-    var fps = 60;
-    var delta = 1 / fps;
+    const frames = 3;
+    const fps = 60;
+    const delta = 1 / fps;
 
-    for (var i = 0; i < frames; ++i) {
+    for (let i = 0; i < frames; ++i) {
       stall(three.Time.now, delta);
       three.trigger({ type: "pre" });
     }
 
-    var start = three.Time.clock;
+    const start = three.Time.clock;
 
     stall(three.Time.now, delay);
     three.trigger({ type: "pre" });
 
-    var clockTime = three.Time.clock;
+    let clockTime = three.Time.clock;
 
     expect(clockTime - start).toBe(0);
 

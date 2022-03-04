@@ -2,7 +2,7 @@
 
 describe("fallback", function () {
   it("displays a fallback, halts install, and cleans up on uninstall", function () {
-    var options = {
+    const options = {
       plugins: ["fallback", "renderer"],
       fallback: {
         force: true,
@@ -12,17 +12,17 @@ describe("fallback", function () {
       },
     };
 
-    var getNode = function () {
+    const getNode = function () {
       return document.querySelector(".threestrap-wat");
     };
-    var getSpan = function () {
+    const getSpan = function () {
       return document.querySelector(".threestrap-wat span.wat");
     };
 
     expect(getNode()).toBe(null);
     expect(getSpan()).toBe(null);
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     node = getNode();
     expect(node).toBeTruthy();
@@ -38,12 +38,12 @@ describe("fallback", function () {
   });
 
   it("installs the fill plugin on failure", function () {
-    var options = {
+    const options = {
       plugins: ["fallback", "renderer"],
       fallback: { force: true },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.plugins.fill).toBeTruthy();
     expect(three.renderer).toBeFalsy();
@@ -52,11 +52,11 @@ describe("fallback", function () {
   });
 
   it("doesn't interfere", function () {
-    var options = {
+    const options = {
       plugins: ["fallback", "renderer"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.fallback).toBe(false);
 

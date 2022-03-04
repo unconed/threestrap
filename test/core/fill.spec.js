@@ -9,13 +9,13 @@ describe("fill", function () {
       );
     }
 
-    var options = {
+    const options = {
       plugins: ["fill"],
     };
 
     expect(test()).toBe(false);
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 
@@ -26,17 +26,17 @@ describe("fill", function () {
 
   it("makes the canvas a block element", function () {
     function test() {
-      let canvas = document.querySelector("canvas");
+      const canvas = document.querySelector("canvas");
       return canvas && canvas.style.display == "block";
     }
 
-    var options = {
+    const options = {
       plugins: ["renderer", "fill"],
     };
 
     expect(test()).toBeFalsy();
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 
@@ -47,21 +47,21 @@ describe("fill", function () {
 
   it("makes the containing element have layout", function () {
     function test() {
-      let canvas = document.querySelector("canvas");
+      const canvas = document.querySelector("canvas");
       return canvas && canvas.parentNode.style.position == "relative";
     }
 
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.appendChild(element);
 
-    var options = {
+    const options = {
       plugins: ["renderer", "fill"],
       element: element,
     };
 
     expect(test()).toBeFalsy();
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(test()).toBe(true);
 
