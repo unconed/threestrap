@@ -2,11 +2,11 @@ import * as THREE from "three";
 
 describe("render", function () {
   it("renders the scene on update", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "render"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.scene = new THREE.Scene();
     three.camera = new THREE.PerspectiveCamera();

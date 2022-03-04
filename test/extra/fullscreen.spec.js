@@ -2,11 +2,11 @@
 
 describe("fullscreen", function () {
   it("adds fullscreen api", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "fullscreen"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.Fullscreen).toBeTruthy();
     expect(three.Fullscreen.toggle).toBeTruthy();

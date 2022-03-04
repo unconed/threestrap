@@ -2,7 +2,7 @@
 
 describe("plugin", function () {
   it("registers a plugin", function () {
-    var spec = {};
+    const spec = {};
 
     expect(Threestrap.Bootstrap.Plugins.mockp1).toBeFalsy();
 
@@ -18,9 +18,9 @@ describe("plugin", function () {
   });
 
   it("sets defaults", function () {
-    var captured = {};
+    let captured = {};
 
-    var spec = {
+    const spec = {
       install: function () {
         captured = this.options;
       },
@@ -32,7 +32,7 @@ describe("plugin", function () {
 
     Threestrap.Bootstrap.registerPlugin("mockp2", spec);
 
-    var options = {
+    const options = {
       init: false,
       mockp2: {
         foo: "baz",
@@ -40,7 +40,7 @@ describe("plugin", function () {
       plugins: ["mockp2"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     three.init();
 

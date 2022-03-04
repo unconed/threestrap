@@ -2,20 +2,20 @@
 
 describe("warmup", function () {
   it("hides canvas", function () {
-    var n = 3;
+    const n = 3;
 
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "warmup"],
       warmup: {
         delay: n,
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.renderer.domElement.style.visibility).toBe("hidden");
 
-    for (var i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) {
       three.trigger({ type: "pre" });
       three.trigger({ type: "post" });
       expect(three.renderer.domElement.style.visibility).toBe("hidden");

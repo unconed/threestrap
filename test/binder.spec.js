@@ -2,11 +2,11 @@
 
 describe("binder", function () {
   it("binds/unbinds events", function () {
-    var ready = 0;
-    var foo = 0;
-    var wtf = 0;
+    let ready = 0;
+    let foo = 0;
+    let wtf = 0;
 
-    var context = {};
+    const context = {};
     THREE.Binder.apply(context);
 
     var object = {
@@ -32,8 +32,8 @@ describe("binder", function () {
     };
     THREE.Binder.apply(object);
 
-    var bind = THREE.Binder.bind(context, {});
-    var unbind = THREE.Binder.unbind(context);
+    const bind = THREE.Binder.bind(context, {});
+    const unbind = THREE.Binder.unbind(context);
 
     _.each(object.listen, function (key) {
       bind(key, object);
@@ -63,9 +63,9 @@ describe("binder", function () {
   });
 
   it("binds/unbinds once events", function () {
-    var ready = 0;
+    let ready = 0;
 
-    var context = {};
+    const context = {};
     THREE.Binder.apply(context);
 
     var object = {
@@ -79,8 +79,8 @@ describe("binder", function () {
     };
     THREE.Binder.apply(object);
 
-    var bind = THREE.Binder.bind(context, {});
-    var unbind = THREE.Binder.unbind(context);
+    const bind = THREE.Binder.bind(context, {});
+    const unbind = THREE.Binder.unbind(context);
 
     _.each(object.listen, function (key) {
       bind(key, object);

@@ -2,8 +2,8 @@
 
 describe("controls", function () {
   it("install controls", function () {
-    var captured = false;
-    var klass = function (object, domElement) {
+    let captured = false;
+    const klass = function (object, domElement) {
       expect(object instanceof THREE.Camera).toBe(true);
       expect(domElement.tagName).toBe("CANVAS");
     };
@@ -13,7 +13,7 @@ describe("controls", function () {
       },
     };
 
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "camera", "controls"],
       controls: {
         klass: klass,
@@ -23,7 +23,7 @@ describe("controls", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.controls instanceof klass).toBe(true);
 
@@ -37,14 +37,14 @@ describe("controls", function () {
   });
 
   it("responds to camera changes", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "camera", "controls"],
       controls: {
         klass: THREE.OrbitControls,
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.controls.object).toBe(three.camera);
 

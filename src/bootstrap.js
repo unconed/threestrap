@@ -12,7 +12,7 @@ export class Bootstrap {
   }
 
   static registerPlugin(name, spec) {
-    var ctor = function (options) {
+    const ctor = function (options) {
       Bootstrap.Plugin.call(this, options);
       this.__name = name;
     };
@@ -78,7 +78,7 @@ export class Bootstrap {
     this.__installed = [];
 
     // Query element
-    var element = this.__options.element;
+    let element = this.__options.element;
     if (element === "" + element) {
       element = document.querySelector(element);
     }
@@ -128,12 +128,12 @@ export class Bootstrap {
     plugins = Array.isArray(plugins) ? plugins : [plugins];
 
     // Resolve alias database
-    var o = this.__options;
-    var aliases = Object.assign({}, o.aliasdb, o.aliases);
+    const o = this.__options;
+    const aliases = Object.assign({}, o.aliasdb, o.aliases);
 
     // Remove inline alias defs from plugins
-    var pred = function (name) {
-      var key = name.split(":");
+    const pred = function (name) {
+      const key = name.split(":");
       if (!key[1]) return true;
       aliases[key[0]] = [key[1]];
       return false;
@@ -150,7 +150,7 @@ export class Bootstrap {
       if (level >= 256) throw "Plug-in alias recursion detected.";
       list = list.filter(pred);
       list.forEach(function (name) {
-        var alias = aliases[name];
+        const alias = aliases[name];
         if (!alias) {
           out.push(name);
         } else {
@@ -192,7 +192,7 @@ export class Bootstrap {
 
   __install(name) {
     // Sanity check
-    var ctor = this.__options.plugindb[name];
+    const ctor = this.__options.plugindb[name];
     if (!ctor)
       throw "[three.install] Cannot install. '" + name + "' is not registered.";
 
@@ -200,8 +200,8 @@ export class Bootstrap {
       return console.warn("[three.install] " + name + " is already installed.");
 
     // Construct
-    var Plugin = ctor;
-    var plugin = new Plugin(this.__options[name] || {}, name);
+    const Plugin = ctor;
+    const plugin = new Plugin(this.__options[name] || {}, name);
     this.plugins[name] = plugin;
 
     // Install

@@ -1,10 +1,10 @@
 export class Api {
   static apply(object) {
     object.set = function (options) {
-      var o = this.options || {};
+      const o = this.options || {};
 
       // Diff out changes
-      var changes = Object.entries(options).reduce(function (
+      const changes = Object.entries(options).reduce(function (
         result,
         [key, value]
       ) {

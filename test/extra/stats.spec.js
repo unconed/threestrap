@@ -2,13 +2,13 @@
 
 describe("stats", function () {
   it("adds stats to the dom", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "stats"],
     };
 
     expect(document.querySelector("#stats")).toBeFalsy();
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(document.querySelector("#stats")).toBeTruthy();
 

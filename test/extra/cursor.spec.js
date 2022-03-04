@@ -2,7 +2,7 @@
 
 describe("cursor", function () {
   it("sets and autohides the cursor", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "camera", "cursor"],
       cursor: {
         hide: true,
@@ -11,7 +11,7 @@ describe("cursor", function () {
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.element.style.cursor).toBe("pointer");
 
@@ -39,14 +39,14 @@ describe("cursor", function () {
   });
 
   it("sets the cursor contextually", function () {
-    var options = {
+    const options = {
       plugins: ["bind", "renderer", "camera", "controls", "cursor"],
       controls: {
         klass: THREE.OrbitControls,
       },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.element.style.cursor).toBe("move");
 

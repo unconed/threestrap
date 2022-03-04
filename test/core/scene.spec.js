@@ -2,11 +2,11 @@
 
 describe("scene", function () {
   it("makes a scene", function () {
-    var options = {
+    const options = {
       plugins: ["scene"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
 
     expect(three.scene instanceof THREE.Scene).toBe(true);
 
