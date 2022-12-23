@@ -1,5 +1,4 @@
 const gulp = require("gulp");
-const eslint = require("gulp-eslint");
 const compiler = require("webpack");
 const webpack = require("webpack-stream");
 const watch = require("gulp-watch");
@@ -23,17 +22,6 @@ gulp.task("pack", function () {
       })
     )
     .pipe(gulp.dest("build/"));
-});
-
-gulp.task("lint", function () {
-  return (
-    gulp
-      // Define the source files
-      .src("src/**/*.js")
-      .pipe(eslint({}))
-      // Output the results in the console
-      .pipe(eslint.format())
-  );
 });
 
 gulp.task("karma", function (done) {
