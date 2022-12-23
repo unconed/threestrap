@@ -16,8 +16,7 @@ Bootstrap.registerPlugin("stats", {
   },
 
   uninstall: function (three) {
-    document.body.removeChild(this.stats.domElement);
-
+    this.stats.domElement.remove()
     delete three.stats;
   },
 
