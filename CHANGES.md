@@ -1,7 +1,7 @@
 ## Changes
 
 ### 0.5.0
-- THREE.js is no longer includeed in the build output and must be included separately. [#26](https://github.com/unconed/threestrap/pull/26)
+- THREE.js is no longer included in the build output and must be included separately. [#26](https://github.com/unconed/threestrap/pull/26)
 - Fixed stats plugin throwing an error on destroy() if mounted in a non-body element [#25](https://github.com/unconed/threestrap/pull/25)
 
 ### 0.0.12-dev
