@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../src";
 
 describe("api", function () {
   it("sends change events", function () {
@@ -9,8 +9,8 @@ describe("api", function () {
       api = this.api({});
     };
 
-    THREE.Binder.apply(klass.prototype);
-    THREE.Api.apply(klass.prototype);
+    Threestrap.Binder.apply(klass.prototype);
+    Threestrap.Api.apply(klass.prototype);
 
     const o = new klass();
     o.on("change", function (event) {

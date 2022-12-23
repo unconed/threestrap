@@ -20,15 +20,17 @@
     "three": ">=0.118.0"
   },
   "scripts": {
-    "build": "webpack --mode=production",
+    "build": "webpack --mode=production --config-name=threestrap",
     "lint": "eslint src/**/*.js",
-    "test": "gulp test"
+    "test": "webpack --config-name=tests && karma start"
   },
   "prettier": {},
   "devDependencies": {
+    "@types/glob": "^8.0.0",
     "@types/node": "^18.11.17",
     "eslint": "^7.28.0",
     "eslint-plugin-jasmine": "^4.1.2",
+    "glob": "^8.0.3",
     "gulp": "^4.0.2",
     "jasmine-core": "^3.7.1",
     "karma": "^6.3.3",

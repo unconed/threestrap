@@ -11,7 +11,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // Defined by gulp
+      "build_tests/tests.js"
     ],
 
     // list of files to exclude
