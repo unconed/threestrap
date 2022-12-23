@@ -7,7 +7,7 @@
 		exports["Threestrap"] = factory(require("THREE"));
 	else
 		root["Threestrap"] = factory(root["THREE"]);
-})(self, function(__WEBPACK_EXTERNAL_MODULE__428__) {
+})(self, (__WEBPACK_EXTERNAL_MODULE__824__) => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -23,11 +23,11 @@ b.fillRect(d,m,n,p);b.fillStyle=l;b.globalAlpha=.9;b.fillRect(d,m,n,p);return{do
 
 /***/ }),
 
-/***/ 428:
+/***/ 824:
 /***/ ((module) => {
 
 "use strict";
-module.exports = __WEBPACK_EXTERNAL_MODULE__428__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__824__;
 
 /***/ })
 
@@ -164,7 +164,7 @@ class Api {
 }
 
 // EXTERNAL MODULE: external "THREE"
-var external_THREE_ = __webpack_require__(428);
+var external_THREE_ = __webpack_require__(824);
 ;// CONCATENATED MODULE: ./src/binder.js
 
 

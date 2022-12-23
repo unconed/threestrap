@@ -1,5 +1,6 @@
-const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
+import * as path from "node:path"
+import TerserPlugin from 'terser-webpack-plugin'
+import type { Configuration } from "webpack"
 
 const LIBRARY_NAME = "Threestrap";
 const PATHS = {
@@ -7,7 +8,7 @@ const PATHS = {
   bundles: path.resolve(__dirname, "build"),
 };
 
-const config = {
+const config: Configuration = {
   entry: {
     threestrap: [PATHS.entryPoint],
     "threestrap.min": [PATHS.entryPoint],
@@ -47,4 +48,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config
