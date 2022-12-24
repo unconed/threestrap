@@ -21,6 +21,8 @@
   },
   "scripts": {
     "build": "webpack --mode=production --config-name=threestrap",
+    "dev": "webpack --mode=development --watch --config-name=threestrap",
+    "prepack": "npm run build",
     "lint": "eslint src/**/*.js",
     "test": "webpack --config-name=tests && karma start"
   },
