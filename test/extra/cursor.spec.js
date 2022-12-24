@@ -39,7 +39,7 @@ describe("cursor", function () {
     three.destroy();
   });
 
-  fit("sets the cursor contextually", function () {
+  it("sets the cursor contextually", function () {
     const options = {
       plugins: ["bind", "renderer", "camera", "controls", "cursor"],
       controls: {
