@@ -1,4 +1,5 @@
-/* global THREE */
+import * as Threestrap from "../../src"
+import * as THREE from "three" 
 
 describe("controls", function () {
   it("install controls", function () {

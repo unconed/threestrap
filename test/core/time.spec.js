@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("time", function () {
   function stall(val, delay) {

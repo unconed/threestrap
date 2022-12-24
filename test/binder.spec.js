@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../src"
 
 describe("binder", function () {
   it("binds/unbinds events", function () {
@@ -7,9 +7,9 @@ describe("binder", function () {
     let wtf = 0;
 
     const context = {};
-    THREE.Binder.apply(context);
+    Threestrap.Binder.apply(context);
 
-    var object = {
+    const object = {
       listen: ["ready", "this.foo:baz", [context, "wtf"]],
       ready: function (event, _context) {
         expect(event.type).toBe("ready");
@@ -30,14 +30,14 @@ describe("binder", function () {
         wtf++;
       },
     };
-    THREE.Binder.apply(object);
+    Threestrap.Binder.apply(object);
 
-    const bind = THREE.Binder.bind(context, {});
-    const unbind = THREE.Binder.unbind(context);
+    const bind = Threestrap.Binder.bind(context, {});
+    const unbind = Threestrap.Binder.unbind(context);
 
-    _.each(object.listen, function (key) {
+    object.listen.forEach(key => {
       bind(key, object);
-    });
+    })
 
     expect(ready).toBe(0);
     expect(foo).toBe(0);
@@ -66,9 +66,9 @@ describe("binder", function () {
     let ready = 0;
 
     const context = {};
-    THREE.Binder.apply(context);
+    Threestrap.Binder.apply(context);
 
-    var object = {
+    const object = {
       listen: ["ready"],
       ready: function (event, _context) {
         expect(event.type).toBe("ready");
@@ -77,14 +77,14 @@ describe("binder", function () {
         ready++;
       },
     };
-    THREE.Binder.apply(object);
+    Threestrap.Binder.apply(object);
 
-    const bind = THREE.Binder.bind(context, {});
-    const unbind = THREE.Binder.unbind(context);
+    const bind = Threestrap.Binder.bind(context, {});
+    const unbind = Threestrap.Binder.unbind(context);
 
-    _.each(object.listen, function (key) {
+    object.listen.forEach(key => {
       bind(key, object);
-    });
+    })
 
     expect(ready).toBe(0);
 

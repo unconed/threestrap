@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src"
 
 describe("vr", function () {
   it("adds vr api", function () {

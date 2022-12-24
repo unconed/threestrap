@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src"
 
 describe("stats", function () {
   it("adds stats to the dom", function () {

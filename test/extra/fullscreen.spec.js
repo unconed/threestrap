@@ -1,5 +1,4 @@
-/* global THREE */
-
+import * as Threestrap from "../../src"
 describe("fullscreen", function () {
   it("adds fullscreen api", function () {
     const options = {

@@ -1,4 +1,4 @@
-/* global Threestrap */
+import * as Threestrap from "../src";
 
 describe("plugin", function () {
   it("registers a plugin", function () {

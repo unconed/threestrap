@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("loop", function () {
   it("installs start/stop methods", function () {
@@ -17,7 +17,7 @@ describe("loop", function () {
     three.destroy();
   });
 
-  it("starts and stops", function (cb) {
+  it("starts and stops", function () {
     const options = {
       plugins: ["loop"],
       loop: {
@@ -62,7 +62,7 @@ describe("loop", function () {
     three.destroy();
   });
 
-  it("loops correctly", function (cb) {
+  it("loops correctly", function () {
     let pre, update, render, post, three;
 
     function stall(val) {

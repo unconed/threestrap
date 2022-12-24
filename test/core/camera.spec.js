@@ -1,4 +1,6 @@
-/* global THREE */
+import * as Threestrap from "../../src";
+import { OrthographicCamera } from "three/src/cameras/OrthographicCamera.js";
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
 
 describe("camera", function () {
   it("installs a perspective camera", function () {
@@ -13,7 +15,7 @@ describe("camera", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(three.camera instanceof THREE.PerspectiveCamera).toBeTruthy();
+    expect(three.camera instanceof PerspectiveCamera).toBeTruthy();
     expect(three.camera.fov).toEqual(42);
     expect(three.camera.near).toEqual(1);
     expect(three.camera.far).toEqual(2);
@@ -37,7 +39,7 @@ describe("camera", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(three.camera instanceof THREE.OrthographicCamera).toBeTruthy();
+    expect(three.camera instanceof OrthographicCamera).toBeTruthy();
     expect(three.camera.left).toEqual(0);
     expect(three.camera.right).toEqual(1);
     expect(three.camera.top).toEqual(2);
@@ -60,7 +62,7 @@ describe("camera", function () {
       this.near = 0;
       this.far = 0;
     };
-    klass.prototype = new THREE.OrthographicCamera();
+    klass.prototype = new OrthographicCamera();
 
     const options = {
       plugins: ["camera"],
@@ -127,7 +129,7 @@ describe("camera", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(three.camera instanceof THREE.OrthographicCamera).toBeTruthy();
+    expect(three.camera instanceof OrthographicCamera).toBeTruthy();
     expect(three.camera.left).toEqual(0);
     expect(three.camera.right).toEqual(1);
     expect(three.camera.top).toEqual(2);
@@ -151,7 +153,7 @@ describe("camera", function () {
       far: 2,
     });
 
-    expect(three.camera instanceof THREE.PerspectiveCamera).toBeTruthy();
+    expect(three.camera instanceof PerspectiveCamera).toBeTruthy();
     expect(three.camera.fov).toEqual(42);
     expect(three.camera.near).toEqual(1);
     expect(three.camera.far).toEqual(2);

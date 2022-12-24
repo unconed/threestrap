@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../src";
 
 describe("three", function () {
   it("initializes and destroys once", function () {
@@ -331,7 +331,7 @@ describe("three", function () {
 
     let caught = false;
     try {
-      const three = new Threestrap.Bootstrap(options);
+      new Threestrap.Bootstrap(options);
     } catch (e) {
       caught = true;
     }
