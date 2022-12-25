@@ -185,16 +185,16 @@ describe("three", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(spec.install.calls.length).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(0);
 
     three.init();
 
-    expect(spec.uninstall.calls.length).toEqual(0);
-    expect(spec.install.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(1);
 
     three.destroy();
 
-    expect(spec.uninstall.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(1);
   });
 
   it("installs/uninstall an aliased plugin", function () {
@@ -221,16 +221,16 @@ describe("three", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(spec.install.calls.length).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(0);
 
     three.init();
 
-    expect(spec.uninstall.calls.length).toEqual(0);
-    expect(spec.install.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(1);
 
     three.destroy();
 
-    expect(spec.uninstall.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(1);
   });
 
   it("hot swaps a plugin", function () {
@@ -246,7 +246,7 @@ describe("three", function () {
       unbind: function () {},
     };
 
-    spyOn(spec, "install").andCallThrough();
+    spyOn(spec, "install").and.callThrough();
     spyOn(spec, "uninstall");
 
     const mock = function () {};
@@ -260,18 +260,18 @@ describe("three", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    expect(spec.install.calls.length).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(0);
     expect(ready).toBe(false);
 
     three.install("mock");
 
-    expect(spec.uninstall.calls.length).toEqual(0);
-    expect(spec.install.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(0);
+    expect(spec.install.calls.count()).toEqual(1);
     expect(ready).toBe(true);
 
     three.uninstall("mock");
 
-    expect(spec.uninstall.calls.length).toEqual(1);
+    expect(spec.uninstall.calls.count()).toEqual(1);
 
     three.destroy();
   });
