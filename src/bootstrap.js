@@ -5,6 +5,19 @@ function isString(str) {
   return str && typeof str.valueOf() === "string";
 }
 
+/**
+ * Like Array.prototype.forEach, but allows the callback to return false to
+ * abort the loop
+ */
+const each = (array, cb) => {
+  let i = 0;
+  for (const item of array) {
+    const success = cb(item, i, array);
+    if (success === false) break;
+    i++
+  }
+}
+
 export class Bootstrap {
   static initClass() {
     this.Plugins = {};
@@ -170,7 +183,7 @@ export class Bootstrap {
     plugins = this.resolve(plugins);
 
     // Install in order
-    plugins.forEach((name) => this.__install(name));
+    each(plugins, (name) => this.__install(name))
 
     // Fire off ready event
     this.__ready();
