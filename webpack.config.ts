@@ -63,6 +63,7 @@ const configs: Configuration[] = [
     ...umdBase(PATHS.testBundle),
     name: "tests",
     mode: "development",
+    devtool: "eval",
     entry: {
       tests: PATHS.testFiles
     }
