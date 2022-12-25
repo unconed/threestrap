@@ -1,7 +1,8 @@
+import type { Config } from "karma"
 // Karma configuration
 // Generated on Wed Jan 22 2014 23:58:15 GMT-0800 (PST)
 
-module.exports = function (config) {
+const config = (config: Config) => {
   config.set({
     // base path, that will be used to resolve files and exclude
     basePath: "",
@@ -9,7 +10,6 @@ module.exports = function (config) {
     // frameworks to use
     frameworks: ["jasmine"],
 
-    // list of files / patterns to load in the browser
     files: [
       "build_tests/tests.js"
     ],
@@ -52,3 +52,5 @@ module.exports = function (config) {
     singleRun: true,
   });
 };
+
+export default config

@@ -29,6 +29,7 @@
   "prettier": {},
   "devDependencies": {
     "@types/glob": "^8.0.0",
+    "@types/karma": "^6.3.3",
     "@types/node": "^18.11.17",
     "eslint": "^7.28.0",
     "eslint-plugin-jasmine": "^4.1.2",
