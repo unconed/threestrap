@@ -1,5 +1,5 @@
 import * as Threestrap from "../../src";
-import { Scene } from "three";
+import { Scene } from "three/src/scenes/Scene.js";
 
 describe("scene", function () {
   it("makes a scene", function () {
