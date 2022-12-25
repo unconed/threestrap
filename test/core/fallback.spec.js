@@ -24,7 +24,7 @@ describe("fallback", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    node = getNode();
+    const node = getNode();
     expect(node).toBeTruthy();
     expect(getSpan()).toBeTruthy();
 
