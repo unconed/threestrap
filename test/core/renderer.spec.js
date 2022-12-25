@@ -1,5 +1,5 @@
 import * as Threestrap from "../../src";
-import { WebGLRenderer } from "three";
+import { WebGL1Renderer } from "three/src/renderers/WebGL1Renderer.js";
 
 describe("renderer", function () {
   it("installs the canvas into the body", function () {
@@ -16,7 +16,7 @@ describe("renderer", function () {
 
     expect(document.querySelectorAll("canvas").length).toBe(1);
 
-    expect(three.renderer).toEqual(jasmine.any(WebGLRenderer));
+    expect(three.renderer).toEqual(jasmine.any(WebGL1Renderer));
     expect(three.renderer.domElement.parentNode).toEqual(document.body);
 
     three.destroy();
@@ -42,7 +42,7 @@ describe("renderer", function () {
 
     expect(document.querySelectorAll("canvas").length).toBe(1);
 
-    expect(three.renderer).toEqual(jasmine.any(WebGLRenderer));
+    expect(three.renderer).toEqual(jasmine.any(WebGL1Renderer));
     expect(three.renderer.domElement.parentNode).toEqual(element);
 
     three.destroy();
