@@ -187,7 +187,7 @@ export class Bootstrap {
     // Uninstall in reverse order
     (plugins || this.__installed)
       .reverse()
-      .forEach((p) => this.__uninstall(p.__name));
+      .forEach((p) => this.__uninstall(p));
   }
 
   __install(name) {
