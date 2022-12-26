@@ -24,7 +24,7 @@
     "dev": "webpack --mode=development --watch --config-name=threestrap",
     "prepack": "npm run build",
     "lint": "eslint src/**/*.js",
-    "test": "webpack --config-name=tests && karma start"
+    "test": "webpack --config-name=tests && karma start --single-run --browsers=ChromeHeadless"
   },
   "prettier": {},
   "devDependencies": {
@@ -37,7 +37,7 @@
     "gulp": "^4.0.2",
     "jasmine-core": "^4.5.0",
     "karma": "^6.3.3",
-    "karma-chrome-launcher": "^3.1.0",
+    "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^4.0.1",
     "prettier": "2.3.1",
     "terser-webpack-plugin": "^5.3.6",
