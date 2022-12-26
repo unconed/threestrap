@@ -24,13 +24,15 @@
     "dev": "webpack --mode=development --watch --config-name=threestrap",
     "prepack": "npm run build",
     "lint": "eslint src/**/*.js",
-    "test": "webpack --config-name=tests && karma start --single-run --browsers=ChromeHeadless"
+    "test": "webpack --config-name=tests && karma start --single-run --browsers=ChromeHeadless",
+    "test:watch": "concurrently --names=webpack,karma -c=magenta,cyan  'webpack --watch --config-name=tests' 'karma start'"
   },
   "prettier": {},
   "devDependencies": {
     "@types/glob": "^8.0.0",
     "@types/karma": "^6.3.3",
     "@types/node": "^18.11.17",
+    "concurrently": "^7.6.0",
     "eslint": "^7.28.0",
     "eslint-plugin-jasmine": "^4.1.2",
     "glob": "^8.0.3",
