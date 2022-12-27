@@ -19,17 +19,21 @@ Examples:
 - [WebGL + CSS 3D](http://acko.net/files/threestrap/multiple_renderers.html)
 - [VR + Controls](http://acko.net/files/threestrap/vr2.html)
 
-# Usage
+## Usage
 
 Install via npm:
 
-```
+```sh
 npm install threestrap
 ```
 
 Add `build/threestrap.js` to your Three.js:
 
 ```html
+<!-- 
+  Or use CDNs like
+  https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.js
+ -->
 <script src="three.js"></script>
 <script src="threestrap.js"></script>
 ```
@@ -37,7 +41,7 @@ Add `build/threestrap.js` to your Three.js:
 Get a threestrap context:
 
 ```javascript
-var three = new Threestrap.Bootstrap();
+const three = new Threestrap.Bootstrap();
 ```
 
 This will create a full-page Three.js WebGL canvas, initialize the scene and
@@ -48,7 +52,7 @@ the `three` context:
 
 ```javascript
 // Insert a cube
-var mesh = new THREE.Mesh(
+const mesh = new THREE.Mesh(
   new THREE.CubeGeometry(0.5, 0.5, 0.5),
   new THREE.MeshNormalMaterial()
 );
@@ -135,11 +139,6 @@ When `init` is set to false, initialization only happens when manually calling
 Plugins can make objects and methods available on the threestrap context, like
 `three.Time.now` or `three.Loop.start()`.
 
-## Builds
-
-- threestrap.js: Full build (but still requires three.js)
-- threestrap-core.js: Core only, requires three.js + lodash
-- threestrap-extra.js: Extra plugins
 
 ## Plugins
 
@@ -149,7 +148,7 @@ installed in the given order.
 Plug-in specific options are grouped under the plug-in's name:
 
 ```javascript
-var three = new Threestrap.Bootstrap({
+const three = new Threestrap.Bootstrap({
   plugins: ["core", "stats"],
   size: {
     width: 1280,
@@ -185,7 +184,7 @@ three.off("event", handler);
 You can also bind events directly to object methods using `.bind`:
 
 ```javascript
-var object = {
+const object = {
   render: function (event, three) {},
   yup: function (event, three) {},
   redraw: function (event, three) {},
