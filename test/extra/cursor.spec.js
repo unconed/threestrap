@@ -1,4 +1,5 @@
-/* global THREE */
+import * as Threestrap from "../../src"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 describe("cursor", function () {
   it("sets and autohides the cursor", function () {
@@ -42,7 +43,7 @@ describe("cursor", function () {
     const options = {
       plugins: ["bind", "renderer", "camera", "controls", "cursor"],
       controls: {
-        klass: THREE.OrbitControls,
+        klass: OrbitControls,
       },
     };
 

@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("fallback", function () {
   it("displays a fallback, halts install, and cleans up on uninstall", function () {
@@ -24,7 +24,7 @@ describe("fallback", function () {
 
     const three = new Threestrap.Bootstrap(options);
 
-    node = getNode();
+    const node = getNode();
     expect(node).toBeTruthy();
     expect(getSpan()).toBeTruthy();
 

@@ -1,13 +1,16 @@
-/* global THREE */
+import * as Threestrap from "../../src";
+
 
 describe("time", function () {
-  function stall(val, delay) {
-    delay = delay || 0;
-    let k,
-      i = 0;
-    while (+new Date() / 1000 <= val + delay) {
-      k = ++i * ++i * ++i * ++i * ++i;
-    }
+  /**
+   * We prefer synchronous sleep here (stalling) rather than something async
+   * (based on setTimeout) because:
+   *  - we are performing time calculations, so we want accurate-length sleeps
+   *  - setTimeout really only guarantees waiting *at least* the given timespan
+   */
+  const syncSleep = (sec) => {
+    const start = new Date().getTime();
+    while (new Date().getTime() < start + sec * 1000) {/** pass */}
   }
 
   it("installs time values", function () {
@@ -29,26 +32,25 @@ describe("time", function () {
     three.destroy();
   });
 
-  it("measures delta / fps correctly", function (cb) {
-    var pre, update, render, post, three;
+  it("measures delta / fps correctly", () => {
 
     const options = {
       plugins: ["bind", "time"],
     };
 
-    var three = new Threestrap.Bootstrap(options);
-    const fps = 60;
+    const three = new Threestrap.Bootstrap(options);
+    const fps = 40;
     const delta = 1 / fps;
     const frames = 5;
 
     three.trigger({ type: "pre" });
 
-    stall(three.Time.now, delta);
+    syncSleep(delta)
 
     three.trigger({ type: "pre" });
 
     for (let i = 0; i < frames - 1; ++i) {
-      stall(three.Time.now, delta);
+      syncSleep(delta)
       three.trigger({ type: "pre" });
     }
 
@@ -71,8 +73,7 @@ describe("time", function () {
     three.destroy();
   });
 
-  it("clock runs at half speed", function (cb) {
-    var pre, update, render, post, three;
+  it("clock runs at half speed", () => {
 
     const RATIO = 1 / 2;
 
@@ -81,7 +82,7 @@ describe("time", function () {
       time: { speed: RATIO },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
     const frames = 5;
     const fps = 60;
     const delta = 1 / fps;
@@ -91,7 +92,7 @@ describe("time", function () {
     const start = three.Time.now;
 
     for (let i = 0; i < frames; ++i) {
-      stall(three.Time.now, delta);
+      syncSleep(delta)
       three.trigger({ type: "pre" });
     }
 
@@ -112,8 +113,7 @@ describe("time", function () {
     three.destroy();
   });
 
-  it("clock waits N frames then starts from 0", function (cb) {
-    var pre, update, render, post, three;
+  it("clock waits N frames then starts from 0", () => {
 
     const delay = 5;
 
@@ -122,17 +122,15 @@ describe("time", function () {
       time: { warmup: delay },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
     const frames = delay;
     const fps = 60;
     const delta = 1 / fps;
 
     three.trigger({ type: "pre" });
 
-    const start = three.Time.clock;
-
     for (let i = 0; i < frames; ++i) {
-      stall(three.Time.now, delta);
+      syncSleep(delta)
       three.trigger({ type: "pre" });
     }
 
@@ -140,7 +138,7 @@ describe("time", function () {
 
     expect(clockTime).toBe(0);
 
-    stall(three.Time.now, delta);
+    syncSleep(delta)
     three.trigger({ type: "pre" });
 
     clockTime = three.Time.clock;
@@ -151,9 +149,7 @@ describe("time", function () {
     three.destroy();
   });
 
-  it("clock ignores frames longer than timeout", function (cb) {
-    var pre, update, render, post, three;
-
+  it("clock ignores frames longer than timeout", () => {
     const delay = 5 / 60;
 
     const options = {
@@ -161,26 +157,26 @@ describe("time", function () {
       time: { timeout: delay },
     };
 
-    var three = new Threestrap.Bootstrap(options);
+    const three = new Threestrap.Bootstrap(options);
     const frames = 3;
     const fps = 60;
     const delta = 1 / fps;
 
     for (let i = 0; i < frames; ++i) {
-      stall(three.Time.now, delta);
+      syncSleep(delta)
       three.trigger({ type: "pre" });
     }
 
     const start = three.Time.clock;
 
-    stall(three.Time.now, delay);
+    syncSleep(delay);
     three.trigger({ type: "pre" });
 
     let clockTime = three.Time.clock;
 
     expect(clockTime - start).toBe(0);
 
-    stall(three.Time.now, delta);
+    syncSleep(delta)
     three.trigger({ type: "pre" });
 
     clockTime = three.Time.clock;

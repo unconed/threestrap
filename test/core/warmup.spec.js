@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("warmup", function () {
   it("hides canvas", function () {

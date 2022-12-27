@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("size", function () {
   it("fits the canvas in an element", function () {
@@ -73,7 +73,7 @@ describe("size", function () {
       },
     };
 
-    dpr = window.devicePixelRatio;
+    const dpr = window.devicePixelRatio;
     window.devicePixelRatio = 2;
 
     const three = new Threestrap.Bootstrap(options);

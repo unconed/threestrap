@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // Not relevant because we we don't run tsc directly, webpack does that
+    // But without something here, tsc file shows errors.
+    "outDir": "./not_relevant",
+    "target": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["./*"],
+    },
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "./webpack.config.ts"],
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}

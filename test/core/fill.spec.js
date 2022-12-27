@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src";
 
 describe("fill", function () {
   it("sets/unsets html, body height", function () {

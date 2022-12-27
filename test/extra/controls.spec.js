@@ -1,10 +1,13 @@
-/* global THREE */
+import * as Threestrap from "../../src"
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
 
 describe("controls", function () {
   it("install controls", function () {
     let captured = false;
     const klass = function (object, domElement) {
-      expect(object instanceof THREE.Camera).toBe(true);
+      expect(object instanceof PerspectiveCamera).toBe(true);
       expect(domElement.tagName).toBe("CANVAS");
     };
     klass.prototype = {
@@ -40,7 +43,7 @@ describe("controls", function () {
     const options = {
       plugins: ["bind", "renderer", "camera", "controls"],
       controls: {
-        klass: THREE.OrbitControls,
+        klass: OrbitControls,
       },
     };
 

@@ -1,7 +1,8 @@
+import type { Config } from "karma"
 // Karma configuration
 // Generated on Wed Jan 22 2014 23:58:15 GMT-0800 (PST)
 
-module.exports = function (config) {
+const config = (config: Config) => {
   config.set({
     // base path, that will be used to resolve files and exclude
     basePath: "",
@@ -9,9 +10,8 @@ module.exports = function (config) {
     // frameworks to use
     frameworks: ["jasmine"],
 
-    // list of files / patterns to load in the browser
     files: [
-      // Defined by gulp
+      "build_tests/tests.js"
     ],
 
     // list of files to exclude
@@ -46,9 +46,7 @@ module.exports = function (config) {
 
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 60000,
-
-    // Continuous Integration mode
-    // if true, it capture browsers, run tests and exit
-    singleRun: true,
   });
 };
+
+export default config

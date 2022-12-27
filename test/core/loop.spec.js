@@ -1,4 +1,6 @@
-/* global THREE */
+import * as Threestrap from "../../src";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe("loop", function () {
   it("installs start/stop methods", function () {
@@ -17,7 +19,7 @@ describe("loop", function () {
     three.destroy();
   });
 
-  it("starts and stops", function (cb) {
+  it("starts and stops", function () {
     const options = {
       plugins: ["loop"],
       loop: {
@@ -62,88 +64,36 @@ describe("loop", function () {
     three.destroy();
   });
 
-  it("loops correctly", function (cb) {
-    let pre, update, render, post, three;
+  it("loops correctly", async () =>  {
+    const callOrder = []
 
-    function stall(val) {
-      let k,
-        i = 0;
-      const delay = 10;
-      while (+new Date() <= val + delay) {
-        k = ++i * ++i * ++i * ++i * ++i;
+    const options = {
+      init: false,
+      plugins: ["bind", "loop"],
+    };
+
+    const three = new Threestrap.Bootstrap(options);
+
+    three.on("pre", () => {
+      callOrder.push("pre")
+    });
+    three.on("update", () => {
+      callOrder.push("update")
+    });
+    three.on("render", () => {
+      callOrder.push("render")
+    });
+    three.on("post", () => {
+      callOrder.push("post")
+      // Lets do two loop iterations, just for fun
+      if (callOrder.length > 4) {
+        three.Loop.stop();
       }
-    }
-
-    runs(function () {
-      const options = {
-        init: false,
-        plugins: ["bind", "loop"],
-      };
-
-      three = new Threestrap.Bootstrap(options);
-
-      three.on("pre", function () {
-        pre = +new Date();
-        stall(pre);
-      });
-      three.on("update", function () {
-        update = +new Date();
-        stall(update);
-      });
-      three.on("render", function () {
-        render = +new Date();
-        stall(render);
-      });
-      three.on("post", function () {
-        post = +new Date();
-      });
-
-      three.init();
     });
 
-    waitsFor(
-      function () {
-        return pre > 0;
-      },
-      "The pre event should be called",
-      100
-    );
+    three.init();
 
-    waitsFor(
-      function () {
-        return update > 0;
-      },
-      "The update event should be called",
-      100
-    );
-
-    waitsFor(
-      function () {
-        return render > 0;
-      },
-      "The render event should be called",
-      100
-    );
-
-    waitsFor(
-      function () {
-        return post > 0;
-      },
-      "The post event should be called",
-      100
-    );
-
-    runs(function () {
-      expect(pre).toBeGreaterThan(0);
-      expect(update).toBeGreaterThan(0);
-      expect(render).toBeGreaterThan(0);
-      expect(post).toBeGreaterThan(0);
-
-      expect(update).toBeGreaterThan(pre);
-      expect(render).toBeGreaterThan(update);
-      expect(post).toBeGreaterThan(render);
-
-      three.destroy();
-    });
+    await sleep(40)
+    expect(callOrder).toEqual(["pre", "update", "render", "post", "pre", "update", "render", "post"])
   });
 });

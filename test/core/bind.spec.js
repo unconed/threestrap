@@ -1,4 +1,4 @@
-/* global THREE */
+import * as Threestrap from "../../src"
 
 describe("bind", function () {
   it("binds events", function () {
@@ -8,7 +8,7 @@ describe("bind", function () {
     let api;
 
     const object = {};
-    THREE.Binder.apply(object);
+    Threestrap.Binder.apply(object);
 
     const spec = {
       listen: ["ready", "this.foo:baz", [object, "wtf"]],
@@ -63,7 +63,7 @@ describe("bind", function () {
     let api;
 
     const object = {};
-    THREE.Binder.apply(object);
+    Threestrap.Binder.apply(object);
 
     const spec = {
       listen: ["ready"],
