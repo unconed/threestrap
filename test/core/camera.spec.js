@@ -1,6 +1,5 @@
 import * as Threestrap from "../../src";
-import { OrthographicCamera } from "three/src/cameras/OrthographicCamera.js";
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { OrthographicCamera, PerspectiveCamera } from "three";
 
 describe("camera", function () {
   it("installs a perspective camera", function () {

@@ -1,4 +1,4 @@
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { PerspectiveCamera } from "three";
 import { Bootstrap } from "../bootstrap";
 
 Bootstrap.registerPlugin("controls", {

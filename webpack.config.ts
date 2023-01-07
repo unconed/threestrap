@@ -38,10 +38,6 @@ const library: Configuration = {
   },
   externals: {
     three: "THREE",
-    "three/src/core/EventDispatcher.js": "THREE",
-    "three/src/renderers/WebGL1Renderer.js": "THREE",
-    "three/src/scenes/Scene.js": "THREE",
-    "three/src/cameras/PerspectiveCamera.js": "THREE",
   },
   optimization: {
     minimize: true,

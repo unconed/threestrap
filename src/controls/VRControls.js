@@ -10,7 +10,7 @@
  * for more info.
  */
 
-import { Matrix4 } from "three/src/math/Matrix4.js";
+import { Matrix4 } from "three";
 
 export class VRControls {
   constructor(object, onError) {

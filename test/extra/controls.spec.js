@@ -1,5 +1,5 @@
 import * as Threestrap from "../../src"
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 
