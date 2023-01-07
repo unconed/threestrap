@@ -1,4 +1,4 @@
-import { EventDispatcher } from "three/src/core/EventDispatcher.js";
+import { EventDispatcher } from "three";
 
 export class Binder {
   static bind(context, globals) {

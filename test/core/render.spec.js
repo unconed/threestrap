@@ -1,7 +1,5 @@
 import * as Threestrap from "../../src";
-import { Scene } from "three";
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
-
+import { Scene, PerspectiveCamera } from "three";
 
 describe("render", function () {
   it("renders the scene on update", function () {

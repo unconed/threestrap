@@ -1,5 +1,5 @@
 import * as Threestrap from "../../src";
-import { WebGL1Renderer } from "three/src/renderers/WebGL1Renderer.js";
+import { WebGL1Renderer } from "three";
 
 describe("renderer", function () {
   it("installs the canvas into the body", function () {

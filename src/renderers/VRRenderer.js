@@ -4,8 +4,7 @@
  * @author wwwtyro https://github.com/wwwtyro
  * @author unconed https://github.com/unconed
  */
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
-import { Vector3 } from "three/src/math/Vector3.js";
+import { PerspectiveCamera, Vector3 } from "three";
 
 export class VRRenderer {
   constructor(renderer, hmd) {

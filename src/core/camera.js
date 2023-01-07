@@ -1,6 +1,4 @@
-import { Camera } from "three/src/cameras/Camera.js";
-import { OrthographicCamera } from "three/src/cameras/OrthographicCamera.js";
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { Camera, OrthographicCamera, PerspectiveCamera } from "three";
 import { Bootstrap } from "../bootstrap";
 
 Bootstrap.registerPlugin("camera", {
