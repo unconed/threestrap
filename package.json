@@ -1,6 +1,6 @@
 {
   "name": "threestrap",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Minimal Three.js Bootstrapper",
   "repository": {
     "type": "git",
