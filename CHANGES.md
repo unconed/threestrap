@@ -1,5 +1,9 @@
 ## Changes
 
+### 0.5.1
+  - Changed how Threestrap imports ThreeJS. Previously, Threestrap (usually) imported from `three/src`. Now it consistently imports from `three`. This change should generally not affect users unless they were using `instanceof` checks.
+  - Fixed tests for CI [#28](https://github.com/unconed/threestrap/pull/28)
+
 ### 0.5.0
 - THREE.js is no longer included in the build output and must be included separately. [#26](https://github.com/unconed/threestrap/pull/26)
 - Fixed stats plugin throwing an error on destroy() if mounted in a non-body element [#25](https://github.com/unconed/threestrap/pull/25)
@@ -10,7 +14,7 @@
 - Controls: Ship TrackballControls.
 - Loop: Add `each` option for rendering at (integer) reduced frame rates.
 
-  0.0.11
+### 0.0.11
 
 - Time: Provide `warmup` option to wait N frames before starting clock (complements render warmup)
 - Time: Add `time` real time clock.
